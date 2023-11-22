@@ -1,9 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css";
-import { BrowserRouter } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material';
+import fbconfig from './firebase/FirebaseConfig';
+import { initializeApp } from 'firebase/app';
+
+const app = initializeApp(fbconfig);
 
 const theme = createTheme({
   typography: {
@@ -11,7 +15,7 @@ const theme = createTheme({
   },
 });
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
