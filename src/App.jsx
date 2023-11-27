@@ -6,6 +6,7 @@ import Home from "./components/Home";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Postings from "./components/Postings";
+import Profile from "./components/Profile";
 
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/postings" element={<PrivateRoute/>}>
           <Route path="/postings" element={<Postings />} />
         </Route>
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </AuthProvider>
   );
