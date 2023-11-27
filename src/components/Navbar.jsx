@@ -48,24 +48,24 @@ function Navbar() {
             paddingRight: 5,
           }}
         >
+         
           {currentUser ? (
             <>
               <Link to="/" style={{ marginRight: 20 }} onClick={doSignOut}>
                 Log Out
               </Link>
-              <Link to="/postings" style={{ marginRight: 20 }}>
-                View Postings
-              </Link>
-              <Link to="/profile">Manage Profile</Link>
+              <Link to="/postings">Postings</Link>
+              <Link to="/profile">Profile</Link>
             </>
           ) : (
             <>
               <Link to="/login" style={{ marginRight: 20 }}>
                 Log In
               </Link>
-              <Link to="/profile">Create an account</Link>
+              <Link to="/register">Create an account</Link>
             </>
           )}
+          
         </Box>
       </Box>
     </Box>

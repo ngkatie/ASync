@@ -2,6 +2,7 @@ import { Box, Typography, TextField, Stack, Button, Container } from "@mui/mater
 import React, { useContext, useState } from "react";
 import { Navigate } from "react-router";
 import { Link } from "react-router-dom";
+import Navbar from "./Navbar";
 import { AuthContext } from "../context/AuthContext";
 import { doCreateUserWithEmailAndPassword } from "../firebase/FirebaseFunctions";
 
@@ -46,6 +47,7 @@ const Register = () => {
 
   return (
     <div>
+      <Navbar/>
       <Box>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
             Register

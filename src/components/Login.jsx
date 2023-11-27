@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Box, Typography, TextField, Stack, Button, Container } from "@mui/material";
 import { doSignInWithEmailAndPassword, doPasswordReset } from "../firebase/FirebaseFunctions";
 import { AuthContext } from "../context/AuthContext";
-import { current } from "immer";
+import Navbar from "./Navbar";
 
 const Login = () => {
   const { currentUser } = useContext(AuthContext);
@@ -27,6 +27,7 @@ const Login = () => {
 
   return (
     <div>
+      <Navbar/>
       <Box>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
         Log In
@@ -49,6 +50,10 @@ const Login = () => {
           />
 
           <Button type="submit">Log In</Button>
+
+          <br></br>
+
+          <small>Don't have an account yet? <Link to="/register">Register here!</Link></small>
 
           {/* <Button onClick={passwordReset}>
             Forgot Password
