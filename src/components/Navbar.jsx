@@ -1,8 +1,12 @@
 import { Box } from "@mui/material";
-import asyncLogo from "/async.png";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import asyncLogo from "/async.png";
+import { doSignOut } from "../firebase/FirebaseFunctions"
 
 function Navbar() {
+  const { currentUser } = useContext(AuthContext);
   return (
     <Box
       sx={{
@@ -44,10 +48,14 @@ function Navbar() {
             paddingRight: 5,
           }}
         >
-          <Link to="/login" style={{ marginRight: 20 }}>
-            Log In
-          </Link>
-          <Link to="/register">Create an account</Link>
+          {currentUser 
+            ? <Link to="/" style={{ marginRight: 20 }} onClick={doSignOut}>Log Out</Link>
+            : <Link to="/login" style={{ marginRight: 20 }}>Log In</Link>
+          }
+          {currentUser 
+            ? <Link to="/postings">View Postings</Link>
+            : <Link to="/register">Create an account</Link>
+          }
         </Box>
       </Box>
     </Box>
