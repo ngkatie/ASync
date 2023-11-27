@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import Navbar from "./Navbar";
 import { Box, Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const Home = () => {
+  const { currentUser } = useContext(AuthContext);
+
   return (
     <>
       <Navbar />
@@ -34,9 +37,11 @@ const Home = () => {
           Ready to Sync?
         </Typography>
 
-        <Button href="/register" variant="outlined" sx={{ fontSize: 16 }}>
-          Get Started Here
-        </Button>
+        { currentUser 
+          ? <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>View Postings</Button>
+          : <Button href="/register" variant="outlined" sx={{ fontSize: 16 }}>Get Started Here</Button>
+        }
+    
       </Box>
     </>
   );

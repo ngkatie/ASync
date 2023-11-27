@@ -53,7 +53,7 @@ function Navbar() {
             : <Link to="/login" style={{ marginRight: 20 }}>Log In</Link>
           }
           {currentUser 
-            ? <Link to="/postings">View Postings</Link>
+            ? <Link to="/postings">Postings</Link>
             : <Link to="/register">Create an account</Link>
           }
         </Box>
