@@ -42,7 +42,7 @@ const Login = () => {
             fullWidth required sx={{mb:4}}
           />
           <TextField 
-            type="text" 
+            type="password" 
             label="Password" 
             color="secondary" 
             onChange={e => setPassword(e.target.value)}

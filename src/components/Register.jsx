@@ -70,14 +70,14 @@ const Register = () => {
           />
           <Stack spacing={2} direction="row" sx={{marginBottom: 4}}>
             <TextField 
-              type="text" 
+              type="password" 
               label="Password" 
               color="secondary" 
               onChange={e => setPassword(e.target.value)}
               fullWidth required sx={{mb:4}}
             />
             <TextField 
-              type="text" 
+              type="password" 
               label="Confirm Password" 
               color="secondary" 
               onChange={e => setConfirmPassword(e.target.value)}
