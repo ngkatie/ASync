@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Navbar from "./Navbar";
 import { Box, Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -37,11 +37,15 @@ const Home = () => {
           Ready to Sync?
         </Typography>
 
-        { currentUser 
-          ? <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>View Postings</Button>
-          : <Button href="/register" variant="outlined" sx={{ fontSize: 16 }}>Get Started Here</Button>
-        }
-    
+        {currentUser ? (
+          <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>
+            View Postings
+          </Button>
+        ) : (
+          <Button href="/register" variant="outlined" sx={{ fontSize: 16 }}>
+            Get Started Here
+          </Button>
+        )}
       </Box>
     </>
   );
