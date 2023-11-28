@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import asyncLogo from "/async.png";
-import { doSignOut } from "../firebase/FirebaseFunctions"
+import { doSignOut } from "../firebase/FirebaseFunctions";
 
 function Navbar() {
   const { currentUser } = useContext(AuthContext);
@@ -33,28 +33,31 @@ function Navbar() {
           paddingBottom: 2,
         }}
       >
-        <Box
-          component="img"
-          src={asyncLogo}
-          alt="ASync logo"
-          sx={{
-            width: 50,
-            height: 50,
-            paddingLeft: 5,
-          }}
-        ></Box>
+        <Link to="/">
+          <Box
+            component="img"
+            src={asyncLogo}
+            alt="ASync logo"
+            sx={{
+              width: 50,
+              height: 50,
+              paddingLeft: 5,
+            }}
+          ></Box>
+        </Link>
         <Box
           sx={{
             paddingRight: 5,
           }}
         >
-         
           {currentUser ? (
             <>
               <Link to="/" style={{ marginRight: 20 }} onClick={doSignOut}>
                 Log Out
               </Link>
-              <Link to="/postings">Postings</Link>
+              <Link to="/postings" style={{ marginRight: 20 }}>
+                Postings
+              </Link>
               <Link to="/profile">Profile</Link>
             </>
           ) : (
@@ -65,7 +68,6 @@ function Navbar() {
               <Link to="/register">Create an account</Link>
             </>
           )}
-          
         </Box>
       </Box>
     </Box>
