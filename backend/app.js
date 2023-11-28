@@ -23,7 +23,7 @@ app.use(async (req, res, next) => {
     requestBody = {};
   }
 
-  console.log(`[${new Date().toUTCString()}]: \n\t${httpVerb} ${urlPath} \n\tRequest Body: ${JSON.stringify(requestBody)}`);
+  console.log(`[${new Date().toUTCString()}]: \n\t${httpVerb} ${urlPath} \n\tRequest Body: ${JSON.stringify(requestBody)}\n`);
   next();
 });
 

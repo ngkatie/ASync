@@ -1,9 +1,10 @@
 import { Router } from 'express';
 const router = Router();
 
-import redis from 'redis';
-const client = redis.createClient();
-client.connect();
+// **** REDIS ****
+// import redis from 'redis';
+// const client = redis.createClient();
+// client.connect();
 
 
 router
