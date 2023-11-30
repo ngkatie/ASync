@@ -26,6 +26,18 @@ try {
     "New York City",
     "New York"
   );
+
+  // posting1 = await postingFunctions.deletePosting('6567e00ece94fe8c506a3a3b');
+  // console.log(posting1);
+
+  // const fieldsToUpdate = {
+  //   companyName: 'Microsoft',
+  //   jobType: 'Full-time',
+  //   numOfEmployees: 120000,
+  //   role: "Full-Stack Software Engineer"
+  // }
+  // posting1 = await postingFunctions.updatePosting('6567eca60304fff083ab0568', fieldsToUpdate)
+  // console.log(posting1);
 } catch (e) {
   console.log(e);
 }
