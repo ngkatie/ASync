@@ -10,15 +10,15 @@ import {
   sendPasswordResetEmail,
   EmailAuthProvider,
   reauthenticateWithCredential,
-} from 'firebase/auth';
-import { func } from 'prop-types';
+} from "firebase/auth";
+import { func } from "prop-types";
 
 async function doCreateUserWithEmailAndPassword(email, password, displayName) {
   const auth = getAuth();
   await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(auth.currentUser, {
-    displayName: displayName
-  })
+    displayName: displayName,
+  });
 }
 
 async function doChangePassword(email, oldPassword, newPassword) {
@@ -55,5 +55,5 @@ export {
   doSignInWithEmailAndPassword,
   // doGoogleSignIn,
   doPasswordReset,
-  doSignOut
-}
+  doSignOut,
+};
