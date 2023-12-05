@@ -52,11 +52,16 @@ let exportedMethods = {
     posting._id = posting._id.toString();
     return posting;
   },
-  async get(id) {
-    //add validation
+  async getPosting(postingId) {
+    if (!postingId || typeof postingId !== 'string' || postingId.trim() === '') {
+      throw 'Invalid posting ID'
+    }
+    if (!ObjectId.isValid(postingId)) {
+      throw 'Invalid ObjectID'
+    }
 
     const postingCollection = await postings();
-    const posting = await postingCollection.findOne({ _id: new ObjectId(id) });
+    const posting = await postingCollection.findOne({ _id: new ObjectId(postingId) });
     if (posting === null) {
       throw "no posting exists with the given id";
     }
@@ -65,8 +70,8 @@ let exportedMethods = {
   async getAll() {
     const postingCollection = await postings();
     let postingList = await postingCollection.find({}).toArray();
-    if (postingList.length === 0) {
-      throw "could not find any postings";
+    if (!postingList) {
+      throw "failed to get all postings";
     }
     postingList = postingList.map((posting) => {
       posting._id = posting._id.toString();
@@ -81,18 +86,17 @@ let exportedMethods = {
       throw 'Posting ID must be a non empty string';
     }
     if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID'
+      throw 'Invalid ObjectID';
     }
-    const objectId = new ObjectId(postingId);
     const postingsCollection = await postings();
-    const posting = await postingsCollection.findOne({ _id: objectId });
+    const posting = await postingsCollection.findOne({ _id: new ObjectId(postingId) });
 
     if (!posting) {
       throw 'No posting found with the supplied ID';
     }
 
     //delete
-    const deleteResult = await postingsCollection.deleteOne({ _id: objectId });
+    const deleteResult = await postingsCollection.deleteOne({ _id: new ObjectId(postingId) });
     // console.log(deleteResult);
     if (deleteResult.deletedCount !== 1) {
       throw 'Deletion failed';
@@ -103,36 +107,47 @@ let exportedMethods = {
   //updatePosting
   async updatePosting(postingId, updatedFields) {
     // validation
+    const validFields = [
+      'employerId',
+      'companyName',
+      'companyLogo',
+      'jobType',
+      'numOfEmployees',
+      'role',
+      'description',
+      'payRate',
+      'skills',
+      'city',
+      'state',
+    ];
+
     if (!postingId || typeof postingId !== 'string' || postingId.trim() === '') {
       throw 'Posting ID must be a non empty string';
     }
     if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID'
+      throw 'Invalid ObjectID';
     }
     if (!updatedFields || typeof updatedFields !== 'object') {
-      throw 'You must provide an object of updated fields'
+      throw 'You must provide an object of updated fields';
+    }
+    const invalidFields = Object.keys(updatedFields).filter(field => !validFields.includes(field));
+    if (invalidFields.length > 0) {
+      throw `Invalid fields: ${invalidFields.join(', ')}`;
     }
 
     const postingsCollection = await postings();
     const currentPosting = await postingsCollection.findOne({ _id: new ObjectId(postingId) });
 
     if (!currentPosting) {
-      throw 'No posting found with the supplied ID'
+      throw 'No posting found with the supplied ID';
     }
 
     // update
-
-    // for (const key in updatedFields) {
-    //   if (currentRecipe[key] === updatedFields[key]) {
-    //     throw 'Values from supplied fields must be different from existing fields';
-    //   }
-    // }
-
     let updatedPosting = await postingsCollection.updateOne(
       { _id: new ObjectId(postingId) },
       { $set: updatedFields }
     );
-      console.log(updatedPosting);
+    //console.log(updatedPosting);
     if (updatedPosting.acknowledged === false) {
       throw 'Failed to update posting';
     }
@@ -140,13 +155,11 @@ let exportedMethods = {
     updatedPosting = await postingsCollection.findOne({ _id: new ObjectId(postingId) });
     return updatedPosting;
   },
-  //getPosting(postingId)
-  //getAll() -> get all postings in postings collection
   //getPostingsByEmployer(employerId)
   async getPostingsByEmployer(employerId) {
     // validate
-    if (!employerId || typeof employerId !== 'string' || employerId.trim() === '' || !ObjectId.isValid(employerId)) {
-      throw 'Invalid employer ID'
+    if (!employerId || typeof employerId !== 'string' || employerId.trim() === '') {
+      throw 'Employer ID must be a non empty string'
     }
     if (!ObjectId.isValid(employerId)) {
       throw 'Invalid ObjectID'
@@ -160,14 +173,18 @@ let exportedMethods = {
     }
 
     // query postings
-
     const postingsCollection = await postings();
-    const employerPostings = await postingsCollection.find({ employerId: employerId }).toArray();
+    let employerPostings = await postingsCollection.find({ employerId: employerId }).toArray();
 
-    return employerPostings;
+    employerPostings = employerPostings.map((posting) => {
+      posting._id = posting._id.toString();
+      posting.employerId = posting.employerId.toString();
+    });
+
+    return employerPostings || [];
   },
   //getApplicants(postingId) -> check if postingId is found in applied[] field for each applicant -> if it is, add to applicants[] and return applicants[]
-  async getApplicants(postingId) {
+  async getApplicantsForPosting(postingId) { //gets a list of applicants for given posting
     // validation
     if (!postingId || typeof postingId !== 'string' || postingId.trim() === '') {
       throw 'Posting ID must be a non empty string';
@@ -188,11 +205,11 @@ let exportedMethods = {
 
     // query applicants
     const applicantsCollection = await applicants();
-    const applicants = await applicantsCollection.find({ applied: postingId });
+    let applicants = await applicantsCollection.find({ applied: postingId }).toArray();
 
-    if (!applicants) {
-      return [];
-    }
+    applicants = applicants.map((applicant) => {
+      applicant._id = applicant._id.toString();
+    });
     return applicants;
   },
 };
