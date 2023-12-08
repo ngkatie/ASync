@@ -5,6 +5,7 @@ import CandidateCard from "./CandidateCard";
 import Navbar from "./Navbar";
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Postings() {
   //   postings = [
@@ -34,6 +35,10 @@ function Postings() {
     }
     fetchData();
   }, []);
+
+  const userType = useSelector((state) => state.user.userRole);
+  console.log(userType);
+
   return (
     <>
       <Navbar />
@@ -49,22 +54,24 @@ function Postings() {
       >
         {postings &&
           postings.map((posting) => (
-            <Link to={`/postings/${posting._id}`} key={posting._id}>
-              <CandidateCard
-                companyName={posting.companyName}
-                companyLogo={posting.companyLogo}
-                jobType={posting.jobType}
-                numOfEmployees={posting.numOfEmployees}
-                role={posting.role}
-                description={posting.description}
-                payRate={posting.payRate}
-                applicants={posting.applicants}
-                skills={posting.skills}
-                city={posting.city}
-                state={posting.state}
-                postedDate={posting.postedDate}
-              />
-            </Link>
+            // <Link to={`/postings/${posting._id}`} key={posting._id}>
+            <CandidateCard
+              key={posting._id}
+              postingId={posting._id}
+              companyName={posting.companyName}
+              companyLogo={posting.companyLogo}
+              jobType={posting.jobType}
+              numOfEmployees={posting.numOfEmployees}
+              role={posting.role}
+              description={posting.description}
+              payRate={posting.payRate}
+              applicants={posting.applicants}
+              skills={posting.skills}
+              city={posting.city}
+              state={posting.state}
+              postedDate={posting.postedDate}
+            />
+            // </Link>
           ))}
       </Box>
       {/* <h1> EMPLOYER VIEW </h1>

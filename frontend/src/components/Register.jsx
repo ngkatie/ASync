@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import { AuthContext } from "../context/AuthContext";
 import { doCreateUserWithEmailAndPassword } from "../firebase/FirebaseFunctions";
+import { useDispatch } from "react-redux";
+import { setUserRole } from "../actions";
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
@@ -25,6 +27,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState("");
   const [userType, setUserType] = useState("");
+
+  const dispatch = useDispatch();
 
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -41,6 +45,7 @@ const Register = () => {
 
     try {
       await doCreateUserWithEmailAndPassword(email, password, displayName);
+      dispatch(setUserRole(userType));
     } catch (e) {
       alert(e);
     }
@@ -81,10 +86,10 @@ const Register = () => {
             sx={{ mb: 4 }}
           />
           <FormControl sx={{ width: "50%" }}>
-            <InputLabel id="user-type-label">Role *</InputLabel>
+            <InputLabel id="user-role-label">Role *</InputLabel>
             <Select
-              labelId="user-type-label"
-              id="user-type"
+              labelId="user-role-label"
+              id="user-role"
               value={userType}
               onChange={(e) => setUserType(e.target.value)}
               label="Role"

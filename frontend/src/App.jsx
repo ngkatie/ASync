@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { AuthProvider } from "./context/AuthContext";
 import Home from "./components/Home";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -10,7 +10,7 @@ import PageNotFound from "./components/PageNotFound";
 import Profile from "./components/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PostingDetails from "./components/PostingDetails";
-import { AuthProvider } from "./context/AuthContext";
+import Apply from "./components/Apply";
 
 function App() {
   return (
@@ -25,6 +25,8 @@ function App() {
           <Route path="/postings/:id" element={<PostingDetails />} />
         </Route>
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/apply/:id" element={<Apply />} />
 
         <Route path="/404" element={<PageNotFound />} />
         <Route path="*" element={<Navigate to="/404" />} />

@@ -7,9 +7,12 @@ import {
   Select,
   MenuItem,
   CardHeader,
+  Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const CandidateView = ({
+const CandidateCard = ({
+  postingId,
   companyName,
   companyLogo,
   jobType,
@@ -23,14 +26,7 @@ const CandidateView = ({
   status,
   applicants,
 }) => {
-  const [applicantStatus, setApplicantStatus] = useState(
-    status || "Not Applied"
-  );
-
-  const handleApplicantStatusChange = (newStatus) => {
-    setApplicantStatus(newStatus);
-    // UPDATE STATUS OF CANDIDATE IN DB
-  };
+  const navigate = useNavigate();
 
   return (
     <Card sx={{ width: "400px" }}>
@@ -46,23 +42,15 @@ const CandidateView = ({
           Pay Rate: ${payRate}/hr
         </Typography>
 
-        <FormControl>
-          <Select
-            value={applicantStatus}
-            onChange={(e) => handleApplicantStatusChange(e.target.value)}
-          >
-            <MenuItem value="Not Applied">Not Applied</MenuItem>
-            <MenuItem value="Applied">Applied</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Typography variant="h6" component="div" style={{ marginTop: "20px" }}>
-          Application Status:
-        </Typography>
-        <Typography variant="subtitle1">{applicantStatus}</Typography>
+        <Button
+          variant="contained"
+          onClick={() => navigate(`/apply/${postingId}`)}
+        >
+          Apply
+        </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default CandidateView;
+export default CandidateCard;
