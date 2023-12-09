@@ -4,9 +4,19 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import asyncLogo from "/async.png";
 import { doSignOut } from "../firebase/FirebaseFunctions";
+import { useDispatch } from "react-redux";
+import { unsetUser } from "../actions";
 
 function Navbar() {
   const { currentUser } = useContext(AuthContext);
+
+  const dispatch = useDispatch();
+
+  const handleSignOut = () => {
+    doSignOut();
+    dispatch(unsetUser());
+  };
+
   return (
     <Box
       sx={{
@@ -52,7 +62,7 @@ function Navbar() {
         >
           {currentUser ? (
             <>
-              <Link to="/" style={{ marginRight: 20 }} onClick={doSignOut}>
+              <Link to="/" style={{ marginRight: 20 }} onClick={handleSignOut}>
                 Log Out
               </Link>
               <Link to="/postings" style={{ marginRight: 20 }}>

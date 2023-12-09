@@ -1,7 +1,7 @@
 const initialState = {
   displayName: null,
   email: null,
-  userRole: null,
+  role: null,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -13,7 +13,7 @@ const userReducer = (state = initialState, action) => {
         ...state,
         displayName: payload.displayName,
         email: payload.email,
-        userRole: payload.userRole,
+        role: payload.role,
       };
     case "UNSET_USER":
       return initialState;

@@ -3,13 +3,17 @@ import Navbar from "./Navbar";
 import { Box, Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
 
+  const currentUserState = useSelector((state) => state.user);
+
   useEffect(() => {
-    console.log(currentUser);
-  }, []);
+    // console.log(currentUser);
+    console.log(currentUserState);
+  }, [currentUserState]);
 
   return (
     <>

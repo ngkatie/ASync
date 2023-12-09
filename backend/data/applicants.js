@@ -55,8 +55,12 @@ let exportedMethods = {
       throw "failed to get all applicants";
     }
     applicantList = applicantList.map((applicant) => {
-      applicant._id = applicant._id.toString();
+      return {
+        ...applicant,
+        _id: applicant._id.toString(),
+      };
     });
+
     return applicantList;
   },
   async updateApplicant(applicantId, updatedFields) {

@@ -36,8 +36,12 @@ function Postings() {
     fetchData();
   }, []);
 
-  const userType = useSelector((state) => state.user.userRole);
-  console.log(userType);
+  const currentUserState = useSelector((state) => state.user);
+
+  useEffect(() => {
+    // console.log(currentUser);
+    console.log(currentUserState);
+  }, [currentUserState]);
 
   return (
     <>

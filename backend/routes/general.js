@@ -54,6 +54,15 @@ router.route("/posting/:id").get(async (req, res) => {
   //code here for posting GET request
 });
 
+router.route("/applicants").get(async (req, res) => {
+  try {
+    const applicantList = await applicantFunctions.getAll();
+    res.status(200).json(applicantList);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/applicant/:id").get(async (req, res) => {
   //code here for applicant GET request
 });
