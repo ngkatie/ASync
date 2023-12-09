@@ -28,7 +28,7 @@ import stateAbbreviations from "../utils/stateAbbreviations";
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
-  const [name, setName] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,7 +44,7 @@ const Register = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-    console.log(name, email, password, confirmPassword);
+    console.log(displayName, email, password, confirmPassword);
     // const [displayName, email, password, confirmPassword] = e.target.elements;
 
     // Check that passwords match
@@ -56,9 +56,9 @@ const Register = () => {
     }
 
     try {
-      await doCreateUserWithEmailAndPassword(email, password, name);
+      await doCreateUserWithEmailAndPassword(email, password, displayName);
       const requestBody = {
-        name: name,
+        displayName: displayName,
         email: email,
         companyName: companyName,
         userRole: userType,
@@ -74,7 +74,7 @@ const Register = () => {
       dispatch(
         setUser(
           user._id,
-          name,
+          displayName,
           email,
           companyName,
           userType,
@@ -108,7 +108,7 @@ const Register = () => {
             type="text"
             label="Name"
             color="secondary"
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setDisplayName(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}

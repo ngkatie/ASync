@@ -52,11 +52,20 @@ const Profile = () => {
         email: userData.email,
       });
       //update mongodb
-      const { userId, ...userDataWithoutId } = userData;
-      await axios.put(
-        `http://localhost:3000/api/update-profile/${userData.userId}`,
-        userDataWithoutId
-      );
+      if (userData.companyName.length === 0) {
+        let { userId, companyName, ...userDataWithoutId } = userData;
+        await axios.put(
+          `http://localhost:3000/api/update-profile/${userData.userId}`,
+          userDataWithoutId
+        );
+      } else {
+        let { userId, ...userDataWithoutId } = userData;
+        await axios.put(
+          `http://localhost:3000/api/update-profile/${userData.userId}`,
+          userDataWithoutId
+        );
+      }
+
       //update redux state
       dispatch(
         setUser(
