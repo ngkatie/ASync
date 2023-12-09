@@ -9,7 +9,7 @@ await db.dropDatabase();
 let posting1 = undefined;
 
 try {
-  posting1 = await postingFunctions.create(
+  posting1 = await postingFunctions.addPosting(
     new ObjectId(),
     "Apple",
     null,

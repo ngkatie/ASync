@@ -17,7 +17,13 @@ import Navbar from "./Navbar";
 import { AuthContext } from "../context/AuthContext";
 import { doCreateUserWithEmailAndPassword } from "../firebase/FirebaseFunctions";
 import { useDispatch } from "react-redux";
-import { setUserRole } from "../actions";
+import { setUser } from "../actions";
+import axios from "axios";
+import dayjs from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
@@ -27,6 +33,10 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState("");
   const [userType, setUserType] = useState("");
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [industry, setIndustry] = useState("");
 
   const dispatch = useDispatch();
 
@@ -45,7 +55,14 @@ const Register = () => {
 
     try {
       await doCreateUserWithEmailAndPassword(email, password, displayName);
-      dispatch(setUserRole(userType));
+      await axios.post("http://localhost:3000/api/register", {
+        displayName: displayName,
+        email: email,
+        userRole: userType,
+        state: state,
+        city: city,
+      });
+      dispatch(setUser(displayName, email, userType));
     } catch (e) {
       alert(e);
     }
@@ -57,6 +74,59 @@ const Register = () => {
     // console.log("User logged in");
     return <Navigate to="/" replace={true} />;
   }
+
+  const stateAbbreviations = [
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY",
+  ];
 
   return (
     <div>
@@ -85,22 +155,67 @@ const Register = () => {
             required
             sx={{ mb: 4 }}
           />
-          <FormControl sx={{ width: "50%" }}>
-            <InputLabel id="user-role-label">Role *</InputLabel>
-            <Select
-              labelId="user-role-label"
-              id="user-role"
-              value={userType}
-              onChange={(e) => setUserType(e.target.value)}
-              label="Role"
+
+          <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
+            <FormControl sx={{ width: "50%" }}>
+              <InputLabel id="user-role-label">Role *</InputLabel>
+              <Select
+                labelId="user-role-label"
+                id="user-role"
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
+                label="Role"
+                required
+              >
+                <MenuItem value="applicant">Applicant</MenuItem>
+                <MenuItem value="employer">Employer</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl sx={{ width: "50%" }}>
+              <InputLabel id="user-state-label">State *</InputLabel>
+              <Select
+                labelId="user-state-label"
+                id="user-state"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                label="State"
+                required
+              >
+                {stateAbbreviations.map((abbreviation) => (
+                  <MenuItem key={abbreviation} value={abbreviation}>
+                    {abbreviation}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              type="text"
+              label="City"
+              color="secondary"
+              onChange={(e) => setCity(e.target.value)}
+              fullWidth
               required
               sx={{ mb: 4 }}
-            >
-              <MenuItem value="applicant">Applicant</MenuItem>
-              <MenuItem value="employer">Employer</MenuItem>
-            </Select>
-          </FormControl>
-          <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            />
+          </Stack>
+          {/* birth date input */}
+          {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker"]}>
+              <DatePicker
+                label="Date of birth"
+                value={birthDate}
+                onChange={(newValue) => {
+                  setBirthDate(newValue);
+                  console.log(newValue);
+                }}
+              />
+            </DemoContainer>
+          </LocalizationProvider> */}
+          <Stack
+            spacing={2}
+            direction="row"
+            sx={{ marginBottom: 4, marginTop: 4 }}
+          >
             <TextField
               type="password"
               label="Password"
@@ -120,6 +235,15 @@ const Register = () => {
               sx={{ mb: 4 }}
             />
           </Stack>
+          {/* <TextField
+            type="text"
+            label="Industry"
+            color="secondary"
+            onChange={(e) => setIndustry(e.target.value)}
+            fullWidth
+            required
+            sx={{ mb: 2 }}
+          /> */}
           <Button type="submit">Register</Button>
         </form>
       </Box>

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import postingFunctions from "../data/postings.js";
+import applicantFunctions from "../data/applicants.js";
+import employerFunctions from "../data/employers.js";
 
 const router = Router();
 
@@ -14,6 +16,28 @@ router.route("/login").post(async (req, res) => {
 
 router.route("/register").post(async (req, res) => {
   //code here for register POST request
+  const { displayName, email, userRole, state, city } = req.body;
+  try {
+    if (userRole === "applicant") {
+      const applicant = await applicantFunctions.addApplicant(
+        displayName,
+        email,
+        "05/31/2002",
+        city,
+        state,
+        "Software"
+      );
+      res.status(201).json(applicant);
+    }
+    // else if (userRole === "employer") {
+    //   // const employer = await employerFunctions.addEmployer(null, )
+    // }
+    else {
+      res.status(400).json({ message: "Invalid user type" });
+    }
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 router.route("/postings").get(async (req, res) => {

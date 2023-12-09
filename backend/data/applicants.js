@@ -1,15 +1,15 @@
 import { applicants } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import { getPosting } from "./postings.js";
+import postingFunctions from "./postings.js";
 
 let exportedMethods = {
-  async addApplicant(name, email, dateOfBirth, city, state, industry) {
+  async addApplicant(name, email, birthDate, city, state, industry) {
     //add validation
 
     let newApplicant = {
       name: name,
       email: email,
-      dateOfBirth: dateOfBirth,
+      birthDate: birthDate,
       city: city,
       state: state,
       industry: industry,
@@ -23,7 +23,7 @@ let exportedMethods = {
     }
 
     const id = insertInfo.insertedId.toString();
-    const applicant = await this.get(id);
+    const applicant = await this.getApplicant(id);
     applicant._id = applicant._id.toString();
     return applicant;
   },
@@ -63,7 +63,7 @@ let exportedMethods = {
     const validFields = [
       "name",
       "email",
-      "dateOfBirth",
+      "birthDate",
       "city",
       "state",
       "industry",
@@ -164,7 +164,7 @@ let exportedMethods = {
 
     const appliedPostings = await Promise.all(
       applicant.applied.map(async (postingId) => {
-        return await getPosting(postingId);
+        return await postingFunctions.getPosting(postingId);
       })
     );
     return appliedPostings;
