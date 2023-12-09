@@ -3,13 +3,12 @@ import { ObjectId } from "mongodb";
 import postingFunctions from "./postings.js";
 
 let exportedMethods = {
-  async addApplicant(name, email, birthDate, city, state, industry) {
+  async addApplicant(name, email, city, state, industry) {
     //add validation
 
     let newApplicant = {
       name: name,
       email: email,
-      birthDate: birthDate,
       city: city,
       state: state,
       industry: industry,
@@ -64,15 +63,7 @@ let exportedMethods = {
     return applicantList;
   },
   async updateApplicant(applicantId, updatedFields) {
-    const validFields = [
-      "name",
-      "email",
-      "birthDate",
-      "city",
-      "state",
-      "industry",
-    ];
-
+    const validFields = ["name", "email", "role", "city", "state", "industry"];
     if (
       !applicantId ||
       typeof applicantId !== "string" ||

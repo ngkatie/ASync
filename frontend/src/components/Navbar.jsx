@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import asyncLogo from "/async.png";
 import { doSignOut } from "../firebase/FirebaseFunctions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { unsetUser } from "../actions";
 
 function Navbar() {
   const { currentUser } = useContext(AuthContext);
 
   const dispatch = useDispatch();
+  const currentUserRole = useSelector((state) => state.user.role);
 
   const handleSignOut = () => {
     doSignOut();
@@ -62,13 +63,20 @@ function Navbar() {
         >
           {currentUser ? (
             <>
-              <Link to="/" style={{ marginRight: 20 }} onClick={handleSignOut}>
-                Log Out
-              </Link>
+              {currentUserRole === "employer" ? (
+                <Link to="/create-posting" style={{ marginRight: 20 }}>
+                  Create Posting
+                </Link>
+              ) : null}
               <Link to="/postings" style={{ marginRight: 20 }}>
                 Postings
               </Link>
-              <Link to="/profile">Profile</Link>
+              <Link to="/profile" style={{ marginRight: 20 }}>
+                Profile
+              </Link>
+              <Link to="/" onClick={handleSignOut}>
+                Log Out
+              </Link>
             </>
           ) : (
             <>

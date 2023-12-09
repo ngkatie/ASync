@@ -8,12 +8,12 @@ import { useSelector } from "react-redux";
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
 
-  const currentUserState = useSelector((state) => state.user);
+  const currentUserRole = useSelector((state) => state.user.role);
 
-  useEffect(() => {
-    // console.log(currentUser);
-    console.log(currentUserState);
-  }, [currentUserState]);
+  // useEffect(() => {
+  //   // console.log(currentUser);
+  //   console.log(currentUserState);
+  // }, [currentUserState]);
 
   return (
     <>
@@ -46,12 +46,22 @@ const Home = () => {
         </Typography>
 
         {currentUser ? (
-          <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>
-            View Postings
-          </Button>
+          currentUserRole === "employer" ? (
+            <Button
+              href="/create-posting"
+              variant="outlined"
+              sx={{ fontSize: 16 }}
+            >
+              Create a job posting
+            </Button>
+          ) : (
+            <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>
+              View postings
+            </Button>
+          )
         ) : (
           <Button href="/register" variant="outlined" sx={{ fontSize: 16 }}>
-            Get Started Here
+            Get started here
           </Button>
         )}
       </Box>

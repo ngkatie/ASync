@@ -11,6 +11,7 @@ import Profile from "./components/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PostingDetails from "./components/PostingDetails";
 import Apply from "./components/Apply";
+import CreatePosting from "./components/CreatePosting";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/postings" element={<Postings />} />
           <Route path="/postings/:id" element={<PostingDetails />} />
         </Route>
+        <Route path="/create-posting" element={<CreatePosting />} />
         <Route path="/profile" element={<Profile />} />
 
         <Route path="/apply/:id" element={<Apply />} />

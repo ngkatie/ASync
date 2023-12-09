@@ -39,20 +39,43 @@ const Login = () => {
       await doSignInWithEmailAndPassword(email, password);
       let applicants = await axios.get("http://localhost:3000/api/applicants");
       applicants = applicants.data;
-      // const employers = await axios.get("http://localhost:3000/api/employers");
-
       for (const applicant of applicants) {
         if (applicant.email === email) {
-          dispatch(setUser(applicant.name, email, "applicant"));
-          console.log("successfully set role after logging in");
+          dispatch(
+            setUser(
+              applicant._id,
+              applicant.name,
+              email,
+              null,
+              "applicant",
+              applicant.state,
+              applicant.city,
+              applicant.industry
+            )
+          );
+          console.log("successfully set applicant's role after logging in");
         }
       }
 
-      // for (const employer of employers) {
-      //   if (employer.email === email) {
-      //     dispatch(setUser(employer.name, email, "employer"));
-      //   }
-      // }
+      let employers = await axios.get("http://localhost:3000/api/employers");
+      employers = employers.data;
+      for (const employer of employers) {
+        if (employer.email === email) {
+          dispatch(
+            setUser(
+              employer._id,
+              employer.name,
+              email,
+              employer.companyName,
+              "employer",
+              employer.state,
+              employer.city,
+              employer.industry
+            )
+          );
+          console.log("successfully set employers's role after logging in");
+        }
+      }
     } catch (e) {
       alert(e);
     }

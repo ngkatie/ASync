@@ -24,10 +24,11 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import stateAbbreviations from "../utils/stateAbbreviations";
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
-  const [displayName, setDisplayName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,14 +36,15 @@ const Register = () => {
   const [userType, setUserType] = useState("");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  // const [birthDate, setBirthDate] = useState("");
   const [industry, setIndustry] = useState("");
+  const [companyName, setCompanyName] = useState("");
 
   const dispatch = useDispatch();
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-    console.log(displayName, email, password, confirmPassword);
+    console.log(name, email, password, confirmPassword);
     // const [displayName, email, password, confirmPassword] = e.target.elements;
 
     // Check that passwords match
@@ -54,15 +56,33 @@ const Register = () => {
     }
 
     try {
-      await doCreateUserWithEmailAndPassword(email, password, displayName);
-      await axios.post("http://localhost:3000/api/register", {
-        displayName: displayName,
+      await doCreateUserWithEmailAndPassword(email, password, name);
+      const requestBody = {
+        name: name,
         email: email,
+        companyName: companyName,
         userRole: userType,
         state: state,
         city: city,
-      });
-      dispatch(setUser(displayName, email, userType));
+        industry: industry,
+      };
+      let user = await axios.post(
+        "http://localhost:3000/api/register",
+        requestBody
+      );
+      user = user.data;
+      dispatch(
+        setUser(
+          user._id,
+          name,
+          email,
+          companyName,
+          userType,
+          state,
+          city,
+          industry
+        )
+      );
     } catch (e) {
       alert(e);
     }
@@ -75,65 +95,12 @@ const Register = () => {
     return <Navigate to="/" replace={true} />;
   }
 
-  const stateAbbreviations = [
-    "AL",
-    "AK",
-    "AZ",
-    "AR",
-    "CA",
-    "CO",
-    "CT",
-    "DE",
-    "FL",
-    "GA",
-    "HI",
-    "ID",
-    "IL",
-    "IN",
-    "IA",
-    "KS",
-    "KY",
-    "LA",
-    "ME",
-    "MD",
-    "MA",
-    "MI",
-    "MN",
-    "MS",
-    "MO",
-    "MT",
-    "NE",
-    "NV",
-    "NH",
-    "NJ",
-    "NM",
-    "NY",
-    "NC",
-    "ND",
-    "OH",
-    "OK",
-    "OR",
-    "PA",
-    "RI",
-    "SC",
-    "SD",
-    "TN",
-    "TX",
-    "UT",
-    "VT",
-    "VA",
-    "WA",
-    "WV",
-    "WI",
-    "WY",
-  ];
-
   return (
     <div>
       <Navbar />
-      <Box sx={{ maxWidth: "500px" }}>
+      <Box sx={{ maxWidth: "500px", marginTop: 10 }}>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
-          Register
+          Create an account
         </Typography>
 
         <form onSubmit={handleRegistration} action={<Link to="/login" />}>
@@ -141,7 +108,7 @@ const Register = () => {
             type="text"
             label="Name"
             color="secondary"
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
@@ -155,7 +122,6 @@ const Register = () => {
             required
             sx={{ mb: 4 }}
           />
-
           <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
             <FormControl sx={{ width: "50%" }}>
               <InputLabel id="user-role-label">Role *</InputLabel>
@@ -195,9 +161,19 @@ const Register = () => {
               onChange={(e) => setCity(e.target.value)}
               fullWidth
               required
-              sx={{ mb: 4 }}
             />
           </Stack>
+          {userType === "employer" ? (
+            <TextField
+              type="text"
+              label="Company Name"
+              color="secondary"
+              onChange={(e) => setCompanyName(e.target.value)}
+              fullWidth
+              required
+              sx={{ mb: 4 }}
+            />
+          ) : null}
           {/* birth date input */}
           {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={["DatePicker"]}>
@@ -211,11 +187,16 @@ const Register = () => {
               />
             </DemoContainer>
           </LocalizationProvider> */}
-          <Stack
-            spacing={2}
-            direction="row"
-            sx={{ marginBottom: 4, marginTop: 4 }}
-          >
+          <TextField
+            type="text"
+            label="Industry"
+            color="secondary"
+            onChange={(e) => setIndustry(e.target.value)}
+            fullWidth
+            required
+            sx={{ mb: 4 }}
+          />
+          <Stack spacing={2} direction="row" sx={{ marginBottom: 2 }}>
             <TextField
               type="password"
               label="Password"
@@ -223,7 +204,6 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               required
-              sx={{ mb: 4 }}
             />
             <TextField
               type="password"
@@ -232,27 +212,16 @@ const Register = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               required
-              sx={{ mb: 4 }}
             />
           </Stack>
-          {/* <TextField
-            type="text"
-            label="Industry"
-            color="secondary"
-            onChange={(e) => setIndustry(e.target.value)}
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-          /> */}
-          <Button type="submit">Register</Button>
+          <Button type="submit" sx={{ fontSize: 24 }}>
+            Register
+          </Button>
         </form>
       </Box>
-
-      <br></br>
-
-      <small>
+      <Typography sx={{ fontSize: 14 }}>
         Already have an account? <Link to="/login">Login</Link>
-      </small>
+      </Typography>
     </div>
   );
 };

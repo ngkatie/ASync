@@ -2,12 +2,13 @@ import { employers } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
 let exportedMethods = {
-  async addEmployer(companyName, email, city, state, industry) {
+  async addEmployer(name, email, companyName, city, state, industry) {
     //add validation
 
     let newEmployer = {
-      companyName: companyName,
+      name: name,
       email: email,
+      companyName: companyName,
       city: city,
       state: state,
       industry: industry,
@@ -21,7 +22,7 @@ let exportedMethods = {
     }
 
     const id = insertInfo.insertedId.toString();
-    const employer = await this.get(id);
+    const employer = await this.getEmployer(id);
     employer._id = employer._id.toString();
     return employer;
   },
@@ -53,12 +54,24 @@ let exportedMethods = {
       throw "failed to get all employers";
     }
     employerList = employerList.map((employer) => {
-      employer._id = employer._id.toString();
+      return {
+        ...employer,
+        _id: employer._id.toString(),
+      };
     });
+
     return employerList;
   },
   async updateEmployer(employerId, updatedFields) {
-    const validFields = ["companyName", "email", "city", "state", "industry"];
+    const validFields = [
+      "name",
+      "email",
+      "companyName",
+      "role",
+      "state",
+      "city",
+      "industry",
+    ];
 
     if (
       !employerId ||

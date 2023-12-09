@@ -10,8 +10,9 @@ import {
   Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const CandidateCard = ({
+const PostingCard = ({
   postingId,
   companyName,
   companyLogo,
@@ -28,6 +29,8 @@ const CandidateCard = ({
 }) => {
   const navigate = useNavigate();
 
+  const currentUserState = useSelector((state) => state.user);
+
   return (
     <Card sx={{ width: "400px" }}>
       <CardHeader title={companyName} subheader={role} />
@@ -42,15 +45,24 @@ const CandidateCard = ({
           Pay Rate: ${payRate}/hr
         </Typography>
 
-        <Button
-          variant="contained"
-          onClick={() => navigate(`/apply/${postingId}`)}
-        >
-          Apply
-        </Button>
+        {currentUserState && currentUserState.role === "employer" ? (
+          <Button
+            variant="contained"
+            onClick={() => navigate(`/postings/${postingId}`)}
+          >
+            View
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            onClick={() => navigate(`/apply/${postingId}`)}
+          >
+            Apply
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-export default CandidateCard;
+export default PostingCard;
