@@ -1,7 +1,12 @@
 const initialState = {
-  displayName: null,
+  userId: null,
+  name: null,
   email: null,
-  userRole: null,
+  companyName: null,
+  role: null,
+  state: null,
+  city: null,
+  industry: null,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -11,9 +16,14 @@ const userReducer = (state = initialState, action) => {
     case "SET_USER":
       return {
         ...state,
-        displayName: payload.displayName,
+        userId: payload.userId,
+        name: payload.name,
         email: payload.email,
-        userRole: payload.userRole,
+        companyName: payload.companyName,
+        role: payload.role,
+        state: payload.state,
+        city: payload.city,
+        industry: payload.industry,
       };
     case "UNSET_USER":
       return initialState;

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployerCard from "./EmployerCard";
-import CandidateCard from "./CandidateCard";
 import Navbar from "./Navbar";
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import PostingCard from "./PostingCard";
 
 function Postings() {
   //   postings = [
@@ -36,8 +36,12 @@ function Postings() {
     fetchData();
   }, []);
 
-  const userType = useSelector((state) => state.user.userRole);
-  console.log(userType);
+  const currentUserState = useSelector((state) => state.user);
+
+  useEffect(() => {
+    // console.log(currentUser);
+    console.log(currentUserState);
+  }, [currentUserState]);
 
   return (
     <>
@@ -55,7 +59,7 @@ function Postings() {
         {postings &&
           postings.map((posting) => (
             // <Link to={`/postings/${posting._id}`} key={posting._id}>
-            <CandidateCard
+            <PostingCard
               key={posting._id}
               postingId={posting._id}
               companyName={posting.companyName}

@@ -1,6 +1,24 @@
-export const setUser = (displayName, email, userRole) => ({
+export const setUser = (
+  userId,
+  name,
+  email,
+  companyName,
+  role,
+  state,
+  city,
+  industry
+) => ({
   type: "SET_USER",
-  payload: { displayName: displayName, email: email, userRole: userRole },
+  payload: {
+    userId: userId,
+    name: name,
+    email: email,
+    companyName: companyName,
+    role: role,
+    state: state,
+    city: city,
+    industry: industry,
+  },
 });
 
 export const unsetUser = () => ({
