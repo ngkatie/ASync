@@ -5,11 +5,11 @@ import employers from "./employers.js";
 let exportedMethods = {
   async addPosting(
     employerId,
+    jobTitle,
     companyName,
     companyLogo,
     jobType,
     numOfEmployees,
-    role,
     description,
     payRate,
     skills,
@@ -27,11 +27,11 @@ let exportedMethods = {
 
     let newPosting = {
       employerId: employerId,
+      jobTitle: jobTitle,
       companyName: companyName,
       companyLogo: companyLogo,
       jobType: jobType,
       numOfEmployees: numOfEmployees,
-      role: role,
       description: description,
       payRate: payRate,
       applicants: [],
@@ -123,11 +123,11 @@ let exportedMethods = {
     // validation
     const validFields = [
       "employerId",
+      "jobTitle",
       "companyName",
       "companyLogo",
       "jobType",
       "numOfEmployees",
-      "role",
       "description",
       "payRate",
       "skills",

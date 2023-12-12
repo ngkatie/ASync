@@ -65,7 +65,7 @@ function Navbar() {
             <>
               {currentUserRole === "employer" ? (
                 <Link to="/create-posting" style={{ marginRight: 20 }}>
-                  Create Posting
+                  Create a posting
                 </Link>
               ) : null}
               <Link to="/postings" style={{ marginRight: 20 }}>
@@ -75,7 +75,7 @@ function Navbar() {
                 Profile
               </Link>
               <Link to="/" onClick={handleSignOut}>
-                Log Out
+                Log out
               </Link>
             </>
           ) : (
