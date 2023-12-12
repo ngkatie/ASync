@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { doSignOut } from "../firebase/FirebaseFunctions";
 import { setUser, unsetUser } from "../actions";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
 import axios from "axios";
 
 const Profile = () => {
@@ -15,6 +15,7 @@ const Profile = () => {
   const [userData, setUserData] = useState({});
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [tab, setTab] = useState(0);
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
@@ -101,70 +102,119 @@ const Profile = () => {
     }));
   };
 
+  const handleTabChange = (event, newTab) => {
+    setTab(newTab);
+  };
+
+  function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+        style={{ minHeight: "500px" }}
+      >
+        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      <Box>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Profile
-        </Typography>
-        {edit ? (
-          <>
-            <TextField
-              label="Name"
-              name="name"
-              value={userData.name}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 4 }}
-            />
-            <TextField
-              label="Email"
-              name="email"
-              value={userData.email}
-              onChange={handleChange}
-              fullWidth
-              disabled
-              sx={{ mb: 2 }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleSaveClick}
-              sx={{ mb: 2 }}
-            >
-              Save
-            </Button>
-          </>
-        ) : (
-          <>
-            <Typography>Name: {userData.name}</Typography>
-            <Typography>Email: {userData.email}</Typography>
-            {userData && userData.role === "employer" && (
-              <Typography>Company: {userData.companyName}</Typography>
+      <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs value={tab} onChange={handleTabChange} centered>
+            <Tab label="About" />
+            {userData && userData.role === "employer" ? (
+              <Tab label="Postings" />
+            ) : null}
+            <Tab label="Settings" />
+          </Tabs>
+        </Box>
+
+        <TabPanel value={tab} index={0}>
+          <Typography>Name: {userData.name}</Typography>
+          <Typography>Email: {userData.email}</Typography>
+          {userData && userData.role === "employer" && (
+            <Typography>Company: {userData.companyName}</Typography>
+          )}
+          <Typography>
+            Location: {userData.city}, {userData.state}
+          </Typography>
+          <Typography>Industry: {userData.industry}</Typography>
+        </TabPanel>
+
+        {userData && userData.role === "employer" && (
+          <TabPanel value={tab} index={1}>
+            <Typography>Postings</Typography>
+          </TabPanel>
+        )}
+
+        <TabPanel value={tab} index={2}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {edit && (
+              <>
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={userData.name}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 4 }}
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  value={userData.email}
+                  onChange={handleChange}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleSaveClick}
+                  sx={{ mb: 2 }}
+                >
+                  Save
+                </Button>
+              </>
             )}
-            <Typography>
-              Location: {userData.city}, {userData.state}
-            </Typography>
-            <Typography>Industry: {userData.industry}</Typography>
             <Button
               variant="outlined"
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
-              Edit
+              Edit credentials
             </Button>
-          </>
-        )}
+            <Button
+              variant="outlined"
+              onClick={showPasswordForm}
+              sx={{ mb: 2 }}
+            >
+              Change Password
+            </Button>
+            {showChangePassword && (
+              <ChangePassword hideForm={hidePasswordForm} />
+            )}
+            <Link to="/" onClick={handleSignOut}>
+              Log out
+            </Link>
+          </Box>
+        </TabPanel>
       </Box>
-      <Box>
-        <Button variant="outlined" onClick={showPasswordForm} sx={{ mb: 2 }}>
-          Change Password
-        </Button>
-        {showChangePassword && <ChangePassword hideForm={hidePasswordForm} />}
-      </Box>
-      <Link to="/" onClick={handleSignOut}>
-        Log Out
-      </Link>
     </>
   );
 };
