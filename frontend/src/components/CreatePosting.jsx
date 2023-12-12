@@ -9,10 +9,10 @@ import {
   Stack,
   TextField,
   Typography,
-  TextareaAutosize,
+  Button,
 } from "@mui/material";
-import { styled } from "@mui/system";
 import stateAbbreviations from "../utils/stateAbbreviations";
+import { Link } from "react-router-dom";
 
 const CreatePosting = () => {
   const [jobTitle, setJobTitle] = useState("");
@@ -26,6 +26,12 @@ const CreatePosting = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
 
+  const [postingId, setPostingId] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  };
+
   return (
     <>
       <Navbar />
@@ -33,7 +39,10 @@ const CreatePosting = () => {
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
           Create a posting
         </Typography>
-        <form>
+        <form
+          onSubmit={handleSubmit}
+          action={<Link to={`/postings${postingId}`} />}
+        >
           <TextField
             type="text"
             label="Job Title"
@@ -145,6 +154,9 @@ const CreatePosting = () => {
               required
             />
           </Stack>
+          <Button type="submit" variant="contained" sx={{ fontSize: 18 }}>
+            Create
+          </Button>
         </form>
       </Box>
     </>
