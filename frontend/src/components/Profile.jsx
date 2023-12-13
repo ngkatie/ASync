@@ -133,7 +133,7 @@ const Profile = () => {
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
         {...other}
-        style={{ minHeight: "500px" }}
+        style={{ minHeight: "600px" }}
       >
         {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
       </div>
