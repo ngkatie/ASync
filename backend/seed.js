@@ -22,7 +22,7 @@ try {
   Core OS - The Core OS team is responsible for the design and development of core technologies that are deployed across all Apple product areas including the iPhone, iPad, Watch, MacBook, iMac, Apple TV, and audio accessories. (Yes, that's pretty much everything.)
   Web Development - Help build web-based tools and applications to improve our products and do more for our customers. Our developers are responsible for crafting the direction of our products by considering the architecture, performance, testing, design, and implementation. And of course we look for engineers that use our products. `,
     "40000",
-    "yearly",
+    "yr",
     "HTML, CSS, JavaScript, React, C++, Python",
     "New York City",
     "New York"

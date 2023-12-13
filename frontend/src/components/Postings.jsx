@@ -54,6 +54,7 @@ function Postings() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          mt: 70,
         }}
       >
         {postings &&
@@ -62,13 +63,14 @@ function Postings() {
             <PostingCard
               key={posting._id}
               postingId={posting._id}
+              jobTitle={posting.jobTitle}
               companyName={posting.companyName}
               companyLogo={posting.companyLogo}
               jobType={posting.jobType}
               numOfEmployees={posting.numOfEmployees}
-              role={posting.role}
               description={posting.description}
-              payRate={posting.payRate}
+              pay={posting.pay}
+              rate={posting.rate}
               applicants={posting.applicants}
               skills={posting.skills}
               city={posting.city}
