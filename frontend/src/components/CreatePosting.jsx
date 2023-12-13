@@ -10,9 +10,15 @@ import {
   TextField,
   Typography,
   Button,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import stateAbbreviations from "../utils/stateAbbreviations";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const CreatePosting = () => {
   const [jobTitle, setJobTitle] = useState("");
@@ -21,15 +27,46 @@ const CreatePosting = () => {
   const [jobType, setJobType] = useState("");
   const [numOfEmployees, setNumOfEmployees] = useState("");
   const [description, setDescription] = useState("");
-  const [payRate, setPayRate] = useState("");
+  const [pay, setPay] = useState("");
+  const [rate, setRate] = useState("");
   const [skills, setSkills] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-
   const [postingId, setPostingId] = useState("");
+
+  const currentUserState = useSelector((state) => state.user);
+
+  if (currentUserState && currentUserState.role !== "employer") {
+    return <Navigate to="/" replace={true} />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const requestBody = {
+        employerId: currentUserState.userId,
+        jobTitle: jobTitle,
+        companyName: companyName,
+        companyLogo: companyLogo,
+        jobType: jobType,
+        numOfEmployees: numOfEmployees,
+        description: description,
+        pay: pay,
+        rate: rate,
+        skills: skills,
+        city: city,
+        state: state,
+      };
+      let posting = await axios.post(
+        "http://localhost:3000/api/postings",
+        requestBody
+      );
+      posting = posting.data;
+      console.log(posting);
+    } catch (e) {
+      alert(e);
+    }
   };
 
   return (
@@ -119,15 +156,43 @@ const CreatePosting = () => {
             required
             sx={{ mb: 4 }}
           />
-          <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
+          <Stack spacing={4} direction="row" sx={{ marginBottom: 4 }}>
             <TextField
               type="text"
-              label="Pay Rate"
+              label="Pay"
               color="secondary"
-              onChange={(e) => setPayRate(e.target.value)}
-              sx={{ width: "70%" }}
+              onChange={(e) => setPay(e.target.value)}
+              sx={{ width: "30%" }}
               required
             />
+            <FormControl>
+              <FormLabel id="rate">Rate *</FormLabel>
+              <RadioGroup
+                row
+                aria-labelledby="rate"
+                name="Rate"
+                value={rate}
+                onChange={(e) => setRate(e.target.value)}
+              >
+                <FormControlLabel
+                  value="hourly"
+                  control={<Radio />}
+                  label="hourly"
+                />
+                <FormControlLabel
+                  value="monthly"
+                  control={<Radio />}
+                  label="monthly"
+                />
+                <FormControlLabel
+                  value="yearly"
+                  control={<Radio />}
+                  label="yearly"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Stack>
+          <Stack spacing={4} direction="row" sx={{ marginBottom: 4 }}>
             <FormControl sx={{ width: "50%" }}>
               <InputLabel id="user-state-label">State *</InputLabel>
               <Select
