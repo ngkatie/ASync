@@ -56,6 +56,46 @@ router.route("/postings").get(async (req, res) => {
   }
 });
 
+router.route("/postings").post(async (req, res) => {
+  const {
+    employerId,
+    jobTitle,
+    companyName,
+    companyLogo,
+    jobType,
+    numOfEmployees,
+    description,
+    pay,
+    rate,
+    skills,
+    city,
+    state,
+  } = req.body;
+  try {
+    const posting = await postingFunctions.addPosting(
+      employerId,
+      jobTitle,
+      companyName,
+      companyLogo,
+      jobType,
+      numOfEmployees,
+      description,
+      pay,
+      rate,
+      skills,
+      city,
+      state
+    );
+    const employerWithNewPosting = await postingFunctions.addPostingToEmployer(
+      employerId,
+      posting._id
+    );
+    res.status(201).json(posting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/posting/:id").get(async (req, res) => {
   //code here for posting GET request
 });

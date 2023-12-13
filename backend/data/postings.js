@@ -1,6 +1,6 @@
-import { postings } from "../config/mongoCollections.js";
+import { postings, employers } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import employers from "./employers.js";
+import employerFunctions from "./employers.js";
 
 let exportedMethods = {
   async addPosting(
@@ -11,7 +11,8 @@ let exportedMethods = {
     jobType,
     numOfEmployees,
     description,
-    payRate,
+    pay,
+    rate,
     skills,
     city,
     state
@@ -26,14 +27,15 @@ let exportedMethods = {
     let date = new Date().toDateString();
 
     let newPosting = {
-      employerId: employerId,
+      employerId: new ObjectId(employerId),
       jobTitle: jobTitle,
       companyName: companyName,
       companyLogo: companyLogo,
       jobType: jobType,
       numOfEmployees: numOfEmployees,
       description: description,
-      payRate: payRate,
+      pay: pay,
+      rate: rate,
       applicants: [],
       skills: skills,
       city: city,
@@ -50,6 +52,7 @@ let exportedMethods = {
     const newId = insertInfo.insertedId.toString();
     const posting = await this.getPosting(newId);
     posting._id = posting._id.toString();
+    posting.employerId = posting.employerId.toString();
     return posting;
   },
   async getPosting(postingId) {
@@ -129,7 +132,8 @@ let exportedMethods = {
       "jobType",
       "numOfEmployees",
       "description",
-      "payRate",
+      "pay",
+      "rate",
       "skills",
       "city",
       "state",
@@ -252,6 +256,53 @@ let exportedMethods = {
       applicant._id = applicant._id.toString();
     });
     return applicants;
+  },
+  async addPostingToEmployer(employerId, postingId) {
+    if (
+      !employerId ||
+      typeof employerId !== "string" ||
+      employerId.trim() === ""
+    ) {
+      throw "Employer ID must be a non-empty string";
+    }
+    if (!ObjectId.isValid(employerId)) {
+      throw "Invalid ObjectID for Employer";
+    }
+    if (
+      !postingId ||
+      typeof postingId !== "string" ||
+      postingId.trim() === ""
+    ) {
+      throw "Posting ID must be a non-empty string";
+    }
+    if (!ObjectId.isValid(postingId)) {
+      throw "Invalid ObjectID for Posting";
+    }
+
+    const employersCollection = await employers();
+    const employer = await employersCollection.findOne({
+      _id: new ObjectId(employerId),
+    });
+
+    if (!employer) {
+      throw "No employer found with the supplied ID";
+    }
+
+    const posting = await this.getPosting(postingId);
+
+    let updatedEmployer = await employersCollection.findOneAndUpdate(
+      { _id: new ObjectId(employerId) },
+      { $addToSet: { postings: posting } },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedEmployer) {
+      throw "Failed to add posting to employer";
+    }
+
+    updatedEmployer._id = updatedEmployer._id.toString();
+
+    return updatedEmployer;
   },
 };
 
