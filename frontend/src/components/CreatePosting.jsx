@@ -175,19 +175,19 @@ const CreatePosting = () => {
                 onChange={(e) => setRate(e.target.value)}
               >
                 <FormControlLabel
-                  value="hourly"
+                  value="hr"
                   control={<Radio />}
-                  label="hourly"
+                  label="Hourly"
                 />
                 <FormControlLabel
-                  value="monthly"
+                  value="mo"
                   control={<Radio />}
-                  label="monthly"
+                  label="Monthly"
                 />
                 <FormControlLabel
-                  value="yearly"
+                  value="yr"
                   control={<Radio />}
-                  label="yearly"
+                  label="Yearly"
                 />
               </RadioGroup>
             </FormControl>

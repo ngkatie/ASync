@@ -14,16 +14,17 @@ import { useSelector } from "react-redux";
 
 const PostingCard = ({
   postingId,
+  jobTitle,
   companyName,
   companyLogo,
   jobType,
   numOfEmployees,
-  role,
   description,
   employer,
   city,
   state,
-  payRate,
+  pay,
+  rate,
   status,
   applicants,
 }) => {
@@ -32,8 +33,8 @@ const PostingCard = ({
   const currentUserState = useSelector((state) => state.user);
 
   return (
-    <Card sx={{ width: "400px" }}>
-      <CardHeader title={companyName} subheader={role} />
+    <Card sx={{ width: "400px", mb: 5, minHeight: 275 }}>
+      <CardHeader title={companyName} subheader={jobTitle} />
       <CardContent>
         <Typography color="textSecondary" gutterBottom>
           {city}, {state}
@@ -42,7 +43,7 @@ const PostingCard = ({
           {numOfEmployees} employees
         </Typography>
         <Typography color="textSecondary" gutterBottom>
-          Pay Rate: ${payRate}/hr
+          Pay Rate: ${pay}/{rate}
         </Typography>
 
         {currentUserState && currentUserState.role === "employer" ? (
