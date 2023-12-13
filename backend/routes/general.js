@@ -122,6 +122,18 @@ router.route("/employers").get(async (req, res) => {
   }
 });
 
+router.route("/employers/:employerId/postings").get(async (req, res) => {
+  const employerId = req.params.employerId;
+
+  try {
+    let employerPostings = await employerFunctions.getEmployer(employerId);
+    employerPostings = employerPostings.postings;
+    res.status(200).json(employerPostings);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/update-profile/:userId").put(async (req, res) => {
   const updatedFields = req.body;
   const userId = req.params.userId;

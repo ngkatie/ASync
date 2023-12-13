@@ -53,8 +53,7 @@ function Postings() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: "100vh",
-          mt: 70,
+          mt: 20,
         }}
       >
         {postings &&

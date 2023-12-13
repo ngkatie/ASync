@@ -9,6 +9,7 @@ import { doSignOut } from "../firebase/FirebaseFunctions";
 import { setUser, unsetUser } from "../actions";
 import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
 import axios from "axios";
+import PostingCard from "./PostingCard";
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
@@ -16,24 +17,40 @@ const Profile = () => {
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [tab, setTab] = useState(0);
+  const [employerPostings, setEmployerPostings] = useState([]);
+  const [applicantAppliedCompanies, setApplicantAppliedCompanies] = useState(
+    []
+  );
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
   console.log(currentUserState);
 
   useEffect(() => {
-    if (currentUserState) {
-      setUserData({
-        userId: currentUserState.userId,
-        name: currentUserState.name,
-        email: currentUserState.email,
-        companyName: currentUserState.companyName,
-        role: currentUserState.role,
-        state: currentUserState.state,
-        city: currentUserState.city,
-        industry: currentUserState.industry,
-      });
+    async function fetchData() {
+      if (currentUserState) {
+        setUserData({
+          userId: currentUserState.userId,
+          name: currentUserState.name,
+          email: currentUserState.email,
+          companyName: currentUserState.companyName,
+          role: currentUserState.role,
+          state: currentUserState.state,
+          city: currentUserState.city,
+          industry: currentUserState.industry,
+        });
+        if (currentUserState.role === "employer") {
+          const postings = await axios.get(
+            `http://localhost:3000/api/employers/${currentUserState.userId}/postings`
+          );
+          setEmployerPostings(postings.data);
+        }
+        // else if (currentUserState.role === "applicant") {
+
+        // }
+      }
     }
+    fetchData();
   }, [currentUserState]);
 
   const handleSignOut = () => {
@@ -126,7 +143,17 @@ const Profile = () => {
   return (
     <>
       <Navbar />
-      <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "background.paper",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 20,
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tab} onChange={handleTabChange} centered>
             <Tab label="About" />
@@ -151,7 +178,31 @@ const Profile = () => {
 
         {userData && userData.role === "employer" && (
           <TabPanel value={tab} index={1}>
-            <Typography>Postings</Typography>
+            {employerPostings &&
+              employerPostings.map((posting) => (
+                <PostingCard
+                  key={posting._id}
+                  postingId={posting._id}
+                  jobTitle={posting.jobTitle}
+                  companyName={posting.companyName}
+                  companyLogo={posting.companyLogo}
+                  jobType={posting.jobType}
+                  numOfEmployees={posting.numOfEmployees}
+                  description={posting.description}
+                  pay={posting.pay}
+                  rate={posting.rate}
+                  applicants={posting.applicants}
+                  skills={posting.skills}
+                  city={posting.city}
+                  state={posting.state}
+                />
+              ))}
+          </TabPanel>
+        )}
+
+        {userData && userData.role === "applicant" && (
+          <TabPanel value={tab} index={1}>
+            <Typography>Applied Companies</Typography>
           </TabPanel>
         )}
 
