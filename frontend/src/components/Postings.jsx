@@ -3,11 +3,14 @@ import axios from "axios";
 import EmployerCard from "./EmployerCard";
 import Navbar from "./Navbar";
 import { Box, Button, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PostingCard from "./PostingCard";
 
 function Postings() {
+  let { page } = useParams();
+  page = Number(page);
+
   const [postings, setPostings] = useState([]);
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
@@ -22,7 +25,7 @@ function Postings() {
       }
     }
     fetchData();
-  }, []);
+  }, [page]);
 
   const currentUserState = useSelector((state) => state.user);
 
