@@ -16,7 +16,7 @@ import {
   Radio,
 } from "@mui/material";
 import stateAbbreviations from "../utils/stateAbbreviations";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
@@ -36,8 +36,11 @@ const CreatePosting = () => {
 
   const currentUserState = useSelector((state) => state.user);
 
+  const navigate = useNavigate();
+
   if (currentUserState && currentUserState.role !== "employer") {
-    return <Navigate to="/" replace={true} />;
+    navigate("/");
+    return;
   }
 
   const handleSubmit = async (e) => {
@@ -64,6 +67,7 @@ const CreatePosting = () => {
       );
       posting = posting.data;
       console.log(posting);
+      navigate(`/postings`);
     } catch (e) {
       alert(e);
     }

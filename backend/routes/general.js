@@ -96,8 +96,16 @@ router.route("/postings").post(async (req, res) => {
   }
 });
 
-router.route("/posting/:id").get(async (req, res) => {
+router.route("/postings/:id").get(async (req, res) => {
   //code here for posting GET request
+  const postingId = req.params.id;
+  try {
+    const posting = await postingFunctions.getPosting(postingId);
+    console.log(posting);
+    res.status(200).json(posting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 router.route("/applicants").get(async (req, res) => {
@@ -117,6 +125,18 @@ router.route("/employers").get(async (req, res) => {
   try {
     const employerList = await employerFunctions.getAll();
     res.status(200).json(employerList);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+router.route("/employers/:employerId/postings").get(async (req, res) => {
+  const employerId = req.params.employerId;
+
+  try {
+    let employerPostings = await employerFunctions.getEmployer(employerId);
+    employerPostings = employerPostings.postings;
+    res.status(200).json(employerPostings);
   } catch (e) {
     res.status(400).send(e);
   }
