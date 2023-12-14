@@ -68,7 +68,7 @@ function Navbar() {
                   Create a posting
                 </Link>
               ) : null}
-              <Link to="/postings" style={{ marginRight: 20 }}>
+              <Link to="/postings/page/1" style={{ marginRight: 20 }}>
                 Postings
               </Link>
               <Link to="/profile" style={{ marginRight: 20 }}>

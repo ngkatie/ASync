@@ -55,7 +55,11 @@ const Home = () => {
               Create a job posting
             </Button>
           ) : (
-            <Button href="/postings" variant="outlined" sx={{ fontSize: 16 }}>
+            <Button
+              href="/postings/page/1"
+              variant="outlined"
+              sx={{ fontSize: 16 }}
+            >
               View postings
             </Button>
           )
