@@ -27,26 +27,30 @@ const PostingCard = ({
   rate,
   status,
   applicants,
+  setCurrentSelectedPostingId,
 }) => {
   const navigate = useNavigate();
 
   const currentUserState = useSelector((state) => state.user);
 
   return (
-    <Card sx={{ width: "400px", mb: 5, minHeight: 275 }}>
+    <Card
+      sx={{ width: "400px", mb: 5, minHeight: 150, cursor: "pointer" }}
+      onClick={() => setCurrentSelectedPostingId(postingId)}
+    >
       <CardHeader title={companyName} subheader={jobTitle} />
       <CardContent>
         <Typography color="textSecondary" gutterBottom>
           {city}, {state}
         </Typography>
-        <Typography color="textSecondary" gutterBottom>
+        {/* <Typography color="textSecondary" gutterBottom>
           {numOfEmployees} employees
         </Typography>
         <Typography color="textSecondary" gutterBottom>
           Pay Rate: ${pay}/{rate}
-        </Typography>
+        </Typography> */}
 
-        {currentUserState && currentUserState.role === "employer" ? (
+        {/* {currentUserState && currentUserState.role === "employer" ? (
           <Button
             variant="contained"
             onClick={() => navigate(`/postings/${postingId}`)}
@@ -56,11 +60,11 @@ const PostingCard = ({
         ) : (
           <Button
             variant="contained"
-            onClick={() => navigate(`/apply/${postingId}`)}
+            onClick={() => setCurrentSelectedPostingId(postingId)}
           >
             Apply
           </Button>
-        )}
+        )} */}
       </CardContent>
     </Card>
   );

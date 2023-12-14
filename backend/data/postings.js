@@ -74,6 +74,8 @@ let exportedMethods = {
     if (posting === null) {
       throw "no posting exists with the given id";
     }
+    posting._id = posting._id.toString();
+    posting.employerId = posting.employerId.toString();
     return posting;
   },
   async getAll() {

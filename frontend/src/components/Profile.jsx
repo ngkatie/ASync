@@ -159,7 +159,9 @@ const Profile = () => {
             <Tab label="About" />
             {userData && userData.role === "employer" ? (
               <Tab label="Postings" />
-            ) : null}
+            ) : (
+              <Tab label="Applied Companies" />
+            )}
             <Tab label="Settings" />
           </Tabs>
         </Box>

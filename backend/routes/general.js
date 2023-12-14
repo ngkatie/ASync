@@ -96,8 +96,16 @@ router.route("/postings").post(async (req, res) => {
   }
 });
 
-router.route("/posting/:id").get(async (req, res) => {
+router.route("/postings/:id").get(async (req, res) => {
   //code here for posting GET request
+  const postingId = req.params.id;
+  try {
+    const posting = await postingFunctions.getPosting(postingId);
+    console.log(posting);
+    res.status(200).json(posting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 router.route("/applicants").get(async (req, res) => {
