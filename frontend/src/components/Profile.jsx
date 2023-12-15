@@ -222,10 +222,9 @@ const Profile = () => {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  mr: 10,
                 }}
               >
-                {postings &&
+                {postings && postings.length !== 0 ? (
                   postings.map((posting) => (
                     <PostingCard
                       key={posting._id}
@@ -244,7 +243,10 @@ const Profile = () => {
                       state={posting.state}
                       setCurrentSelectedPostingId={setCurrentSelectedPostingId}
                     />
-                  ))}
+                  ))
+                ) : (
+                  <Typography>No postings made yet!</Typography>
+                )}
               </Box>
               {currentSelectedPostingId && currentSelectedPosting && (
                 <PostingDetailsModal

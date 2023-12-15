@@ -42,6 +42,7 @@ const PostingDetailsModal = (props) => {
             maxWidth: 600,
             overflowY: "auto",
             p: 2,
+            ml: 10,
           }}
         >
           <Box>
