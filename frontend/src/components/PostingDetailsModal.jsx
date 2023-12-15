@@ -61,11 +61,12 @@ const PostingDetailsModal = (props) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "space-between",
             border: "1px solid rgba(0, 0, 0, 0.2)",
             borderRadius: 5,
             minHeight: 600,
+            maxHeight: 650,
             minWidth: 500,
             maxWidth: 600,
             overflowY: "auto",
@@ -73,10 +74,49 @@ const PostingDetailsModal = (props) => {
             ml: 10,
           }}
         >
-          <Box>
-            <Typography sx={{ fontSize: 24 }}>
-              {currentSelectedPosting.jobTitle}
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <Typography sx={{ fontSize: 30 }}>
+                {currentSelectedPosting.jobTitle}
+              </Typography>
+              {currentUserState && currentUserState.role === "applicant" && (
+                <Button
+                  variant="contained"
+                  disabled={isApplied}
+                  onClick={handleApply}
+                >
+                  {isApplied ? "Already Applied" : "Apply"}
+                </Button>
+              )}
+              {currentUserState &&
+                currentUserState.role === "employer" &&
+                currentUserState.userId ===
+                  currentSelectedPosting.employerId && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDeletePosting}
+                  >
+                    Delete
+                  </Button>
+                )}
+            </Box>
+
             <Typography sx={{ mb: 4 }}>
               {currentSelectedPosting.companyName} |{" "}
               {currentSelectedPosting.city}, {currentSelectedPosting.state} | __
@@ -115,26 +155,6 @@ const PostingDetailsModal = (props) => {
               </Typography>
             </Box>
           </Box>
-          {currentUserState && currentUserState.role === "applicant" && (
-            <Button
-              variant="contained"
-              disabled={isApplied}
-              onClick={handleApply}
-            >
-              {isApplied ? "Already Applied" : "Apply"}
-            </Button>
-          )}
-          {currentUserState &&
-            currentUserState.role === "employer" &&
-            currentUserState.userId === currentSelectedPosting.employerId && (
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleDeletePosting}
-              >
-                Delete
-              </Button>
-            )}
         </Box>
       )}
     </Box>
