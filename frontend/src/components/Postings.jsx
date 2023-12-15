@@ -109,6 +109,7 @@ function Postings() {
             onChange={handlePageChange}
             hidePrevButton={hidePrevButton}
             hideNextButton={hideNextButton}
+            showFirstButton
             showLastButton
             sx={{ mb: 3 }}
           />
