@@ -38,7 +38,7 @@ const PostingCard = ({
       sx={{ width: "400px", mb: 5, minHeight: 150, cursor: "pointer" }}
       onClick={() => setCurrentSelectedPostingId(postingId)}
     >
-      <CardHeader title={companyName} subheader={jobTitle} />
+      <CardHeader title={jobTitle} subheader={companyName} />
       <CardContent>
         <Typography color="textSecondary" gutterBottom>
           {city}, {state}

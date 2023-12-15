@@ -103,16 +103,20 @@ function Postings() {
             mr: 10,
           }}
         >
-          <Pagination
-            count={Math.ceil(numberOfTotalPostings / 10)}
-            page={currentPage}
-            onChange={handlePageChange}
-            hidePrevButton={hidePrevButton}
-            hideNextButton={hideNextButton}
-            showFirstButton
-            showLastButton
-            sx={{ mb: 3 }}
-          />
+          {postings && postings.length !== 0 ? (
+            <Pagination
+              count={Math.ceil(numberOfTotalPostings / 10)}
+              page={currentPage}
+              onChange={handlePageChange}
+              hidePrevButton={hidePrevButton}
+              hideNextButton={hideNextButton}
+              showFirstButton
+              showLastButton
+              sx={{ mb: 3 }}
+            />
+          ) : (
+            <Typography>No postings available yet!</Typography>
+          )}
 
           {postings &&
             postings.map((posting) => (
