@@ -108,6 +108,21 @@ router.route("/postings/:id").get(async (req, res) => {
   }
 });
 
+router.route("/postings/:id").delete(async (req, res) => {
+  const postingId = req.params.id;
+  try {
+    const deletedPosting = await postingFunctions.deletePosting(postingId);
+    const employerWithDeletedPosting =
+      await postingFunctions.deletePostingFromEmployer(
+        deletedPosting.employerId,
+        postingId
+      );
+    res.status(200).json(deletedPosting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/applicants").get(async (req, res) => {
   try {
     const applicantList = await applicantFunctions.getAll();
