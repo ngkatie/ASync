@@ -126,6 +126,20 @@ router.route("/postings").post(async (req, res) => {
   }
 });
 
+router.route("/postings/apply/:id").post(async (req, res) => {
+  const postingId = req.params.id;
+  const { applicantId } = req.body;
+  try {
+    const applicantWithAppliedPosting = await applicantFunctions.applyToPosting(
+      applicantId,
+      postingId
+    );
+    res.status(200).json(applicantWithAppliedPosting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/postings/:id").delete(async (req, res) => {
   const postingId = req.params.id;
   try {
