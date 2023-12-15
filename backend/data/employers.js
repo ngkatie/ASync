@@ -16,6 +16,14 @@ let exportedMethods = {
     };
 
     const employersCollection = await employers();
+
+    const existingEmployer = await employersCollection.findOne({
+      email: email,
+    });
+    if (existingEmployer) {
+      throw "Email is already in use";
+    }
+
     const insertInfo = await employersCollection.insertOne(newEmployer);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "failed to add employer";

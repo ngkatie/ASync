@@ -1,4 +1,4 @@
-import { applicants } from "../config/mongoCollections.js";
+import { applicants, postings, employers } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import postingFunctions from "./postings.js";
 
@@ -9,6 +9,7 @@ let exportedMethods = {
     let newApplicant = {
       name: name,
       email: email,
+      //password: password,
       city: city,
       state: state,
       industry: industry,
@@ -16,6 +17,14 @@ let exportedMethods = {
     };
 
     const applicantsCollection = await applicants();
+
+    const existingApplicant = await applicantsCollection.findOne({
+      email: email,
+    });
+    if (existingApplicant) {
+      throw "Email is already in use";
+    }
+
     const insertInfo = await applicantsCollection.insertOne(newApplicant);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "failed to add applicant";
@@ -190,28 +199,67 @@ let exportedMethods = {
     const applicant = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
     });
-
     if (!applicant) {
       throw "No applicant found with the supplied ID";
     }
-
     if (applicant.applied.includes(postingId)) {
       throw "Applicant has already applied to this posting";
     }
 
+    //add postingId to applied field of applicants
     const updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
       { $addToSet: { applied: postingId } }
     );
-
     if (updatedApplicant.acknowledged === false) {
       throw `Failed to add postingId to applicant's applied list`;
     }
 
-    updatedApplicant = await applicantsCollection.findOne({
+    //add applicantId to applicants field of postings
+    const postingsCollection = await postings();
+    const updatedPosting = await postingsCollection.updateOne(
+      { _id: new ObjectId(postingId) },
+      { $addToSet: { applicants: applicantId } }
+    );
+
+    if (updatedPosting.acknowledged === false) {
+      throw `Failed to add applicantId to posting's applicants list`;
+    }
+
+    //add applicantId to the specific employer's posting's applied
+    //field from the employer's collection
+    const postingWithNewApplicant = await postingsCollection.findOne({
+      _id: new ObjectId(postingId),
+    });
+    const employersCollection = await employers();
+    const employer = await employersCollection.findOne({
+      _id: new ObjectId(postingWithNewApplicant.employerId),
+    });
+
+    if (!employer) {
+      throw "No employer found for the posting";
+    }
+
+    const updatedEmployer = await employersCollection.updateOne(
+      {
+        _id: new ObjectId(postingWithNewApplicant.employerId),
+        "postings._id": new ObjectId(postingId),
+      },
+      { $addToSet: { "postings.$.applicants": applicantId } }
+    );
+
+    if (updatedEmployer.acknowledged === false) {
+      throw `Failed to add applicantId to employer's posting's applicants list`;
+    }
+
+    const applicantWithAppliedPosting = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
     });
-    return updatedApplicant;
+
+    applicantWithAppliedPosting._id =
+      applicantWithAppliedPosting._id.toString();
+    console.log(applicantWithAppliedPosting);
+    return applicantWithAppliedPosting;
   },
 };
 

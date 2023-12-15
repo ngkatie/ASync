@@ -1,14 +1,17 @@
 import { Box, Button, Typography } from "@mui/material";
 import axios from "axios";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const PostingDetailsModal = (props) => {
   const {
     currentSelectedPosting,
     currentUserState,
+    postings,
     setPostings,
     setCurrentSelectedPosting,
   } = props;
+
+  const [isApplied, setIsApplied] = useState(false);
 
   const handleDeletePosting = async () => {
     try {
@@ -25,6 +28,31 @@ const PostingDetailsModal = (props) => {
       alert(e);
     }
   };
+
+  const handleApply = async () => {
+    try {
+      const requestBody = { applicantId: currentUserState.userId };
+      const applicantWithAppliedPosting = await axios.post(
+        `http://localhost:3000/api/postings/apply/${currentSelectedPosting._id}`,
+        requestBody
+      );
+      setIsApplied(true);
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+  useEffect(() => {
+    setIsApplied(false);
+    if (currentSelectedPosting && currentSelectedPosting.applicants) {
+      for (const applicantId of currentSelectedPosting.applicants) {
+        if (applicantId === currentUserState.userId) {
+          setIsApplied(true);
+          break;
+        }
+      }
+    }
+  }, [postings, currentSelectedPosting]);
 
   return (
     <Box>
@@ -88,7 +116,13 @@ const PostingDetailsModal = (props) => {
             </Box>
           </Box>
           {currentUserState && currentUserState.role === "applicant" && (
-            <Button variant="contained">Apply</Button>
+            <Button
+              variant="contained"
+              disabled={isApplied}
+              onClick={handleApply}
+            >
+              {isApplied ? "Already Applied" : "Apply"}
+            </Button>
           )}
           {currentUserState &&
             currentUserState.role === "employer" &&
