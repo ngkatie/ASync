@@ -189,6 +189,19 @@ router.route("/employers/:employerId/postings").get(async (req, res) => {
   }
 });
 
+router
+  .route("/applicants/:applicantId/applied-companies")
+  .get(async (req, res) => {
+    const applicantId = req.params.applicantId;
+    try {
+      let applicantAppliedCompanies =
+        await applicantFunctions.getPostingsAppliedByApplicant(applicantId);
+      res.status(200).json(applicantAppliedCompanies);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  });
+
 router.route("/update-profile/:userId").put(async (req, res) => {
   const updatedFields = req.body;
   const userId = req.params.userId;

@@ -21,9 +21,7 @@ const Profile = () => {
   const [postings, setPostings] = useState([]);
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
-  const [applicantAppliedCompanies, setApplicantAppliedCompanies] = useState(
-    []
-  );
+  const [appliedCompanies, setAppliedCompanies] = useState([]);
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
@@ -51,10 +49,12 @@ const Profile = () => {
           if (postingList.data.length !== 0) {
             setCurrentSelectedPostingId(postingList.data[0]._id);
           }
+        } else if (currentUserState.role === "applicant") {
+          const appliedCompaniesList = await axios.get(
+            `http://localhost:3000/api/applicants/${currentUserState.userId}/applied-companies`
+          );
+          setAppliedCompanies(appliedCompaniesList.data);
         }
-        // else if (currentUserState.role === "applicant") {
-
-        // }
       }
     }
     fetchData();
@@ -262,7 +262,29 @@ const Profile = () => {
 
         {userData && userData.role === "applicant" && (
           <TabPanel value={tab} index={1}>
-            <Typography>Applied Companies</Typography>
+            <Box>
+              {appliedCompanies &&
+                appliedCompanies.map((posting) => (
+                  <PostingCard
+                    key={posting._id}
+                    postingId={posting._id}
+                    jobTitle={posting.jobTitle}
+                    companyName={posting.companyName}
+                    companyLogo={posting.companyLogo}
+                    jobType={posting.jobType}
+                    numOfEmployees={posting.numOfEmployees}
+                    description={posting.description}
+                    pay={posting.pay}
+                    rate={posting.rate}
+                    applicants={posting.applicants}
+                    skills={posting.skills}
+                    city={posting.city}
+                    state={posting.state}
+                    postedDate={posting.postedDate}
+                    setCurrentSelectedPostingId={setCurrentSelectedPostingId}
+                  />
+                ))}
+            </Box>
           </TabPanel>
         )}
 
