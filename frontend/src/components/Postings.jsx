@@ -36,11 +36,17 @@ function Postings() {
 
   useEffect(() => {
     async function fetchData() {
-      let posting = await axios.get(
-        `http://localhost:3000/api/postings/${currentSelectedPostingId}`
-      );
-      setCurrentSelectedPosting(posting.data);
-      console.log(posting.data);
+      try {
+        if (postings.length !== 0) {
+          let posting = await axios.get(
+            `http://localhost:3000/api/postings/${currentSelectedPostingId}`
+          );
+          setCurrentSelectedPosting(posting.data);
+          console.log(posting.data);
+        }
+      } catch (e) {
+        alert(e);
+      }
     }
     fetchData();
   }, [currentSelectedPostingId]);
@@ -95,6 +101,8 @@ function Postings() {
           <PostingDetailsModal
             currentSelectedPosting={currentSelectedPosting}
             currentUserState={currentUserState}
+            setPostings={setPostings}
+            setCurrentSelectedPosting={setCurrentSelectedPosting}
           />
         )}
       </Box>
