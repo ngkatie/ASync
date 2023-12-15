@@ -67,7 +67,7 @@ const CreatePosting = () => {
       );
       posting = posting.data;
       console.log(posting);
-      navigate(`/postings`);
+      navigate(`/postings/page/1`);
     } catch (e) {
       alert(e);
     }

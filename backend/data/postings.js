@@ -120,6 +120,8 @@ let exportedMethods = {
     if (deleteResult.deletedCount !== 1) {
       throw "Deletion failed";
     }
+    posting._id = posting._id.toString();
+    posting.employerId = posting.employerId.toString();
     return posting;
   },
 
@@ -290,7 +292,10 @@ let exportedMethods = {
       throw "No employer found with the supplied ID";
     }
 
-    const posting = await this.getPosting(postingId);
+    const postingCollection = await postings();
+    const posting = await postingCollection.findOne({
+      _id: new ObjectId(postingId),
+    });
 
     let updatedEmployer = await employersCollection.findOneAndUpdate(
       { _id: new ObjectId(employerId) },
@@ -300,6 +305,51 @@ let exportedMethods = {
 
     if (!updatedEmployer) {
       throw "Failed to add posting to employer";
+    }
+
+    updatedEmployer._id = updatedEmployer._id.toString();
+
+    return updatedEmployer;
+  },
+  async deletePostingFromEmployer(employerId, postingId) {
+    if (
+      !employerId ||
+      typeof employerId !== "string" ||
+      employerId.trim() === ""
+    ) {
+      throw "Employer ID must be a non-empty string";
+    }
+    if (!ObjectId.isValid(employerId)) {
+      throw "Invalid ObjectID for Employer";
+    }
+    if (
+      !postingId ||
+      typeof postingId !== "string" ||
+      postingId.trim() === ""
+    ) {
+      throw "Posting ID must be a non-empty string";
+    }
+    if (!ObjectId.isValid(postingId)) {
+      throw "Invalid ObjectID for Posting";
+    }
+
+    const employersCollection = await employers();
+    const employer = await employersCollection.findOne({
+      _id: new ObjectId(employerId),
+    });
+
+    if (!employer) {
+      throw "No employer found with the supplied ID";
+    }
+
+    let updatedEmployer = await employersCollection.findOneAndUpdate(
+      { _id: new ObjectId(employerId) },
+      { $pull: { postings: { _id: new ObjectId(postingId) } } },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedEmployer) {
+      throw "Failed to delete posting from employer";
     }
 
     updatedEmployer._id = updatedEmployer._id.toString();

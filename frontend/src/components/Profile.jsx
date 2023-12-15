@@ -10,6 +10,7 @@ import { setUser, unsetUser } from "../actions";
 import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import PostingCard from "./PostingCard";
+import PostingDetailsModal from "./PostingDetailsModal";
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
@@ -17,7 +18,9 @@ const Profile = () => {
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [tab, setTab] = useState(0);
-  const [employerPostings, setEmployerPostings] = useState([]);
+  const [postings, setPostings] = useState([]);
+  const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
+  const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
   const [applicantAppliedCompanies, setApplicantAppliedCompanies] = useState(
     []
   );
@@ -40,10 +43,14 @@ const Profile = () => {
           industry: currentUserState.industry,
         });
         if (currentUserState.role === "employer") {
-          const postings = await axios.get(
+          const postingList = await axios.get(
             `http://localhost:3000/api/employers/${currentUserState.userId}/postings`
           );
-          setEmployerPostings(postings.data);
+          console.log(postingList.data);
+          setPostings(postingList.data);
+          if (postingList.data.length !== 0) {
+            setCurrentSelectedPostingId(postingList.data[0]._id);
+          }
         }
         // else if (currentUserState.role === "applicant") {
 
@@ -51,7 +58,24 @@ const Profile = () => {
       }
     }
     fetchData();
-  }, [currentUserState]);
+  }, [currentUserState, tab]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (postings.length !== 0) {
+          let posting = await axios.get(
+            `http://localhost:3000/api/postings/${currentSelectedPostingId}`
+          );
+          setCurrentSelectedPosting(posting.data);
+          console.log(posting.data);
+        }
+      } catch (e) {
+        alert(e);
+      }
+    }
+    fetchData();
+  }, [currentSelectedPostingId]);
 
   const handleSignOut = () => {
     doSignOut();
@@ -133,7 +157,7 @@ const Profile = () => {
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
         {...other}
-        style={{ minHeight: "600px" }}
+        style={{ minHeight: "700px" }}
       >
         {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
       </div>
@@ -167,38 +191,70 @@ const Profile = () => {
         </Box>
 
         <TabPanel value={tab} index={0}>
-          <Typography>Name: {userData.name}</Typography>
-          <Typography>Email: {userData.email}</Typography>
-          {userData && userData.role === "employer" && (
-            <Typography>Company: {userData.companyName}</Typography>
-          )}
-          <Typography>
-            Location: {userData.city}, {userData.state}
-          </Typography>
-          <Typography>Industry: {userData.industry}</Typography>
+          <Box sx={{ textAlign: "left" }}>
+            <Typography sx={{ fontSize: 30 }}>{userData.name}</Typography>
+            <Typography>{userData.email}</Typography>
+            {userData && userData.role === "employer" && (
+              <Typography>{userData.companyName}</Typography>
+            )}
+            <Typography>
+              {userData.city}, {userData.state}
+            </Typography>
+            <Typography>Industry: {userData.industry}</Typography>
+          </Box>
         </TabPanel>
 
         {userData && userData.role === "employer" && (
           <TabPanel value={tab} index={1}>
-            {employerPostings &&
-              employerPostings.map((posting) => (
-                <PostingCard
-                  key={posting._id}
-                  postingId={posting._id}
-                  jobTitle={posting.jobTitle}
-                  companyName={posting.companyName}
-                  companyLogo={posting.companyLogo}
-                  jobType={posting.jobType}
-                  numOfEmployees={posting.numOfEmployees}
-                  description={posting.description}
-                  pay={posting.pay}
-                  rate={posting.rate}
-                  applicants={posting.applicants}
-                  skills={posting.skills}
-                  city={posting.city}
-                  state={posting.state}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                mt: 20,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mr: 10,
+                }}
+              >
+                {postings &&
+                  postings.map((posting) => (
+                    <PostingCard
+                      key={posting._id}
+                      postingId={posting._id}
+                      jobTitle={posting.jobTitle}
+                      companyName={posting.companyName}
+                      companyLogo={posting.companyLogo}
+                      jobType={posting.jobType}
+                      numOfEmployees={posting.numOfEmployees}
+                      description={posting.description}
+                      pay={posting.pay}
+                      rate={posting.rate}
+                      applicants={posting.applicants}
+                      skills={posting.skills}
+                      city={posting.city}
+                      state={posting.state}
+                      setCurrentSelectedPostingId={setCurrentSelectedPostingId}
+                    />
+                  ))}
+              </Box>
+              {currentSelectedPostingId && currentSelectedPosting && (
+                <PostingDetailsModal
+                  currentSelectedPosting={currentSelectedPosting}
+                  currentUserState={currentUserState}
+                  setPostings={setPostings}
+                  setCurrentSelectedPosting={setCurrentSelectedPosting}
                 />
-              ))}
+              )}
+            </Box>
           </TabPanel>
         )}
 

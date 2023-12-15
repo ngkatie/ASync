@@ -69,7 +69,7 @@ function Navbar() {
                 </Link>
               ) : null}
               <Link to="/postings/page/1" style={{ marginRight: 20 }}>
-                Postings
+                Jobs
               </Link>
               <Link to="/profile" style={{ marginRight: 20 }}>
                 Profile

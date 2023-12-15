@@ -6,6 +6,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PostingCard from "./PostingCard";
+import PostingDetailsModal from "./PostingDetailsModal";
 
 function Postings() {
   let { page } = useParams();
@@ -20,7 +21,7 @@ function Postings() {
       let postingList = await axios.get("http://localhost:3000/api/postings");
       setPostings(postingList.data);
       console.log(postingList.data);
-      if (postingList.data) {
+      if (postingList.data.length !== 0) {
         setCurrentSelectedPostingId(postingList.data[0]._id);
       }
     }
@@ -35,11 +36,17 @@ function Postings() {
 
   useEffect(() => {
     async function fetchData() {
-      let posting = await axios.get(
-        `http://localhost:3000/api/postings/${currentSelectedPostingId}`
-      );
-      setCurrentSelectedPosting(posting.data);
-      console.log(posting.data);
+      try {
+        if (postings.length !== 0) {
+          let posting = await axios.get(
+            `http://localhost:3000/api/postings/${currentSelectedPostingId}`
+          );
+          setCurrentSelectedPosting(posting.data);
+          console.log(posting.data);
+        }
+      } catch (e) {
+        alert(e);
+      }
     }
     fetchData();
   }, [currentSelectedPostingId]);
@@ -91,99 +98,14 @@ function Postings() {
             ))}
         </Box>
         {currentSelectedPostingId && currentSelectedPosting && (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "space-between",
-              border: "1px solid rgba(0, 0, 0, 0.2)",
-              borderRadius: 5,
-              minHeight: 600,
-              minWidth: 500,
-              maxWidth: 600,
-              overflowY: "auto",
-            }}
-          >
-            <Box sx={{ p: 2 }}>
-              <Typography sx={{ fontSize: 24 }}>
-                {currentSelectedPosting.jobTitle}
-              </Typography>
-              <Typography sx={{ mb: 4 }}>
-                {currentSelectedPosting.companyName} |{" "}
-                {currentSelectedPosting.city}, {currentSelectedPosting.state} |
-                __ applicants
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "center",
-                  mb: 4,
-                }}
-              >
-                <Typography>{currentSelectedPosting.jobType}</Typography>
-                <Typography>
-                  {currentSelectedPosting.numOfEmployees} employees
-                </Typography>
-                <Typography>Skills: {currentSelectedPosting.skills}</Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  Pay Rate: ${currentSelectedPosting.pay}/
-                  {currentSelectedPosting.rate}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "center",
-                }}
-              >
-                <Typography sx={{ fontSize: 20, mb: 2 }}>About</Typography>
-                <Typography sx={{ textAlign: "left" }}>
-                  {currentSelectedPosting.description}
-                </Typography>
-              </Box>
-              {currentUserState && currentUserState.role === "applicant" && (
-                <Button variant="contained">Apply</Button>
-              )}
-            </Box>
-          </Box>
+          <PostingDetailsModal
+            currentSelectedPosting={currentSelectedPosting}
+            currentUserState={currentUserState}
+            setPostings={setPostings}
+            setCurrentSelectedPosting={setCurrentSelectedPosting}
+          />
         )}
       </Box>
-      {/* <h1> EMPLOYER VIEW </h1>
-      {postings.map((posting) => (
-        <EmployerCard
-          key={posting.id}
-          id={posting.id}
-          role={posting.role}
-          description={posting.description}
-          employer={posting.employer}
-          city={posting.city}
-          state={posting.state}
-          payRate={posting.payRate}
-          status={posting.status}
-          applicants={posting.applicants}
-        />
-      ))}
-
-      <h1> CANDIDATE VIEW </h1>
-      {postings.map((posting) => (
-        <CandidateCard
-          key={posting.id}
-          id={posting.id}
-          role={posting.role}
-          description={posting.description}
-          employer={posting.employer}
-          city={posting.city}
-          state={posting.state}
-          payRate={posting.payRate}
-          status={posting.status}
-          applicants={posting.applicants}
-        />
-      ))} */}
     </>
   );
 }
