@@ -92,7 +92,7 @@ const PostingDetailsModal = (props) => {
               }}
             >
               <Typography sx={{ fontSize: 30 }}>
-                {currentSelectedPosting.jobTitle}
+                {currentSelectedPosting && currentSelectedPosting.jobTitle}
               </Typography>
               {currentUserState && currentUserState.role === "applicant" && (
                 <Button
@@ -118,9 +118,14 @@ const PostingDetailsModal = (props) => {
             </Box>
 
             <Typography sx={{ mb: 4 }}>
-              {currentSelectedPosting.companyName} |{" "}
-              {currentSelectedPosting.city}, {currentSelectedPosting.state} | __
-              applicants
+              {currentSelectedPosting && currentSelectedPosting.companyName} |{" "}
+              {currentSelectedPosting && currentSelectedPosting.city},{" "}
+              {currentSelectedPosting && currentSelectedPosting.state} |{" "}
+              {currentSelectedPosting &&
+              currentSelectedPosting.applicants &&
+              currentSelectedPosting.applicants.length === 1
+                ? `${currentSelectedPosting.applicants.length} applicant`
+                : `${currentSelectedPosting.applicants.length} applicants`}
             </Typography>
             <Box
               sx={{
