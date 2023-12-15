@@ -90,15 +90,17 @@ const PostingDetailsModal = (props) => {
           {currentUserState && currentUserState.role === "applicant" && (
             <Button variant="contained">Apply</Button>
           )}
-          {currentUserState && currentUserState.role === "employer" && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDeletePosting}
-            >
-              Delete
-            </Button>
-          )}
+          {currentUserState &&
+            currentUserState.role === "employer" &&
+            currentUserState.userId === currentSelectedPosting.employerId && (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleDeletePosting}
+              >
+                Delete
+              </Button>
+            )}
         </Box>
       )}
     </Box>

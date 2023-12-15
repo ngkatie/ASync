@@ -56,6 +56,36 @@ router.route("/postings").get(async (req, res) => {
   }
 });
 
+router.route("/postings/:id").get(async (req, res) => {
+  //code here for posting GET request
+  const postingId = req.params.id;
+  try {
+    const posting = await postingFunctions.getPosting(postingId);
+    console.log(posting);
+    res.status(200).json(posting);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+router.route("/postings/page/:pagenum").get(async (req, res) => {
+  try {
+    let page = req.params.pagenum.trim();
+    page = Number(page);
+    if (page <= 0) {
+      res.status(400).send("400 BAD REQUEST");
+    }
+
+    let postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(
+      page
+    );
+    console.log(postingsByPageNumber.length);
+    res.status(200).json(postingsByPageNumber);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 router.route("/postings").post(async (req, res) => {
   const {
     employerId,
@@ -91,18 +121,6 @@ router.route("/postings").post(async (req, res) => {
       posting._id
     );
     res.status(201).json(posting);
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
-
-router.route("/postings/:id").get(async (req, res) => {
-  //code here for posting GET request
-  const postingId = req.params.id;
-  try {
-    const posting = await postingFunctions.getPosting(postingId);
-    console.log(posting);
-    res.status(200).json(posting);
   } catch (e) {
     res.status(400).send(e);
   }

@@ -91,6 +91,16 @@ let exportedMethods = {
     });
     return postingList;
   },
+  async getPostingsByPageNumber(page) {
+    const postingCollection = await postings();
+    let skipAmount = (page - 1) * 10;
+    const postingList = await postingCollection
+      .find({})
+      .skip(skipAmount)
+      .limit(10)
+      .toArray();
+    return postingList;
+  },
   async deletePosting(postingId) {
     //validation
     if (

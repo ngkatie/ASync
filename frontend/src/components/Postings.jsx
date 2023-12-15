@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployerCard from "./EmployerCard";
 import Navbar from "./Navbar";
-import { Box, Button, Typography } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Box, Button, Pagination, Stack, Typography } from "@mui/material";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PostingCard from "./PostingCard";
 import PostingDetailsModal from "./PostingDetailsModal";
@@ -13,20 +13,42 @@ function Postings() {
   page = Number(page);
 
   const [postings, setPostings] = useState([]);
+  const [numberOfTotalPostings, setNumberOfTotalPostings] = useState(0);
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
+  const [startingIndex, setStartingIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(page);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
-      let postingList = await axios.get("http://localhost:3000/api/postings");
-      setPostings(postingList.data);
-      console.log(postingList.data);
-      if (postingList.data.length !== 0) {
-        setCurrentSelectedPostingId(postingList.data[0]._id);
+      if (isNaN(page) || page < 1) {
+        navigate("/400");
+        return;
+      }
+      try {
+        let postingList = await axios.get(
+          `http://localhost:3000/api/postings/page/${page}`
+        );
+        setPostings(postingList.data);
+        console.log(postingList.data);
+        if (postingList.data.length !== 0) {
+          setCurrentSelectedPostingId(postingList.data[0]._id);
+        }
+        const totalPostings = await axios.get(
+          "http://localhost:3000/api/postings"
+        );
+        setNumberOfTotalPostings(totalPostings.data.length);
+        let index = (page - 1) * 10;
+        setStartingIndex(index);
+      } catch (e) {
+        alert(e);
+        navigate("/404");
       }
     }
     fetchData();
-  }, [page]);
+  }, [page, currentPage]);
 
   const currentUserState = useSelector((state) => state.user);
 
@@ -51,6 +73,14 @@ function Postings() {
     fetchData();
   }, [currentSelectedPostingId]);
 
+  const handlePageChange = (e, newPage) => {
+    setCurrentPage(newPage);
+    navigate(`/postings/page/${newPage}`);
+  };
+
+  const hidePrevButton = page === 1;
+  const hideNextButton = numberOfTotalPostings - startingIndex <= 10;
+
   return (
     <>
       <Navbar />
@@ -73,6 +103,21 @@ function Postings() {
             mr: 10,
           }}
         >
+          {postings && postings.length !== 0 ? (
+            <Pagination
+              count={Math.ceil(numberOfTotalPostings / 10)}
+              page={currentPage}
+              onChange={handlePageChange}
+              hidePrevButton={hidePrevButton}
+              hideNextButton={hideNextButton}
+              showFirstButton
+              showLastButton
+              sx={{ mb: 3 }}
+            />
+          ) : (
+            <Typography>No postings available yet!</Typography>
+          )}
+
           {postings &&
             postings.map((posting) => (
               // <Link to={`/postings/${posting._id}`} key={posting._id}>
