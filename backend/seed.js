@@ -174,8 +174,8 @@ const postingSeedData = [
     description: `Apple is offering an exciting internship opportunity for a UX/UI Design Intern to join our dynamic design team. As a UX/UI Design Intern, you will have the chance to work on real-world projects, collaborate with experienced designers, and contribute to the user experience of our innovative products.
 
     We are looking for creative individuals with a passion for design, a strong eye for detail, and a desire to learn and grow in a fast-paced environment.`,
-    pay: '$20 - $25 per hour',
-    rate: 'hourly',
+    pay: '20 - 25',
+    rate: 'hour',
     skills: 'Adobe Creative Suite, Figma, Sketch, Prototyping, User Research',
     city: 'Cupertino',
     state: 'CA',
