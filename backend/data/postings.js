@@ -51,6 +51,12 @@ let exportedMethods = {
 
     const newId = insertInfo.insertedId.toString();
     const posting = await this.getPosting(newId);
+
+    const employerWithNewPosting = await this.addPostingToEmployer(
+      employerId,
+      posting._id
+    );
+
     posting._id = posting._id.toString();
     posting.employerId = posting.employerId.toString();
 
@@ -131,6 +137,11 @@ let exportedMethods = {
     if (deleteResult.deletedCount !== 1) {
       throw 'Deletion failed';
     }
+
+    const employerWithDeletedPosting = await this.deletePostingFromEmployer(
+      posting.employerId,
+      postingId
+    );
 
     //remove postingId from applicant applied arrays
     const applicantsCollection = await applicants();
