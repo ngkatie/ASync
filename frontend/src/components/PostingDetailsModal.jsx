@@ -12,9 +12,9 @@ import {
   MenuItem,
   Select,
   Typography,
-} from "@mui/material";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+} from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 const PostingDetailsModal = (props) => {
   const {
@@ -27,7 +27,7 @@ const PostingDetailsModal = (props) => {
   const [isApplied, setIsApplied] = useState(false);
   const [currentApplicants, setCurrentApplicants] = useState([]);
   const [applicantStatuses, setApplicantStatuses] = useState({});
-  const [applicationStatus, setApplicationStatus] = useState("");
+  const [applicationStatus, setApplicationStatus] = useState('');
 
   // useEffect(() => {
   //   console.log(applicantStatus);
@@ -36,7 +36,7 @@ const PostingDetailsModal = (props) => {
   useEffect(() => {
     async function fetchData() {
       if (
-        currentUserState.role === "applicant" &&
+        currentUserState.role === 'applicant' &&
         currentSelectedPosting &&
         currentSelectedPosting.applicants
       ) {
@@ -51,13 +51,17 @@ const PostingDetailsModal = (props) => {
           `http://localhost:3000/api/applicants/${currentUserState.userId}`
         );
         for (const application of currentApplicant.data.applied) {
-          if (application.postingId === currentSelectedPosting._id) {
+          if (
+            application &&
+            application.applicantStatus &&
+            application.postingId === currentSelectedPosting._id
+          ) {
             setApplicationStatus(application.applicantStatus);
             break;
           }
         }
       } else if (
-        currentUserState.role === "employer" &&
+        currentUserState.role === 'employer' &&
         currentSelectedPosting &&
         currentSelectedPosting.applicants &&
         currentSelectedPosting.applicants.length !== 0
@@ -96,7 +100,7 @@ const PostingDetailsModal = (props) => {
     try {
       const requestBody = {
         applicantId: currentUserState.userId,
-        applicantStatus: applicantStatus || "In Progress",
+        applicantStatus: 'In Progress',
       };
       const applicantWithAppliedPosting = await axios.post(
         `http://localhost:3000/api/postings/apply/${currentSelectedPosting._id}`,
@@ -130,57 +134,57 @@ const PostingDetailsModal = (props) => {
       {currentSelectedPosting._id !== undefined && (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            border: "1px solid rgba(0, 0, 0, 0.2)",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            border: '1px solid rgba(0, 0, 0, 0.2)',
             borderRadius: 5,
             minHeight: 600,
             maxHeight: 650,
             minWidth: 500,
             maxWidth: 600,
-            overflowY: "auto",
+            overflowY: 'auto',
             p: 2,
             ml: 10,
           }}
         >
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              width: "100%",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              width: '100%',
             }}
           >
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
               }}
             >
               <Typography sx={{ fontSize: 30 }}>
                 {currentSelectedPosting && currentSelectedPosting.jobTitle}
               </Typography>
-              {currentUserState && currentUserState.role === "applicant" && (
+              {currentUserState && currentUserState.role === 'applicant' && (
                 <Button
-                  variant="contained"
+                  variant='contained'
                   disabled={isApplied}
                   onClick={handleApply}
                 >
-                  {isApplied ? "Already Applied" : "Apply"}
+                  {isApplied ? 'Already Applied' : 'Apply'}
                 </Button>
               )}
               {currentUserState &&
-                currentUserState.role === "employer" &&
+                currentUserState.role === 'employer' &&
                 currentUserState.userId ===
                   currentSelectedPosting.employerId && (
                   <Button
-                    variant="contained"
-                    color="error"
+                    variant='contained'
+                    color='error'
                     onClick={handleDeletePosting}
                   >
                     Delete
@@ -189,9 +193,9 @@ const PostingDetailsModal = (props) => {
             </Box>
 
             <Typography sx={{ mb: 4 }}>
-              {currentSelectedPosting && currentSelectedPosting.companyName} |{" "}
-              {currentSelectedPosting && currentSelectedPosting.city},{" "}
-              {currentSelectedPosting && currentSelectedPosting.state} |{" "}
+              {currentSelectedPosting && currentSelectedPosting.companyName} |{' '}
+              {currentSelectedPosting && currentSelectedPosting.city},{' '}
+              {currentSelectedPosting && currentSelectedPosting.state} |{' '}
               {currentSelectedPosting &&
               currentSelectedPosting.applicants &&
               currentSelectedPosting.applicants.length === 1
@@ -200,10 +204,10 @@ const PostingDetailsModal = (props) => {
             </Typography>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
                 mb: 4,
               }}
             >
@@ -212,35 +216,35 @@ const PostingDetailsModal = (props) => {
                 {currentSelectedPosting.numOfEmployees} employees
               </Typography>
               <Typography>Skills: {currentSelectedPosting.skills}</Typography>
-              <Typography color="textSecondary" gutterBottom>
+              <Typography color='textSecondary' gutterBottom>
                 Pay Rate: ${currentSelectedPosting.pay}/
                 {currentSelectedPosting.rate}
               </Typography>
             </Box>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
               }}
             >
               <Box
                 sx={{
                   mb: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
                 }}
               >
                 <Typography sx={{ fontSize: 24 }}>About</Typography>
-                <Typography sx={{ textAlign: "left" }}>
+                <Typography sx={{ textAlign: 'left' }}>
                   {currentSelectedPosting.description}
                 </Typography>
               </Box>
               {currentUserState &&
-                currentUserState.role === "employer" &&
+                currentUserState.role === 'employer' &&
                 currentSelectedPosting.employerId ===
                   currentUserState.userId && (
                   <Box>
@@ -249,7 +253,7 @@ const PostingDetailsModal = (props) => {
                       dense
                       sx={{
                         minWidth: 500,
-                        bgcolor: "background.paper",
+                        bgcolor: 'background.paper',
                       }}
                     >
                       {currentSelectedPosting &&
@@ -261,18 +265,18 @@ const PostingDetailsModal = (props) => {
                           <ListItem
                             key={applicant._id}
                             disablePadding
-                            sx={{ width: "100%" }}
+                            sx={{ width: '100%' }}
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                <Avatar src="/async.png" />
+                                <Avatar src='/async.png' />
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
                               <Typography>Resume somewhere here</Typography>
-                              <FormControl sx={{ width: "30%" }}>
+                              <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}
                                 >
@@ -283,7 +287,7 @@ const PostingDetailsModal = (props) => {
                                   id={`applicant-status-${index}`}
                                   value={
                                     applicantStatuses[applicant._id] ||
-                                    "In Progress"
+                                    'In Progress'
                                   }
                                   onChange={(e) => {
                                     setApplicantStatuses((prevStatuses) => ({
@@ -295,7 +299,7 @@ const PostingDetailsModal = (props) => {
                                       applicant
                                     );
                                   }}
-                                  label="Status"
+                                  label='Status'
                                 >
                                   <MenuItem value={`In Progress`}>
                                     In Progress
@@ -315,7 +319,7 @@ const PostingDetailsModal = (props) => {
                 )}
 
               {currentUserState &&
-                currentUserState.role === "applicant" &&
+                currentUserState.role === 'applicant' &&
                 currentSelectedPosting.applicants.includes(
                   currentUserState.userId
                 ) && (
