@@ -170,13 +170,14 @@ let exportedMethods = {
     }
 
     const appliedPostings = await Promise.all(
-      applicant.applied.map(async (postingId) => {
+      applicant.applied.map(async (application) => {
+        const postingId = application.postingId.toString();
         return await postingFunctions.getPosting(postingId);
       })
     );
     return appliedPostings;
   },
-  async applyToPosting(applicantId, postingId) {
+  async applyToPosting(applicantId, postingId, applicantStatus) {
     if (
       !applicantId ||
       typeof applicantId !== 'string' ||
@@ -212,7 +213,14 @@ let exportedMethods = {
     //add postingId to applied field of applicants
     const updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
-      { $addToSet: { applied: postingId } }
+      {
+        $addToSet: {
+          applied: {
+            postingId: new ObjectId(postingId),
+            applicantStatus: applicantStatus,
+          },
+        },
+      }
     );
     if (updatedApplicant.acknowledged === false) {
       throw `Failed to add postingId to applicant's applied list`;
@@ -261,7 +269,9 @@ let exportedMethods = {
 
     applicantWithAppliedPosting._id =
       applicantWithAppliedPosting._id.toString();
-    console.log(applicantWithAppliedPosting);
+    for (let application of applicantWithAppliedPosting.applied) {
+      application.postingId = application.postingId.toString();
+    }
     return applicantWithAppliedPosting;
   },
 };

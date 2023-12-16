@@ -1,5 +1,5 @@
-import { employers } from '../config/mongoCollections.js';
-import { ObjectId } from 'mongodb';
+import { employers, applicants } from "../config/mongoCollections.js";
+import { ObjectId } from "mongodb";
 
 let exportedMethods = {
   async addEmployer(name, email, companyName, city, state, industry) {
@@ -155,6 +155,56 @@ let exportedMethods = {
     }
     employer._id = employer._id.toString();
     return employer;
+  },
+  async updateApplicantStatus(applicantId, postingId, newStatus) {
+    const validStatuses = ["In Progress", "Accepted", "Rejected"];
+
+    if (
+      !applicantId ||
+      typeof applicantId !== "string" ||
+      applicantId.trim() === ""
+    ) {
+      throw "Applicant ID must be a non-empty string";
+    }
+
+    if (!ObjectId.isValid(applicantId)) {
+      throw "Invalid ObjectID for applicant ID";
+    }
+
+    if (
+      !postingId ||
+      typeof postingId !== "string" ||
+      postingId.trim() === ""
+    ) {
+      throw "Posting ID must be a non-empty string";
+    }
+
+    if (!ObjectId.isValid(postingId)) {
+      throw "Invalid ObjectID for posting ID";
+    }
+
+    if (!validStatuses.includes(newStatus)) {
+      throw "Invalid applicant status";
+    }
+
+    const applicantsCollection = await applicants();
+    const updateResult = await applicantsCollection.updateOne(
+      {
+        _id: new ObjectId(applicantId),
+        "applied.postingId": new ObjectId(postingId),
+      },
+      {
+        $set: {
+          "applied.$.applicantStatus": newStatus,
+        },
+      }
+    );
+
+    const updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+
+    return updatedApplicant;
   },
 };
 
