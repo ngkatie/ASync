@@ -1,4 +1,18 @@
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
@@ -6,12 +20,46 @@ const PostingDetailsModal = (props) => {
   const {
     currentSelectedPosting,
     currentUserState,
-    postings,
     setPostings,
     setCurrentSelectedPosting,
   } = props;
 
   const [isApplied, setIsApplied] = useState(false);
+  const [currentApplicants, setCurrentApplicants] = useState([]);
+  const [applicantStatus, setApplicantStatus] = useState("");
+
+  useEffect(() => {
+    async function fetchData() {
+      if (
+        currentUserState.role === "applicant" &&
+        currentSelectedPosting &&
+        currentSelectedPosting.applicants
+      ) {
+        setIsApplied(false);
+        for (const applicantId of currentSelectedPosting.applicants) {
+          if (applicantId === currentUserState.userId) {
+            setIsApplied(true);
+            break;
+          }
+        }
+      } else if (
+        currentUserState.role === "employer" &&
+        currentSelectedPosting &&
+        currentSelectedPosting.applicants.length !== 0
+      ) {
+        const applicantList = [];
+        for (const applicantId of currentSelectedPosting.applicants) {
+          const applicant = await axios.get(
+            `http://localhost:3000/api/applicants/${applicantId}`
+          );
+          applicantList.push(applicant.data);
+        }
+        setCurrentApplicants(applicantList);
+        console.log(applicantList);
+      }
+    }
+    fetchData();
+  }, [currentSelectedPosting]);
 
   const handleDeletePosting = async () => {
     try {
@@ -41,18 +89,6 @@ const PostingDetailsModal = (props) => {
       alert(e);
     }
   };
-
-  useEffect(() => {
-    setIsApplied(false);
-    if (currentSelectedPosting && currentSelectedPosting.applicants) {
-      for (const applicantId of currentSelectedPosting.applicants) {
-        if (applicantId === currentUserState.userId) {
-          setIsApplied(true);
-          break;
-        }
-      }
-    }
-  }, [postings, currentSelectedPosting]);
 
   return (
     <Box>
@@ -154,10 +190,84 @@ const PostingDetailsModal = (props) => {
                 justifyContent: "center",
               }}
             >
-              <Typography sx={{ fontSize: 20, mb: 2 }}>About</Typography>
-              <Typography sx={{ textAlign: "left" }}>
-                {currentSelectedPosting.description}
-              </Typography>
+              <Box
+                sx={{
+                  mb: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography sx={{ fontSize: 24 }}>About</Typography>
+                <Typography sx={{ textAlign: "left" }}>
+                  {currentSelectedPosting.description}
+                </Typography>
+              </Box>
+              {currentUserState &&
+                currentUserState.role === "employer" &&
+                currentSelectedPosting.employerId ===
+                  currentUserState.userId && (
+                  <Box>
+                    <Typography sx={{ fontSize: 24 }}>Applicants</Typography>
+                    <List
+                      dense
+                      sx={{
+                        minWidth: 500,
+                        bgcolor: "background.paper",
+                      }}
+                    >
+                      {currentSelectedPosting &&
+                      currentSelectedPosting.applicants &&
+                      currentSelectedPosting.applicants.length !== 0 &&
+                      currentApplicants &&
+                      currentApplicants.length !== 0 ? (
+                        currentApplicants.map((applicant, index) => (
+                          <ListItem
+                            key={applicant._id}
+                            disablePadding
+                            sx={{ width: "100%" }}
+                          >
+                            <ListItemButton>
+                              <ListItemAvatar>
+                                <Avatar src="/async.png" />
+                              </ListItemAvatar>
+                              <ListItemText
+                                id={applicant._id}
+                                primary={applicant.name}
+                              />
+                              <Typography>Resume somewhere here</Typography>
+                              <FormControl sx={{ width: "30%" }}>
+                                <InputLabel
+                                  id={`applicant-status-label-${index}`}
+                                >
+                                  Status
+                                </InputLabel>
+                                <Select
+                                  labelId={`applicant-status-label-${index}`}
+                                  id={`applicant-status-${index}`}
+                                  value={applicantStatus}
+                                  onChange={(e) =>
+                                    setApplicantStatus(e.target.value)
+                                  }
+                                  label="Status"
+                                >
+                                  <MenuItem value={`inProgress`}>
+                                    In Progress
+                                  </MenuItem>
+                                  <MenuItem value={`accept`}>Accept</MenuItem>
+                                  <MenuItem value={`reject`}>Reject</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </ListItemButton>
+                          </ListItem>
+                        ))
+                      ) : (
+                        <Typography>No applicants yet!</Typography>
+                      )}
+                    </List>
+                  </Box>
+                )}
             </Box>
           </Box>
         </Box>

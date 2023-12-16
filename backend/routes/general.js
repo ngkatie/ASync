@@ -58,7 +58,7 @@ router.route("/postings").get(async (req, res) => {
 
 router.route("/postings/:id").get(async (req, res) => {
   //code here for posting GET request
-  const postingId = req.params.id;
+  const postingId = req.params.id.trim();
   try {
     const posting = await postingFunctions.getPosting(postingId);
     console.log(posting);
@@ -127,7 +127,7 @@ router.route("/postings").post(async (req, res) => {
 });
 
 router.route("/postings/apply/:id").post(async (req, res) => {
-  const postingId = req.params.id;
+  const postingId = req.params.id.trim();
   const { applicantId } = req.body;
   try {
     const applicantWithAppliedPosting = await applicantFunctions.applyToPosting(
@@ -141,7 +141,7 @@ router.route("/postings/apply/:id").post(async (req, res) => {
 });
 
 router.route("/postings/:id").delete(async (req, res) => {
-  const postingId = req.params.id;
+  const postingId = req.params.id.trim();
   try {
     const deletedPosting = await postingFunctions.deletePosting(postingId);
     const employerWithDeletedPosting =
@@ -164,9 +164,29 @@ router.route("/applicants").get(async (req, res) => {
   }
 });
 
-router.route("/applicant/:id").get(async (req, res) => {
+router.route("/applicants/:id").get(async (req, res) => {
   //code here for applicant GET request
+  const applicantId = req.params.id.trim();
+  try {
+    const applicant = await applicantFunctions.getApplicant(applicantId);
+    res.status(200).json(applicant);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
+
+router
+  .route("/applicants/:applicantId/applied-companies")
+  .get(async (req, res) => {
+    const applicantId = req.params.applicantId.trim();
+    try {
+      let applicantAppliedCompanies =
+        await applicantFunctions.getPostingsAppliedByApplicant(applicantId);
+      res.status(200).json(applicantAppliedCompanies);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  });
 
 router.route("/employers").get(async (req, res) => {
   try {
@@ -178,7 +198,7 @@ router.route("/employers").get(async (req, res) => {
 });
 
 router.route("/employers/:employerId/postings").get(async (req, res) => {
-  const employerId = req.params.employerId;
+  const employerId = req.params.employerId.trim();
 
   try {
     let employerPostings = await employerFunctions.getEmployer(employerId);
@@ -189,22 +209,9 @@ router.route("/employers/:employerId/postings").get(async (req, res) => {
   }
 });
 
-router
-  .route("/applicants/:applicantId/applied-companies")
-  .get(async (req, res) => {
-    const applicantId = req.params.applicantId;
-    try {
-      let applicantAppliedCompanies =
-        await applicantFunctions.getPostingsAppliedByApplicant(applicantId);
-      res.status(200).json(applicantAppliedCompanies);
-    } catch (e) {
-      res.status(400).send(e);
-    }
-  });
-
 router.route("/update-profile/:userId").put(async (req, res) => {
   const updatedFields = req.body;
-  const userId = req.params.userId;
+  const userId = req.params.userId.trim();
   try {
     if (updatedFields.role === "applicant") {
       const updatedApplicant = await applicantFunctions.updateApplicant(
