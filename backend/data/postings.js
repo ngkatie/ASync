@@ -132,23 +132,13 @@ let exportedMethods = {
       throw 'Deletion failed';
     }
 
-    // remove postingId from applicant applied arrays
+    //remove postingId from applicant applied arrays
     const applicantsCollection = await applicants();
-    const applicantsWithPosting = await applicantsCollection
-      .find({ applied: postingId })
-      .toArray();
-
-    for (const applicant of applicantsWithPosting) {
-      const updatedAppliedArray = applicant.applied.filter(
-        (id) => id !== postingId
-      );
-
-      await applicantsCollection.updateOne(
-        { _id: new ObjectId(applicant._id) },
-        { $set: { applied: updatedAppliedArray } }
-      );
-    }
-
+    const updateResult = await applicantsCollection.updateMany(
+      { 'applied.postingId': new ObjectId(postingId) },
+      { $pull: { applied: { postingId: new ObjectId(postingId) } } }
+    );
+    console.log(updateResult);
     posting._id = posting._id.toString();
     posting.employerId = posting.employerId.toString();
     return posting;
