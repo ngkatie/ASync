@@ -128,11 +128,12 @@ router.route("/postings").post(async (req, res) => {
 
 router.route("/postings/apply/:id").post(async (req, res) => {
   const postingId = req.params.id.trim();
-  const { applicantId } = req.body;
+  const { applicantId, applicantStatus } = req.body;
   try {
     const applicantWithAppliedPosting = await applicantFunctions.applyToPosting(
       applicantId,
-      postingId
+      postingId,
+      applicantStatus
     );
     res.status(200).json(applicantWithAppliedPosting);
   } catch (e) {
@@ -183,6 +184,27 @@ router
       let applicantAppliedCompanies =
         await applicantFunctions.getPostingsAppliedByApplicant(applicantId);
       res.status(200).json(applicantAppliedCompanies);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  });
+
+router
+  .route("/applicants/:applicantId/update-status")
+  .patch(async (req, res) => {
+    const applicantId = req.params.applicantId.trim();
+    const { postingId, applicantStatus } = req.body;
+    console.log(applicantId);
+    console.log(postingId);
+    console.log(applicantStatus);
+    try {
+      let applicantWithUpdatedStatus =
+        await employerFunctions.updateApplicantStatus(
+          applicantId,
+          postingId,
+          applicantStatus
+        );
+      res.status(200).json(applicantWithUpdatedStatus);
     } catch (e) {
       res.status(400).send(e);
     }

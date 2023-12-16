@@ -26,7 +26,12 @@ const PostingDetailsModal = (props) => {
 
   const [isApplied, setIsApplied] = useState(false);
   const [currentApplicants, setCurrentApplicants] = useState([]);
-  const [applicantStatus, setApplicantStatus] = useState("");
+  const [applicantStatuses, setApplicantStatuses] = useState({});
+  const [applicationStatus, setApplicationStatus] = useState("");
+
+  // useEffect(() => {
+  //   console.log(applicantStatus);
+  // }, [applicantStatus]);
 
   useEffect(() => {
     async function fetchData() {
@@ -42,9 +47,19 @@ const PostingDetailsModal = (props) => {
             break;
           }
         }
+        const currentApplicant = await axios.get(
+          `http://localhost:3000/api/applicants/${currentUserState.userId}`
+        );
+        for (const application of currentApplicant.data.applied) {
+          if (application.postingId === currentSelectedPosting._id) {
+            setApplicationStatus(application.applicantStatus);
+            break;
+          }
+        }
       } else if (
         currentUserState.role === "employer" &&
         currentSelectedPosting &&
+        currentSelectedPosting.applicants &&
         currentSelectedPosting.applicants.length !== 0
       ) {
         const applicantList = [];
@@ -59,7 +74,7 @@ const PostingDetailsModal = (props) => {
       }
     }
     fetchData();
-  }, [currentSelectedPosting]);
+  }, [currentSelectedPosting, applicantStatuses]);
 
   const handleDeletePosting = async () => {
     try {
@@ -79,12 +94,32 @@ const PostingDetailsModal = (props) => {
 
   const handleApply = async () => {
     try {
-      const requestBody = { applicantId: currentUserState.userId };
+      const requestBody = {
+        applicantId: currentUserState.userId,
+        applicantStatus: applicantStatus || "In Progress",
+      };
       const applicantWithAppliedPosting = await axios.post(
         `http://localhost:3000/api/postings/apply/${currentSelectedPosting._id}`,
         requestBody
       );
       setIsApplied(true);
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+  const handleChangeApplicantStatus = async (newStatus, currentApplicant) => {
+    try {
+      const requestBody = {
+        postingId: currentSelectedPosting._id,
+        applicantStatus: newStatus,
+      };
+      console.log(currentApplicant);
+      const applicantWithUpdatedStatus = await axios.patch(
+        `http://localhost:3000/api/applicants/${currentApplicant._id}/update-status`,
+        requestBody
+      );
+      console.log(applicantWithUpdatedStatus.data);
     } catch (e) {
       alert(e);
     }
@@ -246,17 +281,27 @@ const PostingDetailsModal = (props) => {
                                 <Select
                                   labelId={`applicant-status-label-${index}`}
                                   id={`applicant-status-${index}`}
-                                  value={applicantStatus}
-                                  onChange={(e) =>
-                                    setApplicantStatus(e.target.value)
+                                  value={
+                                    applicantStatuses[applicant._id] ||
+                                    "In Progress"
                                   }
+                                  onChange={(e) => {
+                                    setApplicantStatuses((prevStatuses) => ({
+                                      ...prevStatuses,
+                                      [applicant._id]: e.target.value,
+                                    }));
+                                    handleChangeApplicantStatus(
+                                      e.target.value,
+                                      applicant
+                                    );
+                                  }}
                                   label="Status"
                                 >
-                                  <MenuItem value={`inProgress`}>
+                                  <MenuItem value={`In Progress`}>
                                     In Progress
                                   </MenuItem>
-                                  <MenuItem value={`accept`}>Accept</MenuItem>
-                                  <MenuItem value={`reject`}>Reject</MenuItem>
+                                  <MenuItem value={`Accepted`}>Accept</MenuItem>
+                                  <MenuItem value={`Rejected`}>Reject</MenuItem>
                                 </Select>
                               </FormControl>
                             </ListItemButton>
@@ -266,6 +311,20 @@ const PostingDetailsModal = (props) => {
                         <Typography>No applicants yet!</Typography>
                       )}
                     </List>
+                  </Box>
+                )}
+
+              {currentUserState &&
+                currentUserState.role === "applicant" &&
+                currentSelectedPosting.applicants.includes(
+                  currentUserState.userId
+                ) && (
+                  <Box>
+                    {applicationStatus && (
+                      <Typography sx={{ fontSize: 24, mt: 5 }}>
+                        Application Status: {applicationStatus}
+                      </Typography>
+                    )}
                   </Box>
                 )}
             </Box>
