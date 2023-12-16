@@ -54,11 +54,6 @@ let exportedMethods = {
     posting._id = posting._id.toString();
     posting.employerId = posting.employerId.toString();
 
-    const employersCollection = await employers();
-    await employersCollection.updateOne(
-      { _id: new ObjectId(employerId) },
-      { $addToSet: { postings: newId } }
-    );
     return posting;
   },
   async getPosting(postingId) {
