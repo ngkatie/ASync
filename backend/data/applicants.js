@@ -1,6 +1,6 @@
-import { applicants, postings, employers } from "../config/mongoCollections.js";
-import { ObjectId } from "mongodb";
-import postingFunctions from "./postings.js";
+import { applicants, postings, employers } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
+import postingFunctions from './postings.js';
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
@@ -22,12 +22,12 @@ let exportedMethods = {
       email: email,
     });
     if (existingApplicant) {
-      throw "Email is already in use";
+      throw 'Email is already in use';
     }
 
     const insertInfo = await applicantsCollection.insertOne(newApplicant);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw "failed to add applicant";
+      throw 'failed to add applicant';
     }
 
     const id = insertInfo.insertedId.toString();
@@ -38,13 +38,13 @@ let exportedMethods = {
   async getApplicant(applicantId) {
     if (
       !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
+      typeof applicantId !== 'string' ||
+      applicantId.trim() === ''
     ) {
-      throw "Applicant ID must be a non empty string";
+      throw 'Applicant ID must be a non empty string';
     }
     if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
 
     const applicantCollection = await applicants();
@@ -52,15 +52,16 @@ let exportedMethods = {
       _id: new ObjectId(applicantId),
     });
     if (!applicant) {
-      throw "no applicant with the given id exists";
+      throw 'no applicant with the given id exists';
     }
+    applicant._id = applicant._id.toString();
     return applicant;
   },
   async getAll() {
     const applicantCollection = await applicants();
     let applicantList = await applicantCollection.find({}).toArray();
     if (!applicantList) {
-      throw "failed to get all applicants";
+      throw 'failed to get all applicants';
     }
     applicantList = applicantList.map((applicant) => {
       return {
@@ -72,25 +73,25 @@ let exportedMethods = {
     return applicantList;
   },
   async updateApplicant(applicantId, updatedFields) {
-    const validFields = ["name", "email", "role", "city", "state", "industry"];
+    const validFields = ['name', 'email', 'role', 'city', 'state', 'industry'];
     if (
       !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
+      typeof applicantId !== 'string' ||
+      applicantId.trim() === ''
     ) {
-      throw "Applicant ID must be a non empty string";
+      throw 'Applicant ID must be a non empty string';
     }
     if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
-    if (!updatedFields || typeof updatedFields !== "object") {
-      throw "You must provide an object of updated fields";
+    if (!updatedFields || typeof updatedFields !== 'object') {
+      throw 'You must provide an object of updated fields';
     }
     const invalidFields = Object.keys(updatedFields).filter(
       (field) => !validFields.includes(field)
     );
     if (invalidFields.length > 0) {
-      throw `Invalid fields: ${invalidFields.join(", ")}`;
+      throw `Invalid fields: ${invalidFields.join(', ')}`;
     }
 
     const applicantsCollection = await applicants();
@@ -99,7 +100,7 @@ let exportedMethods = {
     });
 
     if (!currentApplicant) {
-      throw "No applicant found with the supplied ID";
+      throw 'No applicant found with the supplied ID';
     }
 
     let updatedApplicant = await applicantsCollection.updateOne(
@@ -107,24 +108,25 @@ let exportedMethods = {
       { $set: updatedFields }
     );
     if (updatedApplicant.acknowledged === false) {
-      throw "Failed to update applicant";
+      throw 'Failed to update applicant';
     }
 
     updatedApplicant = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
     });
+    updatedApplicant._id = updatedApplicant._id.toString();
     return updatedApplicant;
   },
   async deleteApplicant(applicantId) {
     if (
       !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
+      typeof applicantId !== 'string' ||
+      applicantId.trim() === ''
     ) {
-      throw "Applicant ID must be a non empty string";
+      throw 'Applicant ID must be a non empty string';
     }
     if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
     const applicantsCollection = await applicants();
     const applicant = await applicantsCollection.findOne({
@@ -132,7 +134,7 @@ let exportedMethods = {
     });
 
     if (!applicant) {
-      throw "No applicant found with the supplied ID";
+      throw 'No applicant found with the supplied ID';
     }
 
     const deleteResult = await applicantsCollection.deleteOne({
@@ -140,21 +142,22 @@ let exportedMethods = {
     });
     // console.log(deleteResult);
     if (deleteResult.deletedCount !== 1) {
-      throw "Deletion failed";
+      throw 'Deletion failed';
     }
+    applicant._id = applicant._id.toString();
     return applicant;
   },
   async getPostingsAppliedByApplicant(applicantId) {
     // get all postings that an applicant has applied to
     if (
       !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
+      typeof applicantId !== 'string' ||
+      applicantId.trim() === ''
     ) {
-      throw "Applicant ID must be a non empty string";
+      throw 'Applicant ID must be a non empty string';
     }
     if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
 
     const applicantsCollection = await applicants();
@@ -163,7 +166,7 @@ let exportedMethods = {
     });
 
     if (!applicant) {
-      throw "No applicant found with the supplied ID";
+      throw 'No applicant found with the supplied ID';
     }
 
     const appliedPostings = await Promise.all(
@@ -177,23 +180,23 @@ let exportedMethods = {
   async applyToPosting(applicantId, postingId, applicantStatus) {
     if (
       !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
+      typeof applicantId !== 'string' ||
+      applicantId.trim() === ''
     ) {
-      throw "Applicant ID must be a non empty string";
+      throw 'Applicant ID must be a non empty string';
     }
     if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
     if (
       !postingId ||
-      typeof postingId !== "string" ||
-      postingId.trim() === ""
+      typeof postingId !== 'string' ||
+      postingId.trim() === ''
     ) {
-      throw "Posting ID must be a non empty string";
+      throw 'Posting ID must be a non empty string';
     }
     if (!ObjectId.isValid(postingId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
 
     const applicantsCollection = await applicants();
@@ -201,10 +204,10 @@ let exportedMethods = {
       _id: new ObjectId(applicantId),
     });
     if (!applicant) {
-      throw "No applicant found with the supplied ID";
+      throw 'No applicant found with the supplied ID';
     }
     if (applicant.applied.includes(postingId)) {
-      throw "Applicant has already applied to this posting";
+      throw 'Applicant has already applied to this posting';
     }
 
     //add postingId to applied field of applicants
@@ -245,15 +248,15 @@ let exportedMethods = {
     });
 
     if (!employer) {
-      throw "No employer found for the posting";
+      throw 'No employer found for the posting';
     }
 
     const updatedEmployer = await employersCollection.updateOne(
       {
         _id: new ObjectId(postingWithNewApplicant.employerId),
-        "postings._id": new ObjectId(postingId),
+        'postings._id': new ObjectId(postingId),
       },
-      { $addToSet: { "postings.$.applicants": applicantId } }
+      { $addToSet: { 'postings.$.applicants': applicantId } }
     );
 
     if (updatedEmployer.acknowledged === false) {

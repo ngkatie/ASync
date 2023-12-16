@@ -21,12 +21,12 @@ let exportedMethods = {
       email: email,
     });
     if (existingEmployer) {
-      throw "Email is already in use";
+      throw 'Email is already in use';
     }
 
     const insertInfo = await employersCollection.insertOne(newEmployer);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw "failed to add employer";
+      throw 'failed to add employer';
     }
 
     const id = insertInfo.insertedId.toString();
@@ -37,13 +37,13 @@ let exportedMethods = {
   async getEmployer(employerId) {
     if (
       !employerId ||
-      typeof employerId !== "string" ||
-      employerId.trim() === ""
+      typeof employerId !== 'string' ||
+      employerId.trim() === ''
     ) {
-      throw "Invalid employer ID";
+      throw 'Invalid employer ID';
     }
     if (!ObjectId.isValid(employerId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
 
     const employerCollection = await employers();
@@ -51,15 +51,16 @@ let exportedMethods = {
       _id: new ObjectId(employerId),
     });
     if (!employer) {
-      throw "no employer with the given id exists";
+      throw 'no employer with the given id exists';
     }
+    employer._id = employer._id.toString();
     return employer;
   },
   async getAll() {
     const employerCollection = await employers();
     let employerList = await employerCollection.find({}).toArray();
     if (!employerList) {
-      throw "failed to get all employers";
+      throw 'failed to get all employers';
     }
     employerList = employerList.map((employer) => {
       return {
@@ -72,33 +73,33 @@ let exportedMethods = {
   },
   async updateEmployer(employerId, updatedFields) {
     const validFields = [
-      "name",
-      "email",
-      "companyName",
-      "role",
-      "state",
-      "city",
-      "industry",
+      'name',
+      'email',
+      'companyName',
+      'role',
+      'state',
+      'city',
+      'industry',
     ];
 
     if (
       !employerId ||
-      typeof employerId !== "string" ||
-      employerId.trim() === ""
+      typeof employerId !== 'string' ||
+      employerId.trim() === ''
     ) {
-      throw "Employer ID must be a non empty string";
+      throw 'Employer ID must be a non empty string';
     }
     if (!ObjectId.isValid(employerId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
-    if (!updatedFields || typeof updatedFields !== "object") {
-      throw "You must provide an object of updated fields";
+    if (!updatedFields || typeof updatedFields !== 'object') {
+      throw 'You must provide an object of updated fields';
     }
     const invalidFields = Object.keys(updatedFields).filter(
       (field) => !validFields.includes(field)
     );
     if (invalidFields.length > 0) {
-      throw `Invalid fields: ${invalidFields.join(", ")}`;
+      throw `Invalid fields: ${invalidFields.join(', ')}`;
     }
 
     const employersCollection = await employers();
@@ -107,7 +108,7 @@ let exportedMethods = {
     });
 
     if (!currentEmployer) {
-      throw "No employer found with the supplied ID";
+      throw 'No employer found with the supplied ID';
     }
 
     let updatedEmployer = await employersCollection.updateOne(
@@ -116,24 +117,25 @@ let exportedMethods = {
     );
     //console.log(updatedEmployer);
     if (updatedEmployer.acknowledged === false) {
-      throw "Failed to update employer";
+      throw 'Failed to update employer';
     }
 
     updatedEmployer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
     });
+    updatedEmployer._id = updatedEmployer._id.toString();
     return updatedEmployer;
   },
   async deleteEmployer(employerId) {
     if (
       !employerId ||
-      typeof employerId !== "string" ||
-      employerId.trim() === ""
+      typeof employerId !== 'string' ||
+      employerId.trim() === ''
     ) {
-      throw "Employer ID must be a non empty string";
+      throw 'Employer ID must be a non empty string';
     }
     if (!ObjectId.isValid(employerId)) {
-      throw "Invalid ObjectID";
+      throw 'Invalid ObjectID';
     }
     const employersCollection = await employers();
     const employer = await employersCollection.findOne({
@@ -141,7 +143,7 @@ let exportedMethods = {
     });
 
     if (!employer) {
-      throw "No employer found with the supplied ID";
+      throw 'No employer found with the supplied ID';
     }
 
     const deleteResult = await employersCollection.deleteOne({
@@ -149,8 +151,9 @@ let exportedMethods = {
     });
     // console.log(deleteResult);
     if (deleteResult.deletedCount !== 1) {
-      throw "Deletion failed";
+      throw 'Deletion failed';
     }
+    employer._id = employer._id.toString();
     return employer;
   },
   async updateApplicantStatus(applicantId, postingId, newStatus) {
