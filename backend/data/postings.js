@@ -138,11 +138,6 @@ let exportedMethods = {
       throw 'Deletion failed';
     }
 
-    const employerWithDeletedPosting = await this.deletePostingFromEmployer(
-      posting.employerId,
-      postingId
-    );
-
     //remove postingId from applicant applied arrays
     const applicantsCollection = await applicants();
     const updateResult = await applicantsCollection.updateMany(
