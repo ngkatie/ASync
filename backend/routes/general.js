@@ -141,6 +141,11 @@ router.route('/postings/:id').delete(async (req, res) => {
   const postingId = req.params.id.trim();
   try {
     const deletedPosting = await postingFunctions.deletePosting(postingId);
+    const employerWithDeletedPosting =
+      await postingFunctions.deletePostingFromEmployer(
+        deletedPosting.employerId,
+        postingId
+      );
     res.status(200).json(deletedPosting);
   } catch (e) {
     res.status(400).send(e);

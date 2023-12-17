@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import EmployerCard from "./EmployerCard";
-import Navbar from "./Navbar";
-import { Box, Button, Pagination, Stack, Typography } from "@mui/material";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import PostingCard from "./PostingCard";
-import PostingDetailsModal from "./PostingDetailsModal";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import EmployerCard from './EmployerCard';
+import Navbar from './Navbar';
+import { Box, Button, Pagination, Stack, Typography } from '@mui/material';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import PostingCard from './PostingCard';
+import PostingDetailsModal from './PostingDetailsModal';
 
 function Postings() {
   let { page } = useParams();
@@ -14,7 +14,7 @@ function Postings() {
 
   const [postings, setPostings] = useState([]);
   const [numberOfTotalPostings, setNumberOfTotalPostings] = useState(0);
-  const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
+  const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState('');
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
   const [startingIndex, setStartingIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(page);
@@ -24,7 +24,7 @@ function Postings() {
   useEffect(() => {
     async function fetchData() {
       if (isNaN(page) || page < 1) {
-        navigate("/400");
+        navigate('/400');
         return;
       }
       try {
@@ -37,14 +37,14 @@ function Postings() {
           setCurrentSelectedPostingId(postingList.data[0]._id);
         }
         const totalPostings = await axios.get(
-          "http://localhost:3000/api/postings"
+          'http://localhost:3000/api/postings'
         );
         setNumberOfTotalPostings(totalPostings.data.length);
         let index = (page - 1) * 10;
         setStartingIndex(index);
       } catch (e) {
         alert(e);
-        navigate("/404");
+        navigate('/404');
       }
     }
     fetchData();
@@ -86,20 +86,20 @@ function Postings() {
       <Navbar />
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
           mt: 20,
         }}
       >
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
             mr: 10,
           }}
         >
@@ -117,30 +117,38 @@ function Postings() {
           ) : (
             <Typography>No postings available yet!</Typography>
           )}
-
-          {postings &&
-            postings.map((posting) => (
-              // <Link to={`/postings/${posting._id}`} key={posting._id}>
-              <PostingCard
-                key={posting._id}
-                postingId={posting._id}
-                jobTitle={posting.jobTitle}
-                companyName={posting.companyName}
-                companyLogo={posting.companyLogo}
-                jobType={posting.jobType}
-                numOfEmployees={posting.numOfEmployees}
-                description={posting.description}
-                pay={posting.pay}
-                rate={posting.rate}
-                applicants={posting.applicants}
-                skills={posting.skills}
-                city={posting.city}
-                state={posting.state}
-                postedDate={posting.postedDate}
-                setCurrentSelectedPostingId={setCurrentSelectedPostingId}
-              />
-              // </Link>
-            ))}
+          <Box
+            sx={{
+              minHeight: 600,
+              maxHeight: 650,
+              overflowY: 'auto',
+              p: 2,
+            }}
+          >
+            {postings &&
+              postings.map((posting) => (
+                // <Link to={`/postings/${posting._id}`} key={posting._id}>
+                <PostingCard
+                  key={posting._id}
+                  postingId={posting._id}
+                  jobTitle={posting.jobTitle}
+                  companyName={posting.companyName}
+                  companyLogo={posting.companyLogo}
+                  jobType={posting.jobType}
+                  numOfEmployees={posting.numOfEmployees}
+                  description={posting.description}
+                  pay={posting.pay}
+                  rate={posting.rate}
+                  applicants={posting.applicants}
+                  skills={posting.skills}
+                  city={posting.city}
+                  state={posting.state}
+                  postedDate={posting.postedDate}
+                  setCurrentSelectedPostingId={setCurrentSelectedPostingId}
+                />
+                // </Link>
+              ))}
+          </Box>
         </Box>
         {currentSelectedPostingId && currentSelectedPosting && (
           <PostingDetailsModal

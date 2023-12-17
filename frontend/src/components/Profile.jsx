@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
-import Navbar from "./Navbar";
-import { updateProfile } from "firebase/auth";
-import ChangePassword from "./ChangePassword";
-import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { doSignOut } from "../firebase/FirebaseFunctions";
-import { setUser, unsetUser } from "../actions";
-import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
-import axios from "axios";
-import PostingCard from "./PostingCard";
-import PostingDetailsModal from "./PostingDetailsModal";
+import React, { useState, useEffect, useContext } from 'react';
+import Navbar from './Navbar';
+import { updateProfile } from 'firebase/auth';
+import ChangePassword from './ChangePassword';
+import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { doSignOut } from '../firebase/FirebaseFunctions';
+import { setUser, unsetUser } from '../actions';
+import { Box, Button, Tab, Tabs, TextField, Typography } from '@mui/material';
+import axios from 'axios';
+import PostingCard from './PostingCard';
+import PostingDetailsModal from './PostingDetailsModal';
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
@@ -19,7 +19,7 @@ const Profile = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [tab, setTab] = useState(0);
   const [postings, setPostings] = useState([]);
-  const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState("");
+  const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState('');
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
   const [appliedCompanies, setAppliedCompanies] = useState([]);
 
@@ -40,7 +40,7 @@ const Profile = () => {
           city: currentUserState.city,
           industry: currentUserState.industry,
         });
-        if (currentUserState.role === "employer") {
+        if (currentUserState.role === 'employer') {
           const postingList = await axios.get(
             `http://localhost:3000/api/employers/${currentUserState.userId}/postings`
           );
@@ -49,7 +49,7 @@ const Profile = () => {
           if (postingList.data.length !== 0) {
             setCurrentSelectedPostingId(postingList.data[0]._id);
           }
-        } else if (currentUserState.role === "applicant") {
+        } else if (currentUserState.role === 'applicant') {
           const appliedCompaniesList = await axios.get(
             `http://localhost:3000/api/applicants/${currentUserState.userId}/applied-companies`
           );
@@ -62,8 +62,9 @@ const Profile = () => {
 
   useEffect(() => {
     async function fetchData() {
+      console.log(postings);
       try {
-        if (postings.length !== 0) {
+        if (postings && postings.length !== 0) {
           let posting = await axios.get(
             `http://localhost:3000/api/postings/${currentSelectedPostingId}`
           );
@@ -123,7 +124,7 @@ const Profile = () => {
       );
       setEdit(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating profile:', error);
     }
   };
 
@@ -152,12 +153,12 @@ const Profile = () => {
 
     return (
       <div
-        role="tabpanel"
+        role='tabpanel'
         hidden={value !== index}
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
         {...other}
-        style={{ minHeight: "700px" }}
+        style={{ minHeight: '700px' }}
       >
         {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
       </div>
@@ -169,32 +170,32 @@ const Profile = () => {
       <Navbar />
       <Box
         sx={{
-          width: "100%",
-          bgcolor: "background.paper",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          width: '100%',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           mt: 20,
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={handleTabChange} centered>
-            <Tab label="About" />
-            {userData && userData.role === "employer" ? (
-              <Tab label="Postings" />
+            <Tab label='About' />
+            {userData && userData.role === 'employer' ? (
+              <Tab label='Postings' />
             ) : (
-              <Tab label="Applied Companies" />
+              <Tab label='Applied Companies' />
             )}
-            <Tab label="Settings" />
+            <Tab label='Settings' />
           </Tabs>
         </Box>
 
         <TabPanel value={tab} index={0}>
-          <Box sx={{ textAlign: "left" }}>
+          <Box sx={{ textAlign: 'left' }}>
             <Typography sx={{ fontSize: 30 }}>{userData.name}</Typography>
             <Typography>{userData.email}</Typography>
-            {userData && userData.role === "employer" && (
+            {userData && userData.role === 'employer' && (
               <Typography>{userData.companyName}</Typography>
             )}
             <Typography>
@@ -204,24 +205,24 @@ const Profile = () => {
           </Box>
         </TabPanel>
 
-        {userData && userData.role === "employer" && (
+        {userData && userData.role === 'employer' && (
           <TabPanel value={tab} index={1}>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
                 mt: 20,
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 {postings && postings.length !== 0 ? (
@@ -260,7 +261,7 @@ const Profile = () => {
           </TabPanel>
         )}
 
-        {userData && userData.role === "applicant" && (
+        {userData && userData.role === 'applicant' && (
           <TabPanel value={tab} index={1}>
             <Box>
               {appliedCompanies &&
@@ -291,25 +292,25 @@ const Profile = () => {
         <TabPanel value={tab} index={2}>
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
             {edit && (
               <>
                 <TextField
-                  label="Name"
-                  name="name"
+                  label='Name'
+                  name='name'
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 4 }}
                 />
                 <TextField
-                  label="Email"
-                  name="email"
+                  label='Email'
+                  name='email'
                   value={userData.email}
                   onChange={handleChange}
                   fullWidth
@@ -317,7 +318,7 @@ const Profile = () => {
                   sx={{ mb: 2 }}
                 />
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={handleSaveClick}
                   sx={{ mb: 2 }}
                 >
@@ -326,14 +327,14 @@ const Profile = () => {
               </>
             )}
             <Button
-              variant="outlined"
+              variant='outlined'
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
               Edit credentials
             </Button>
             <Button
-              variant="outlined"
+              variant='outlined'
               onClick={showPasswordForm}
               sx={{ mb: 2 }}
             >
@@ -342,7 +343,7 @@ const Profile = () => {
             {showChangePassword && (
               <ChangePassword hideForm={hidePasswordForm} />
             )}
-            <Link to="/" onClick={handleSignOut}>
+            <Link to='/' onClick={handleSignOut}>
               Log out
             </Link>
           </Box>
