@@ -2,13 +2,14 @@ import { Router } from 'express';
 import postingFunctions from '../data/postings.js';
 import applicantFunctions from '../data/applicants.js';
 import employerFunctions from '../data/employers.js';
+import * as validation from "./routeValidation.js"
 
 const router = Router();
 
 // **** REDIS ****
-// import redis from 'redis';
-// const client = redis.createClient();
-// client.connect();
+import redis from 'redis';
+const client = redis.createClient();
+client.connect();
 
 router.route('/login').post(async (req, res) => {
   //code here for login POST request
@@ -29,8 +30,8 @@ router.route('/register').post(async (req, res) => {
       res.status(201).json(applicant);
     } else if (userRole === 'employer') {
       const { companyName } = req.body;
-      console.log(req.body);
-      console.log(email);
+      // console.log(req.body);
+      // console.log(email);
       const employer = await employerFunctions.addEmployer(
         displayName,
         email,
@@ -61,11 +62,20 @@ router.route('/postings').get(async (req, res) => {
 
 router.route('/postings/:id').get(async (req, res) => {
   //code here for posting GET request
-  const postingId = req.params.id.trim();
   try {
-    const posting = await postingFunctions.getPosting(postingId);
-    console.log(posting);
-    res.status(200).json(posting);
+    const postingId = validation.validStr(req.params.id);
+    let postingInfo = null;
+
+    let posting = await client.hGet('postings', postingId);
+    if (posting) {
+      postingInfo = JSON.parse(posting);
+      console.log(`Posting ${postingId} from cache`);
+    }
+    else {
+      postingInfo = await postingFunctions.getPosting(postingId);
+      await client.hSet('postings', postingId, JSON.stringify(postingInfo));
+    }
+    return res.status(200).json(postingInfo);
   } catch (e) {
     res.status(400).send(e);
   }
@@ -73,15 +83,18 @@ router.route('/postings/:id').get(async (req, res) => {
 
 router.route('/postings/page/:pagenum').get(async (req, res) => {
   try {
-    let page = req.params.pagenum.trim();
-    page = Number(page);
-    if (page <= 0) {
-      res.status(400).send('400 BAD REQUEST');
-    }
+    let page = validation.validInt(req.params.pagenum);
+    let postingsByPageNumber = null;
 
-    let postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(
-      page
-    );
+    let cachedPostings = await client.hGet('postingsPage', page);
+    if (cachedPostings) {
+      postingsByPageNumber = JSON.parse(cachedPostings);
+      console.log(`Postings on page ${page} from cache`);
+    }
+    else {
+      postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(page);
+      await client.hSet('postingsPage', page, JSON.stringify(postingsByPageNumber));
+    }
     console.log(postingsByPageNumber.length);
     res.status(200).json(postingsByPageNumber);
   } catch (e) {
@@ -126,9 +139,9 @@ router.route('/postings').post(async (req, res) => {
 });
 
 router.route('/postings/apply/:id').post(async (req, res) => {
-  const postingId = req.params.id.trim();
   const { applicantId, applicantStatus } = req.body;
   try {
+    const postingId = validation.validStr(req.params.id);
     const applicantWithAppliedPosting = await applicantFunctions.applyToPosting(
       applicantId,
       postingId,
@@ -181,12 +194,23 @@ router.route('/applicants').get(async (req, res) => {
 
 router.route('/applicants/:id').get(async (req, res) => {
   //code here for applicant GET request
-  const applicantId = req.params.id.trim();
+  let applicant = null;
   try {
-    const applicant = await applicantFunctions.getApplicant(applicantId);
+    const applicantId = validation.validStr(req.params.id);
+    const cachedApplicant = await client.hGet('applicants', applicantId);
+    if (cachedApplicant) {
+      applicant = JSON.parse(cachedApplicant);
+      console.log(`Applicant ${applicantId} from cache`);
+    }
+    else {
+      console.log('Getting applicant from API');
+      applicant = await applicantFunctions.getApplicant(applicantId);
+      await client.hSet('applicants', applicantId, JSON.stringify(applicant));
+    }
     res.status(200).json(applicant);
   } catch (e) {
     res.status(400).send(e);
+    console.log(e);
   }
 });
 

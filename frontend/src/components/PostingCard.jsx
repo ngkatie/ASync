@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 
 const PostingCard = ({
   postingId,
+  userRole,
   jobTitle,
   companyName,
   companyLogo,
@@ -44,9 +45,11 @@ const PostingCard = ({
           {city}, {state}
         </Typography>
         
-        {/* <Typography>
-          Status: {status}
-        </Typography> */}
+        {userRole ? 
+          <Typography color="textSecondary" gutterBottom>
+            Status: {status}
+          </Typography>
+        : ""}
         {/* <Typography color="textSecondary" gutterBottom>
           {numOfEmployees} employees
         </Typography>

@@ -79,6 +79,16 @@ const Profile = () => {
     fetchData();
   }, [currentSelectedPostingId]);
 
+  const findStatus = async (postingId) => {
+    console.log('REACHED');
+    let applicant = await axios.get(
+      `http://localhost:3000/api/applicants/${currentUserState.userId}`
+    );
+    const { data } = applicant;
+    const appInfo = data.applied.filter((post) => post.postingId == postingId);
+    return appInfo[0].applicantStatus;
+  }
+
   const handleSignOut = () => {
     doSignOut();
     dispatch(unsetUser());
@@ -235,6 +245,7 @@ const Profile = () => {
                   postings.map((posting) => (
                     <PostingCard
                       key={posting._id}
+                      userRole={userData.role}
                       postingId={posting._id}
                       jobTitle={posting.jobTitle}
                       companyName={posting.companyName}
@@ -274,6 +285,7 @@ const Profile = () => {
                 appliedCompanies.map((posting) => (
                   <PostingCard
                     key={posting._id}
+                    userRole={userData.role}
                     postingId={posting._id}
                     jobTitle={posting.jobTitle}
                     companyName={posting.companyName}
@@ -288,7 +300,7 @@ const Profile = () => {
                     city={posting.city}
                     state={posting.state}
                     postedDate={posting.postedDate}
-                    // status={findStatus}
+                    status={findStatus(posting._id)}
                     setCurrentSelectedPostingId={setCurrentSelectedPostingId}
                   />
                 ))
