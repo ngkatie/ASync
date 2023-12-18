@@ -29,6 +29,8 @@ router.route('/register').post(async (req, res) => {
       res.status(201).json(applicant);
     } else if (userRole === 'employer') {
       const { companyName } = req.body;
+      console.log(req.body);
+      console.log(email);
       const employer = await employerFunctions.addEmployer(
         displayName,
         email,

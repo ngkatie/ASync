@@ -50,7 +50,7 @@ function validEmail(str) {
     if (!EmailValidator.validate(email)) {
         throw `Error: Invalid ${email}`;
     }
-    return true;
+    return email;
   }
   
 

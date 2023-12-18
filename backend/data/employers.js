@@ -27,7 +27,7 @@ let exportedMethods = {
     };
 
     const employersCollection = await employers();
-
+  
     const existingEmployer = await employersCollection.findOne({
       email: email,
     });
