@@ -176,7 +176,12 @@ const Profile = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          mt: 20,
+          color: "black",
+          backgroundColor: 'rgb(200,200,200)',
+          padding: '10px',
+          borderRadius: 5,
+          width: '100%',
+          mt: 11,
         }}
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -214,7 +219,6 @@ const Profile = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                mt: 20,
               }}
             >
               <Box
@@ -223,6 +227,7 @@ const Profile = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  color: "black",
                 }}
               >
                 {postings && postings.length !== 0 ? (
@@ -296,6 +301,7 @@ const Profile = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
+              color: "black",
             }}
           >
             {edit && (

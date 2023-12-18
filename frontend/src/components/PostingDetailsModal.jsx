@@ -140,13 +140,16 @@ const PostingDetailsModal = (props) => {
             justifyContent: 'space-between',
             border: '1px solid rgba(0, 0, 0, 0.2)',
             borderRadius: 5,
+            backgroundColor: "white",
             minHeight: 600,
             maxHeight: 650,
             minWidth: 500,
             maxWidth: 600,
             overflowY: 'auto',
+            boxShadow: 2,
             p: 2,
-            ml: 10,
+            mr: 5,
+            ml: 5,
           }}
         >
           <Box
@@ -155,6 +158,7 @@ const PostingDetailsModal = (props) => {
               flexDirection: 'column',
               alignItems: 'flex-start',
               width: '100%',
+              color: 'black',
             }}
           >
             <Box
@@ -164,6 +168,7 @@ const PostingDetailsModal = (props) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 width: '100%',
+                color: 'black',
               }}
             >
               <Typography sx={{ fontSize: 30 }}>

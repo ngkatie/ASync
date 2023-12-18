@@ -24,7 +24,7 @@ function Navbar() {
         display: "flex",
         alignItems: "center",
         width: "100%",
-        height: "120px",
+        height: "100px",
         backgroundColor: "rgba(255, 255, 255, .95)",
         color: "black",
         position: "fixed",
