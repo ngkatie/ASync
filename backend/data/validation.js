@@ -1,4 +1,5 @@
 import EmailValidator from "email-validator";
+import { ObjectId } from "mongodb";
 
 function validObjectId(id) {
     if (
@@ -45,7 +46,7 @@ function validAlphabetical(input) {
 }
 
 function validEmail(str) {
-    const email = checkString(str).toLowerCase();
+    const email = validStr(str).toLowerCase();
     if (!EmailValidator.validate(email)) {
         throw `Error: Invalid ${email}`;
     }

@@ -31,6 +31,7 @@ let exportedMethods = {
     const existingEmployer = await employersCollection.findOne({
       email: email,
     });
+    console.log(existingEmployer);
     if (existingEmployer) {
       throw [400, 'Email is already in use'];
     }

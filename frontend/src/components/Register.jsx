@@ -85,6 +85,7 @@ const Register = () => {
       );
     } catch (e) {
       alert(e);
+      console.log(e);
     }
   };
 
@@ -122,23 +123,24 @@ const Register = () => {
             required
             sx={{ mb: 4 }}
           />
-          <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
-            <FormControl sx={{ width: "50%" }}>
-              <InputLabel id="user-role-label">Role *</InputLabel>
-              <Select
-                labelId="user-role-label"
-                id="user-role"
-                value={userType}
-                onChange={(e) => setUserType(e.target.value)}
-                label="Role"
-                required
+          <FormControl fullWidth required>
+            <InputLabel id="user-role-label">Role</InputLabel>
+            <Select
+              labelId="user-role-label"
+              id="user-role"
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              label="Role"
+              required
+              sx={{ mb: 4 }}
               >
-                <MenuItem value="applicant">Applicant</MenuItem>
-                <MenuItem value="employer">Employer</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl sx={{ width: "50%" }}>
-              <InputLabel id="user-state-label">State *</InputLabel>
+              <MenuItem value="applicant">Applicant</MenuItem>
+              <MenuItem value="employer">Employer</MenuItem>
+            </Select>
+          </FormControl>
+          <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
+            <FormControl sx={{ width: "50%" }} required>
+              <InputLabel id="user-state-label">State</InputLabel>
               <Select
                 labelId="user-state-label"
                 id="user-state"

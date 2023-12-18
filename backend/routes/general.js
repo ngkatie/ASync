@@ -43,6 +43,7 @@ router.route('/register').post(async (req, res) => {
     }
   } catch (e) {
     res.status(400).send(e);
+    console.log(e);
   }
 });
 
