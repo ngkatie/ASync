@@ -86,19 +86,20 @@ router.route('/postings/page/:pagenum').get(async (req, res) => {
     let page = validation.validInt(req.params.pagenum);
     let postingsByPageNumber = null;
 
-    let cachedPostings = await client.hGet('postingsPage', page);
+    let cachedPostings = await client.hGet('postingsPage', toString(page));
     if (cachedPostings) {
       postingsByPageNumber = JSON.parse(cachedPostings);
       console.log(`Postings on page ${page} from cache`);
     }
     else {
       postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(page);
-      await client.hSet('postingsPage', page, JSON.stringify(postingsByPageNumber));
+      await client.hSet('postingsPage', toString(page), JSON.stringify(postingsByPageNumber));
     }
     console.log(postingsByPageNumber.length);
     res.status(200).json(postingsByPageNumber);
   } catch (e) {
     res.status(400).send(e);
+    console.log(e);
   }
 });
 
