@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Navbar from './Navbar';
 import { updateProfile } from 'firebase/auth';
 import ChangePassword from './ChangePassword';
+import UploadImageModal from './UploadImageModal';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +18,7 @@ const Profile = () => {
   const [userData, setUserData] = useState({});
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showUploadImage, setShowUploadImage] = useState(false);
   const [tab, setTab] = useState(0);
   const [postings, setPostings] = useState([]);
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState('');
@@ -40,6 +42,7 @@ const Profile = () => {
           state: currentUserState.state,
           city: currentUserState.city,
           industry: currentUserState.industry,
+          photoURL: currentUser.photoURL
         });
         if (currentUserState.role === 'employer') {
           const postingList = await axios.get(
@@ -147,6 +150,14 @@ const Profile = () => {
     setShowChangePassword(false);
   };
 
+  const showUploadImageForm = () => {
+    setShowUploadImage(true);
+  }
+
+  const hideUploadPhotoForm = () => {
+    setShowUploadImage(false);
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({
@@ -209,6 +220,10 @@ const Profile = () => {
 
         <TabPanel value={tab} index={0}>
           <Box sx={{ textAlign: 'left' }}>
+            {userData.photoURL 
+              ? <img src={userData.photoURL} width="200"/>
+              : ""
+            }
             <Typography sx={{ fontSize: 30 }}>{userData.name}</Typography>
             <Typography>{userData.email}</Typography>
             {userData && userData.role === 'employer' && (
@@ -349,6 +364,7 @@ const Profile = () => {
                 </Button>
               </>
             )}
+
             <Button
               variant='outlined'
               onClick={handleEditClick}
@@ -356,6 +372,18 @@ const Profile = () => {
             >
               Edit credentials
             </Button>
+
+            <Button
+              variant='outlined'
+              onClick={showUploadImageForm}
+              sx={{ mb: 2 }}
+            >
+              Upload profile photo
+            </Button>
+            {showUploadImage && (
+              <UploadImageModal hideForm={hideUploadPhotoForm}/>
+            )}
+
             <Button
               variant='outlined'
               onClick={showPasswordForm}
@@ -366,6 +394,7 @@ const Profile = () => {
             {showChangePassword && (
               <ChangePassword hideForm={hidePasswordForm} />
             )}
+            
             <Link to='/' onClick={handleSignOut}>
               Log out
             </Link>

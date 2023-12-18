@@ -12,6 +12,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import PostingDetails from "./components/PostingDetails";
 import Apply from "./components/Apply";
 import CreatePosting from "./components/CreatePosting";
+import UploadImageModal from "./components/UploadImageModal";
 
 function App() {
   return (

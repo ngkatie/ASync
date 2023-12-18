@@ -9,8 +9,10 @@ import { initializeApp } from "firebase/app";
 import { Provider } from "react-redux";
 import { store, persistor } from "./store.js";
 import { PersistGate } from "redux-persist/integration/react";
+import { getStorage } from "firebase/storage";
 
 const app = initializeApp(firebaseConfig);
+export const storage = getStorage(app);
 
 const theme = createTheme({
   typography: {
