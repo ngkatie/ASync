@@ -1,9 +1,20 @@
 import { employers, applicants } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
+import * as validation from "./validation.js"
 
 let exportedMethods = {
   async addEmployer(name, email, companyName, city, state, industry) {
     //add validation
+    try {
+      name = validation.validAlphabetical(name);
+      email = validation.validEmail(email);
+      companyName = validation.validStr(companyName);
+      city = validation.validAlphabetical(city);
+      state = validation.validState(state);
+      industry = validation.validStr(industry);
+    } catch (error) {
+      throw [400, error];
+    }
 
     let newEmployer = {
       name: name,
@@ -12,7 +23,7 @@ let exportedMethods = {
       city: city,
       state: state,
       industry: industry,
-      postings: [],
+      postings: []
     };
 
     const employersCollection = await employers();
@@ -21,12 +32,12 @@ let exportedMethods = {
       email: email,
     });
     if (existingEmployer) {
-      throw 'Email is already in use';
+      throw [400, 'Email is already in use'];
     }
 
     const insertInfo = await employersCollection.insertOne(newEmployer);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw 'failed to add employer';
+      throw [400, 'Failed to add employer'];
     }
 
     const id = insertInfo.insertedId.toString();
@@ -34,28 +45,21 @@ let exportedMethods = {
     employer._id = employer._id.toString();
     return employer;
   },
+
   async getEmployer(employerId) {
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Invalid employer ID';
-    }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID';
-    }
+    employerId = validation.validObjectId(employerId);
 
     const employerCollection = await employers();
     const employer = await employerCollection.findOne({
       _id: new ObjectId(employerId),
     });
     if (!employer) {
-      throw 'no employer with the given id exists';
+      throw [404, 'No employer with the given ID exists'];
     }
     employer._id = employer._id.toString();
     return employer;
   },
+
   async getAll() {
     const employerCollection = await employers();
     let employerList = await employerCollection.find({}).toArray();
@@ -71,6 +75,7 @@ let exportedMethods = {
 
     return employerList;
   },
+
   async updateEmployer(employerId, updatedFields) {
     const validFields = [
       'name',
@@ -82,24 +87,15 @@ let exportedMethods = {
       'industry',
     ];
 
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Employer ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID';
-    }
+    employerId = validation.validObjectId(employerId);
     if (!updatedFields || typeof updatedFields !== 'object') {
-      throw 'You must provide an object of updated fields';
+      throw [400, 'You must provide an object of updated fields'];
     }
     const invalidFields = Object.keys(updatedFields).filter(
       (field) => !validFields.includes(field)
     );
     if (invalidFields.length > 0) {
-      throw `Invalid fields: ${invalidFields.join(', ')}`;
+      throw [400, `Invalid fields: ${invalidFields.join(', ')}`];
     }
 
     const employersCollection = await employers();
@@ -108,7 +104,7 @@ let exportedMethods = {
     });
 
     if (!currentEmployer) {
-      throw 'No employer found with the supplied ID';
+      throw [404, 'No employer found with the supplied ID'];
     }
 
     let updatedEmployer = await employersCollection.updateOne(
@@ -126,17 +122,9 @@ let exportedMethods = {
     updatedEmployer._id = updatedEmployer._id.toString();
     return updatedEmployer;
   },
+
   async deleteEmployer(employerId) {
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Employer ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID';
-    }
+    employerId = validation.validObjectId(employerId);
     const employersCollection = await employers();
     const employer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
