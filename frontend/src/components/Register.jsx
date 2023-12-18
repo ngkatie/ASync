@@ -98,7 +98,7 @@ const Register = () => {
   return (
     <div>
       <Navbar />
-      <Box sx={{ maxWidth: "500px", marginTop: 10 }}>
+      <Box sx={{ maxWidth: "500px", marginTop: 10, color: "black" }}>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
           Create an account
         </Typography>

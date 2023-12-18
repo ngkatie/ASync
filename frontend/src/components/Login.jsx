@@ -90,7 +90,7 @@ const Login = () => {
     <div>
       <Navbar />
       <Box>
-        <Typography variant='h4' sx={{ marginBottom: 2 }}>
+        <Typography variant='h4' sx={{ marginBottom: 2, color: "black" }}>
           Log In
         </Typography>
 
