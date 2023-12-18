@@ -12,9 +12,12 @@ import {
   MenuItem,
   Select,
   Typography,
+  Dialog,
+  DialogContent,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import EditPostingForm from './EditPostingForm';
 
 const PostingDetailsModal = (props) => {
   const {
@@ -28,6 +31,7 @@ const PostingDetailsModal = (props) => {
   const [currentApplicants, setCurrentApplicants] = useState([]);
   const [applicantStatuses, setApplicantStatuses] = useState({});
   const [applicationStatus, setApplicationStatus] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   // useEffect(() => {
   //   console.log(applicantStatus);
@@ -129,6 +133,29 @@ const PostingDetailsModal = (props) => {
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveEditing = async (editedPosting) => {
+    // console.log(currentSelectedPosting._id);
+    // console.log(editedPosting);
+    try {
+      const updatedPosting = await axios.patch(
+        `http://localhost:3000/api/postings/${currentSelectedPosting._id}`,
+        editedPosting
+      );
+      setCurrentSelectedPosting(updatedPosting.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving edited posting:', error);
+    }
+  };
+
+  const handleCancelEditing = () => {
+    setIsEditing(false);
+  };
+
   return (
     <Box>
       {currentSelectedPosting._id !== undefined && (
@@ -140,13 +167,16 @@ const PostingDetailsModal = (props) => {
             justifyContent: 'space-between',
             border: '1px solid rgba(0, 0, 0, 0.2)',
             borderRadius: 5,
+            backgroundColor: "white",
             minHeight: 600,
             maxHeight: 650,
             minWidth: 500,
             maxWidth: 600,
             overflowY: 'auto',
+            boxShadow: 2,
             p: 2,
-            ml: 10,
+            mr: 5,
+            ml: 5,
           }}
         >
           <Box
@@ -155,6 +185,7 @@ const PostingDetailsModal = (props) => {
               flexDirection: 'column',
               alignItems: 'flex-start',
               width: '100%',
+              color: 'black',
             }}
           >
             <Box
@@ -164,6 +195,7 @@ const PostingDetailsModal = (props) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 width: '100%',
+                color: 'black',
               }}
             >
               <Typography sx={{ fontSize: 30 }}>
@@ -171,7 +203,7 @@ const PostingDetailsModal = (props) => {
               </Typography>
               {currentUserState && currentUserState.role === 'applicant' && (
                 <Button
-                  variant='contained'
+                  variant="contained"
                   disabled={isApplied}
                   onClick={handleApply}
                 >
@@ -182,13 +214,46 @@ const PostingDetailsModal = (props) => {
                 currentUserState.role === 'employer' &&
                 currentUserState.userId ===
                   currentSelectedPosting.employerId && (
-                  <Button
-                    variant='contained'
-                    color='error'
-                    onClick={handleDeletePosting}
-                  >
-                    Delete
-                  </Button>
+                  <>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: 2,
+                      }}
+                    >
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick();
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleDeletePosting}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                    <Dialog
+                      open={isEditing}
+                      onClose={handleCancelEditing}
+                      maxWidth="sm"
+                      fullWidth
+                    >
+                      <DialogContent>
+                        <Typography variant="h6">Edit Posting</Typography>
+                        <EditPostingForm
+                          currentSelectedPosting={currentSelectedPosting}
+                          onSave={handleSaveEditing}
+                          onCancel={handleCancelEditing}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </>
                 )}
             </Box>
 
@@ -216,7 +281,7 @@ const PostingDetailsModal = (props) => {
                 {currentSelectedPosting.numOfEmployees} employees
               </Typography>
               <Typography>Skills: {currentSelectedPosting.skills}</Typography>
-              <Typography color='textSecondary' gutterBottom>
+              <Typography color="textSecondary" gutterBottom>
                 Pay Rate: ${currentSelectedPosting.pay}/
                 {currentSelectedPosting.rate}
               </Typography>
@@ -269,7 +334,7 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                <Avatar src='/async.png' />
+                                <Avatar src="/async.png" />
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
@@ -299,7 +364,7 @@ const PostingDetailsModal = (props) => {
                                       applicant
                                     );
                                   }}
-                                  label='Status'
+                                  label="Status"
                                 >
                                   <MenuItem value={`In Progress`}>
                                     In Progress

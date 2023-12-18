@@ -90,8 +90,11 @@ function Postings() {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
+          backgroundColor: 'rgb(200,200,200)',
+          padding: '10px',
+          borderRadius: 5,
           width: '100%',
-          mt: 20,
+          mt: 11,
         }}
       >
         <Box
@@ -100,7 +103,7 @@ function Postings() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            mr: 10,
+            ml: 5,
           }}
         >
           {postings && postings.length !== 0 ? (
@@ -112,7 +115,8 @@ function Postings() {
               hideNextButton={hideNextButton}
               showFirstButton
               showLastButton
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, mt: 3 }}
+              color='primary'
             />
           ) : (
             <Typography>No postings available yet!</Typography>

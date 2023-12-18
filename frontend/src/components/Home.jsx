@@ -26,6 +26,7 @@ const Home = () => {
           flexDirection: "column",
           width: "50%",
           margin: "auto",
+          color: "black"
         }}
       >
         <Typography variant="h4" sx={{ marginBottom: 2 }}>

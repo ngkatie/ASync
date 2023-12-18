@@ -22,7 +22,6 @@ import axios from "axios";
 
 const CreatePosting = () => {
   const [jobTitle, setJobTitle] = useState("");
-  const [companyName, setCompanyName] = useState("");
   const [companyLogo, setCompanyLogo] = useState("");
   const [jobType, setJobType] = useState("");
   const [numOfEmployees, setNumOfEmployees] = useState("");
@@ -50,7 +49,7 @@ const CreatePosting = () => {
       const requestBody = {
         employerId: currentUserState.userId,
         jobTitle: jobTitle,
-        companyName: companyName,
+        companyName: currentUserState.companyName,
         companyLogo: companyLogo,
         jobType: jobType,
         numOfEmployees: numOfEmployees,
@@ -76,7 +75,7 @@ const CreatePosting = () => {
   return (
     <>
       <Navbar />
-      <Box sx={{ maxWidth: "500px", marginTop: 20 }}>
+      <Box sx={{ maxWidth: "500px", marginTop: 20, color: "black" }}>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
           Create a posting
         </Typography>
@@ -89,15 +88,6 @@ const CreatePosting = () => {
             label="Job Title"
             color="secondary"
             onChange={(e) => setJobTitle(e.target.value)}
-            fullWidth
-            required
-            sx={{ mb: 4 }}
-          />
-          <TextField
-            type="text"
-            label="Company Name"
-            color="secondary"
-            onChange={(e) => setCompanyName(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}

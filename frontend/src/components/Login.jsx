@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Navigate } from "react-router";
-import { Link } from "react-router-dom";
+import React, { useState, useContext, useEffect } from 'react';
+import { Navigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -8,21 +8,21 @@ import {
   Stack,
   Button,
   Container,
-} from "@mui/material";
+} from '@mui/material';
 import {
   doSignInWithEmailAndPassword,
   doPasswordReset,
-} from "../firebase/FirebaseFunctions";
-import { AuthContext } from "../context/AuthContext";
-import Navbar from "./Navbar";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../actions";
+} from '../firebase/FirebaseFunctions';
+import { AuthContext } from '../context/AuthContext';
+import Navbar from './Navbar';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../actions';
 
 const Login = () => {
   const { currentUser } = useContext(AuthContext);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const dispatch = useDispatch();
 
@@ -37,7 +37,8 @@ const Login = () => {
 
     try {
       await doSignInWithEmailAndPassword(email, password);
-      let applicants = await axios.get("http://localhost:3000/api/applicants");
+      let applicants = await axios.get('http://localhost:3000/api/applicants');
+      console.log(applicants);
       applicants = applicants.data;
       for (const applicant of applicants) {
         if (applicant.email === email) {
@@ -47,7 +48,7 @@ const Login = () => {
               applicant.name,
               email,
               null,
-              "applicant",
+              'applicant',
               applicant.state,
               applicant.city,
               applicant.industry
@@ -57,7 +58,7 @@ const Login = () => {
         }
       }
 
-      let employers = await axios.get("http://localhost:3000/api/employers");
+      let employers = await axios.get('http://localhost:3000/api/employers');
       employers = employers.data;
       for (const employer of employers) {
         if (employer.email === email) {
@@ -67,7 +68,7 @@ const Login = () => {
               employer.name,
               email,
               employer.companyName,
-              "employer",
+              'employer',
               employer.state,
               employer.city,
               employer.industry
@@ -82,44 +83,44 @@ const Login = () => {
   };
 
   if (currentUser) {
-    return <Navigate to="/" />;
+    return <Navigate to='/' />;
   }
 
   return (
     <div>
       <Navbar />
       <Box>
-        <Typography variant="h4" sx={{ marginBottom: 2 }}>
+        <Typography variant='h4' sx={{ marginBottom: 2 }}>
           Log In
         </Typography>
 
-        <form onSubmit={handleLogin} action={<Link to="/postings" />}>
+        <form onSubmit={handleLogin} action={<Link to='/postings' />}>
           <TextField
-            type="email"
-            label="Email"
-            color="secondary"
+            type='email'
+            label='Email'
+            color='secondary'
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           <TextField
-            type="password"
-            label="Password"
-            color="secondary"
+            type='password'
+            label='Password'
+            color='secondary'
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
 
-          <Button type="submit">Log In</Button>
+          <Button type='submit'>Log In</Button>
 
           <br></br>
 
           <small>
-            Don't have an account yet?{" "}
-            <Link to="/register">Register here!</Link>
+            Don't have an account yet?{' '}
+            <Link to='/register'>Register here!</Link>
           </small>
 
           {/* <Button onClick={passwordReset}>

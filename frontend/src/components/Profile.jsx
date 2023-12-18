@@ -176,7 +176,12 @@ const Profile = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          mt: 20,
+          color: 'black',
+          backgroundColor: 'rgb(200,200,200, 0.3)',
+          padding: '10px',
+          borderRadius: 5,
+          p: 2,
+          mt: 11,
         }}
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -214,7 +219,6 @@ const Profile = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                mt: 20,
               }}
             >
               <Box
@@ -223,6 +227,7 @@ const Profile = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  color: 'black',
                 }}
               >
                 {postings && postings.length !== 0 ? (
@@ -264,7 +269,7 @@ const Profile = () => {
         {userData && userData.role === 'applicant' && (
           <TabPanel value={tab} index={1}>
             <Box>
-              {appliedCompanies &&
+              {appliedCompanies && appliedCompanies.length !== 0 ? (
                 appliedCompanies.map((posting) => (
                   <PostingCard
                     key={posting._id}
@@ -284,7 +289,10 @@ const Profile = () => {
                     postedDate={posting.postedDate}
                     setCurrentSelectedPostingId={setCurrentSelectedPostingId}
                   />
-                ))}
+                ))
+              ) : (
+                <Typography>No companies you've applied to yet!</Typography>
+              )}
             </Box>
           </TabPanel>
         )}
@@ -296,6 +304,7 @@ const Profile = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
+              color: 'black',
             }}
           >
             {edit && (

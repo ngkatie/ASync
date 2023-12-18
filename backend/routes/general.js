@@ -138,20 +138,35 @@ router.route('/postings/apply/:id').post(async (req, res) => {
   }
 });
 
-router.route('/postings/:id').delete(async (req, res) => {
-  const postingId = req.params.id.trim();
-  try {
-    const deletedPosting = await postingFunctions.deletePosting(postingId);
-    const employerWithDeletedPosting =
-      await postingFunctions.deletePostingFromEmployer(
-        deletedPosting.employerId,
-        postingId
+router
+  .route('/postings/:id')
+  .delete(async (req, res) => {
+    const postingId = req.params.id.trim();
+    try {
+      const deletedPosting = await postingFunctions.deletePosting(postingId);
+      const employerWithDeletedPosting =
+        await postingFunctions.deletePostingFromEmployer(
+          deletedPosting.employerId,
+          postingId
+        );
+      res.status(200).json(deletedPosting);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  })
+  .patch(async (req, res) => {
+    const postingId = req.params.id.trim();
+    const updatedFields = req.body;
+    try {
+      const updatedPosting = await postingFunctions.updatePosting(
+        postingId,
+        updatedFields
       );
-    res.status(200).json(deletedPosting);
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
+      res.status(200).json(updatedPosting);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  });
 
 router.route('/applicants').get(async (req, res) => {
   try {

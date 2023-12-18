@@ -35,7 +35,7 @@ const PostingCard = ({
 
   return (
     <Card
-      sx={{ width: "400px", mb: 5, minHeight: 150, cursor: "pointer" }}
+      sx={{ width: "400px", mb: 5, minHeight: 150, cursor: "pointer", borderRadius: 5, boxShadow: 2 }}
       onClick={() => setCurrentSelectedPostingId(postingId)}
     >
       <CardHeader title={jobTitle} subheader={companyName} />
