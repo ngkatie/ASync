@@ -22,6 +22,7 @@ const Profile = () => {
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState('');
   const [currentSelectedPosting, setCurrentSelectedPosting] = useState({});
   const [appliedCompanies, setAppliedCompanies] = useState([]);
+  const [appliedStatuses, setAppliedStatuses] = useState([]);
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
@@ -287,6 +288,7 @@ const Profile = () => {
                     city={posting.city}
                     state={posting.state}
                     postedDate={posting.postedDate}
+                    // status={findStatus}
                     setCurrentSelectedPostingId={setCurrentSelectedPostingId}
                   />
                 ))

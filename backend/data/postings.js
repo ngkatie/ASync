@@ -1,6 +1,7 @@
 import { postings, employers, applicants } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import employerFunctions from './employers.js';
+import * as validation from "../validation.js";
 
 let exportedMethods = {
   async addPosting(
@@ -156,8 +157,8 @@ let exportedMethods = {
     const validFields = [
       'employerId',
       'jobTitle',
-      'companyName',
-      'companyLogo',
+      // 'companyName',
+      // 'companyLogo',
       'jobType',
       'numOfEmployees',
       'description',

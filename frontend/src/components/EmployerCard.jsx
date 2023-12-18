@@ -18,6 +18,13 @@ const EmployerCard = (props) => {
     //UPDATE STATUS OF APPLICANT IN DB
   };
 
+  const findStatus = (applicant) => {
+    console.log("REACHED");
+    const appInfo = applicant.applied.filter((post) => post.postingId == props.id);
+    console.log(appInfo);
+    return appInfo.applicantStatus
+  };
+
   return (
     <Card sx={{ width: '400px' }}>
       <CardContent>
@@ -48,11 +55,15 @@ const EmployerCard = (props) => {
           Applicants:
         </Typography>
         {props.applicants.map((applicant) => (
-          <div key={applicant.id} style={{ marginBottom: '10px' }}>
+          <div key={applicant.id} style={{ marginBottom: '10px' }}> 
+          
             <Typography variant="subtitle1">{applicant.name}</Typography>
             <FormControl>
               <Select
-                value={applicantStatus[applicant.id] || 'Not Applied'}
+                value={applicant.applied.filter(
+                  (post) => post.postingId == props.id
+                  ).applicantStatus
+                }
                 onChange={(e) => handleApplicantStatusChange(applicant.id, e.target.value)}
               >
                 <MenuItem value="Not Applied">Not Applied</MenuItem>

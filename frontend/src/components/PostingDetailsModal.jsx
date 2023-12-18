@@ -78,7 +78,7 @@ const PostingDetailsModal = (props) => {
           applicantList.push(applicant.data);
         }
         setCurrentApplicants(applicantList);
-        console.log(applicantList);
+        // console.log(applicantList);
       }
     }
     fetchData();
@@ -115,6 +115,12 @@ const PostingDetailsModal = (props) => {
       alert(e);
     }
   };
+
+  const findStatus = (applicant) => {
+    const appInfo = applicant.applied.filter((post) => post.postingId == currentSelectedPosting._id);
+    console.log(appInfo[0].applicantStatus);
+    return appInfo[0].applicantStatus;
+  }
 
   const handleChangeApplicantStatus = async (newStatus, currentApplicant) => {
     try {
@@ -351,8 +357,7 @@ const PostingDetailsModal = (props) => {
                                   labelId={`applicant-status-label-${index}`}
                                   id={`applicant-status-${index}`}
                                   value={
-                                    applicantStatuses[applicant._id] ||
-                                    'In Progress'
+                                    findStatus(applicant)
                                   }
                                   onChange={(e) => {
                                     setApplicantStatuses((prevStatuses) => ({
@@ -366,11 +371,9 @@ const PostingDetailsModal = (props) => {
                                   }}
                                   label="Status"
                                 >
-                                  <MenuItem value={`In Progress`}>
-                                    In Progress
-                                  </MenuItem>
-                                  <MenuItem value={`Accepted`}>Accept</MenuItem>
-                                  <MenuItem value={`Rejected`}>Reject</MenuItem>
+                                  <MenuItem value={`In Progress`}>In Progress</MenuItem>
+                                  <MenuItem value={`Accepted`}>Accepted</MenuItem>
+                                  <MenuItem value={`Rejected`}>Rejected</MenuItem>
                                 </Select>
                               </FormControl>
                             </ListItemButton>

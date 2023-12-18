@@ -43,6 +43,10 @@ const PostingCard = ({
         <Typography color="textSecondary" gutterBottom>
           {city}, {state}
         </Typography>
+        
+        {/* <Typography>
+          Status: {status}
+        </Typography> */}
         {/* <Typography color="textSecondary" gutterBottom>
           {numOfEmployees} employees
         </Typography>

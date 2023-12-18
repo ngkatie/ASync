@@ -145,35 +145,20 @@ let exportedMethods = {
     employer._id = employer._id.toString();
     return employer;
   },
+  
   async updateApplicantStatus(applicantId, postingId, newStatus) {
     const validStatuses = ["In Progress", "Accepted", "Rejected"];
 
-    if (
-      !applicantId ||
-      typeof applicantId !== "string" ||
-      applicantId.trim() === ""
-    ) {
-      throw "Applicant ID must be a non-empty string";
-    }
+    try {
+      applicantId = validation.validStr(applicantId);
+      postingId = validation.validStr(postingId);
 
-    if (!ObjectId.isValid(applicantId)) {
-      throw "Invalid ObjectID for applicant ID";
-    }
-
-    if (
-      !postingId ||
-      typeof postingId !== "string" ||
-      postingId.trim() === ""
-    ) {
-      throw "Posting ID must be a non-empty string";
-    }
-
-    if (!ObjectId.isValid(postingId)) {
-      throw "Invalid ObjectID for posting ID";
-    }
-
-    if (!validStatuses.includes(newStatus)) {
-      throw "Invalid applicant status";
+      if (!validStatuses.includes(newStatus)) {
+        throw "Invalid applicant status";
+      }
+    } catch (e) {
+      console.log(e);
+      throw [400, 'Bad input']
     }
 
     const applicantsCollection = await applicants();

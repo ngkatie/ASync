@@ -2,11 +2,7 @@ import EmailValidator from "email-validator";
 import { ObjectId } from "mongodb";
 
 function validObjectId(id) {
-    if (
-        !id ||
-        typeof id !== 'string' ||
-        id.trim() === ''
-    ) { throw 'Invalid ObjectID'; }
+    id = validStr(id);
     if (!ObjectId.isValid(id)) {
         throw 'Invalid ObjectID';
     }
