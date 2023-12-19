@@ -107,6 +107,7 @@ let exportedMethods = {
       .skip(skipAmount)
       .limit(10)
       .toArray();
+    // console.log(postingList);
     return postingList;
   },
   async deletePosting(postingId) {

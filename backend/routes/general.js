@@ -86,16 +86,8 @@ router.route('/postings/page/:pagenum').get(async (req, res) => {
     let page = validation.validInt(req.params.pagenum);
     let postingsByPageNumber = null;
 
-    let cachedPostings = await client.hGet('postingsPage', toString(page));
-    if (cachedPostings) {
-      postingsByPageNumber = JSON.parse(cachedPostings);
-      console.log(`Postings on page ${page} from cache`);
-    }
-    else {
-      postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(page);
-      await client.hSet('postingsPage', toString(page), JSON.stringify(postingsByPageNumber));
-    }
-    console.log(postingsByPageNumber.length);
+    postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(page);
+
     res.status(200).json(postingsByPageNumber);
   } catch (e) {
     res.status(400).send(e);
@@ -148,6 +140,12 @@ router.route('/postings/apply/:id').post(async (req, res) => {
       postingId,
       applicantStatus
     );
+    
+    // Update cache
+    const applicantInfo = await applicantFunctions.getApplicant(applicantId);
+    await client.hSet('applicants', applicantId, JSON.stringify(applicantInfo));
+    const postingInfo = await postingFunctions.getPosting(postingId);
+    await client.hSet('postings', postingId, JSON.stringify(postingInfo));
     res.status(200).json(applicantWithAppliedPosting);
   } catch (e) {
     res.status(400).send(e);

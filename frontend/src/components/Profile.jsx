@@ -28,7 +28,7 @@ const Profile = () => {
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
-  console.log(currentUserState);
+  // console.log(currentUserState);
 
   useEffect(() => {
     async function fetchData() {
@@ -96,6 +96,7 @@ const Profile = () => {
   const findStatus = (postingId) => {
     const appInfo = appliedStatuses.filter((post) => post.postingId == postingId);
     const status = appInfo[0].applicantStatus;
+    // console.log(appInfo[0]);
     return status;
   }
 
