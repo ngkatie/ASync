@@ -136,10 +136,10 @@ const Login = () => {
 
           <br />
 
-          <small>
+          <Typography sx={{ color: 'black', fontSize: 14 }}>
             Don't have an account yet?{' '}
             <Link to="/register">Register here!</Link>
-          </small>
+          </Typography>
         </form>
       </Box>
     </div>
