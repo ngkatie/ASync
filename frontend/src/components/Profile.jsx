@@ -41,7 +41,7 @@ const Profile = () => {
 
   const dispatch = useDispatch();
   const currentUserState = useSelector((state) => state.user);
-  console.log(currentUserState);
+  // console.log(currentUserState);
 
   useEffect(() => {
     async function fetchData() {
@@ -95,15 +95,23 @@ const Profile = () => {
     fetchData();
   }, [currentSelectedPostingId]);
 
-  const findStatus = async (postingId) => {
-    console.log('REACHED');
-    let applicant = await axios.get(
-      `http://localhost:3000/api/applicants/${currentUserState.userId}`
-    );
-    const { data } = applicant;
-    const appInfo = data.applied.filter((post) => post.postingId == postingId);
-    return appInfo[0].applicantStatus;
-  };
+  useEffect(() => {
+    async function getStatuses() {
+      let applicant = await axios.get(
+        `http://localhost:3000/api/applicants/${currentUserState.userId}`
+      );
+      const { data } = applicant;
+      setAppliedStatuses(data.applied);
+    };
+    getStatuses();
+  }, [])
+
+  const findStatus = (postingId) => {
+    const appInfo = appliedStatuses.filter((post) => post.postingId == postingId);
+    const status = appInfo[0].applicantStatus;
+    // console.log(appInfo[0]);
+    return status;
+  }
 
   const handleSignOut = () => {
     doSignOut();
