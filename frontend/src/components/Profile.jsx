@@ -102,16 +102,18 @@ const Profile = () => {
       );
       const { data } = applicant;
       setAppliedStatuses(data.applied);
-    };
+    }
     getStatuses();
-  }, [])
+  }, []);
 
   const findStatus = (postingId) => {
-    const appInfo = appliedStatuses.filter((post) => post.postingId == postingId);
+    const appInfo = appliedStatuses.filter(
+      (post) => post.postingId == postingId
+    );
     const status = appInfo[0].applicantStatus;
     // console.log(appInfo[0]);
     return status;
-  }
+  };
 
   const handleSignOut = () => {
     doSignOut();
@@ -124,21 +126,39 @@ const Profile = () => {
 
   const handleSaveClick = async () => {
     try {
-      e.preventDefault();
       //update context api
       await updateProfile(currentUser, {
         displayName: userData.name,
         email: userData.email,
       });
       //update mongodb
+      let userDataWithoutId = {};
       if (currentUserState.role === 'employer') {
-        let { userId, companyName, ...userDataWithoutId } = userData;
+        const { userId, companyName, ...employerData } = userData;
+        userDataWithoutId = {
+          companyName,
+          role: employerData.role,
+          state: employerData.state,
+          city: employerData.city,
+          industry: employerData.industry,
+        };
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
         );
       } else {
-        let { userId, ...userDataWithoutId } = userData;
+        const { userId, ...applicantData } = userData;
+        userDataWithoutId = {
+          name: applicantData.name,
+          email: applicantData.email,
+          role: applicantData.role,
+          state: applicantData.state,
+          city: applicantData.city,
+          industry: applicantData.industry,
+        };
+
+        console.log(userDataWithoutId);
+        console.log(userData);
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
