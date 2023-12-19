@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Navbar from './Navbar';
 import { updateProfile } from 'firebase/auth';
 import ChangePassword from './ChangePassword';
@@ -8,16 +8,29 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { doSignOut } from '../firebase/FirebaseFunctions';
 import { setUser, unsetUser } from '../actions';
-import { Box, Button, Tab, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import axios from 'axios';
 import PostingCard from './PostingCard';
 import PostingDetailsModal from './PostingDetailsModal';
+import stateAbbreviations from '../utils/stateAbbreviations';
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState({});
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showEditCredentials, setShowEditCredentials] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
   const [tab, setTab] = useState(0);
   const [postings, setPostings] = useState([]);
@@ -42,7 +55,7 @@ const Profile = () => {
           state: currentUserState.state,
           city: currentUserState.city,
           industry: currentUserState.industry,
-          photoURL: currentUser.photoURL
+          photoURL: currentUser.photoURL,
         });
         if (currentUserState.role === 'employer') {
           const postingList = await axios.get(
@@ -106,18 +119,19 @@ const Profile = () => {
   };
 
   const handleEditClick = () => {
-    setEdit(true);
+    setEdit(() => !edit);
   };
 
   const handleSaveClick = async () => {
     try {
+      e.preventDefault();
       //update context api
       await updateProfile(currentUser, {
         displayName: userData.name,
         email: userData.email,
       });
       //update mongodb
-      if (userData.companyName.length === 0) {
+      if (currentUserState.role === 'employer') {
         let { userId, companyName, ...userDataWithoutId } = userData;
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
@@ -160,11 +174,11 @@ const Profile = () => {
 
   const showUploadImageForm = () => {
     setShowUploadImage(true);
-  }
+  };
 
   const hideUploadPhotoForm = () => {
     setShowUploadImage(false);
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -183,7 +197,7 @@ const Profile = () => {
 
     return (
       <div
-        role='tabpanel'
+        role="tabpanel"
         hidden={value !== index}
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
@@ -216,22 +230,23 @@ const Profile = () => {
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={handleTabChange} centered>
-            <Tab label='About' />
+            <Tab label="About" />
             {userData && userData.role === 'employer' ? (
-              <Tab label='Postings' />
+              <Tab label="Postings" />
             ) : (
-              <Tab label='Applied Companies' />
+              <Tab label="Applied Companies" />
             )}
-            <Tab label='Settings' />
+            <Tab label="Settings" />
           </Tabs>
         </Box>
 
         <TabPanel value={tab} index={0}>
           <Box sx={{ textAlign: 'left' }}>
-            {userData.photoURL 
-              ? <img src={userData.photoURL} width="200"/>
-              : ""
-            }
+            {userData.photoURL ? (
+              <img src={userData.photoURL} width="200" />
+            ) : (
+              ''
+            )}
             <Typography sx={{ fontSize: 30 }}>{userData.name}</Typography>
             <Typography>{userData.email}</Typography>
             {userData && userData.role === 'employer' && (
@@ -347,24 +362,57 @@ const Profile = () => {
             {edit && (
               <>
                 <TextField
-                  label='Name'
-                  name='name'
+                  label="Name"
+                  name="name"
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 4 }}
                 />
                 <TextField
-                  label='Email'
-                  name='email'
+                  label="Email"
+                  name="email"
                   value={userData.email}
                   onChange={handleChange}
                   fullWidth
                   disabled
                   sx={{ mb: 2 }}
                 />
+                <TextField
+                  label="City"
+                  name="city"
+                  value={userData.city}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <FormControl fullWidth required sx={{ mb: 2 }}>
+                  <InputLabel id="user-state-label">State</InputLabel>
+                  <Select
+                    labelId="user-state-label"
+                    id="user-state"
+                    name="state"
+                    value={userData.state}
+                    onChange={handleChange}
+                    label="State"
+                  >
+                    {stateAbbreviations.map((abbreviation) => (
+                      <MenuItem key={abbreviation} value={abbreviation}>
+                        {abbreviation}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Industry"
+                  name="industry"
+                  value={userData.industry}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
                 <Button
-                  variant='contained'
+                  variant="contained"
                   onClick={handleSaveClick}
                   sx={{ mb: 2 }}
                 >
@@ -374,26 +422,26 @@ const Profile = () => {
             )}
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
-              Edit credentials
+              Edit profile details
             </Button>
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={showUploadImageForm}
               sx={{ mb: 2 }}
             >
               Upload profile photo
             </Button>
             {showUploadImage && (
-              <UploadImageModal hideForm={hideUploadPhotoForm}/>
+              <UploadImageModal hideForm={hideUploadPhotoForm} />
             )}
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={showPasswordForm}
               sx={{ mb: 2 }}
             >
@@ -402,8 +450,8 @@ const Profile = () => {
             {showChangePassword && (
               <ChangePassword hideForm={hidePasswordForm} />
             )}
-            
-            <Link to='/' onClick={handleSignOut}>
+
+            <Link to="/" onClick={handleSignOut}>
               Log out
             </Link>
           </Box>
