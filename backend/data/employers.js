@@ -1,17 +1,25 @@
 import { employers, applicants } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-import * as validation from './validation.js';
+import {
+  validObjectId,
+  validStr,
+  validFloat,
+  validInt,
+  validAlphabetical,
+  validEmail,
+  validState
+} from "./validation.js"
 
 let exportedMethods = {
   async addEmployer(name, email, companyName, city, state, industry) {
     //add validation
     try {
-      name = validation.validAlphabetical(name);
-      email = validation.validEmail(email);
-      companyName = validation.validStr(companyName);
-      city = validation.validAlphabetical(city);
-      state = validation.validState(state);
-      industry = validation.validStr(industry);
+      name = validAlphabetical(name);
+      email = validEmail(email);
+      companyName = validStr(companyName);
+      city = validAlphabetical(city);
+      state = validState(state);
+      industry = validStr(industry);
     } catch (e) {
       throw {code: 400, err: e};
     }
@@ -46,14 +54,18 @@ let exportedMethods = {
   },
 
   async getEmployer(employerId) {
-    employerId = validation.validObjectId(employerId);
+    try {
+      employerId = validStr(employerId);
+    } catch (e) {
+      throw {code: 400, err: 'Invalid employerId'};
+    }
 
     const employerCollection = await employers();
     const employer = await employerCollection.findOne({
       _id: new ObjectId(employerId),
     });
     if (!employer) {
-      throw [404, 'No employer with the given ID exists'];
+      throw {code: 404, err: 'No employer with the given ID exists'};
     }
     employer._id = employer._id.toString();
     return employer;
@@ -63,7 +75,7 @@ let exportedMethods = {
     const employerCollection = await employers();
     let employerList = await employerCollection.find({}).toArray();
     if (!employerList) {
-      throw 'failed to get all employers';
+      throw {code: 500, err: 'Failed to get all employers'};
     }
     employerList = employerList.map((employer) => {
       return {
@@ -71,7 +83,6 @@ let exportedMethods = {
         _id: employer._id.toString(),
       };
     });
-
     return employerList;
   },
 
@@ -86,32 +97,38 @@ let exportedMethods = {
       'industry',
     ];
 
-    employerId = validation.validObjectId(employerId);
+    try {
+      employerId = validStr(employerId);
+    } catch (e) {
+      throw {code: 400, err: 'Invalid employerId'};
+    }
+
     if (!updatedFields || typeof updatedFields !== 'object') {
-      throw [400, 'You must provide an object of updated fields'];
+      throw {code: 400, err: 'Must provide an object of updated fields'};
     }
     const invalidFields = Object.keys(updatedFields).filter(
       (field) => !validFields.includes(field)
     );
     if (invalidFields.length > 0) {
-      throw [400, `Invalid fields: ${invalidFields.join(', ')}`];
+      throw {
+        code: 400, 
+        err: `Invalid fields: ${invalidFields.join(', ')}`
+      };
     }
 
     const employersCollection = await employers();
-
     const existingEmployer = await employersCollection.findOne({
       email: updatedFields.email,
     });
     if (existingEmployer) {
-      throw 'Email is already in use';
+      throw {code: 400, err: 'Email is already in use'};
     }
 
     const currentEmployer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
     });
-
     if (!currentEmployer) {
-      throw [404, 'No employer found with the supplied ID'];
+      throw {code: 404, err: 'No employer found with the supplied ID'};
     }
 
     let updatedEmployer = await employersCollection.updateOne(
@@ -120,7 +137,7 @@ let exportedMethods = {
     );
     //console.log(updatedEmployer);
     if (updatedEmployer.acknowledged === false) {
-      throw 'Failed to update employer';
+      throw {code: 500, err: 'Failed to update employer'};
     }
 
     updatedEmployer = await employersCollection.findOne({
@@ -131,14 +148,20 @@ let exportedMethods = {
   },
 
   async deleteEmployer(employerId) {
-    employerId = validation.validObjectId(employerId);
+    
+    try {
+      employerId = validStr(employerId);
+    } catch (e) {
+      throw {code: 400, err: 'Invalid employerId'}
+    }
+
     const employersCollection = await employers();
     const employer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
     });
 
     if (!employer) {
-      throw 'No employer found with the supplied ID';
+      throw {code: 404, err: 'No employer found with the supplied ID'};
     }
 
     const deleteResult = await employersCollection.deleteOne({
@@ -146,7 +169,7 @@ let exportedMethods = {
     });
     // console.log(deleteResult);
     if (deleteResult.deletedCount !== 1) {
-      throw 'Deletion failed';
+      throw {code: 500, err: 'Deletion failed'};
     }
     employer._id = employer._id.toString();
     return employer;
@@ -156,35 +179,38 @@ let exportedMethods = {
     const validStatuses = ['In Progress', 'Accepted', 'Rejected'];
 
     try {
-      applicantId = validation.validStr(applicantId);
-      postingId = validation.validStr(postingId);
+      applicantId = validStr(applicantId);
+      postingId = validStr(postingId);
 
       if (!validStatuses.includes(newStatus)) {
         throw 'Invalid applicant status';
       }
     } catch (e) {
-      console.log(e);
-      throw [400, 'Bad input'];
+      throw {code: 400, err: 'Invalid input'};
     }
 
-    const applicantsCollection = await applicants();
-    const updateResult = await applicantsCollection.updateOne(
-      {
-        _id: new ObjectId(applicantId),
-        'applied.postingId': new ObjectId(postingId),
-      },
-      {
-        $set: {
-          'applied.$.applicantStatus': newStatus,
+    try {
+      const applicantsCollection = await applicants();
+      const updateResult = await applicantsCollection.updateOne(
+        {
+          _id: new ObjectId(applicantId),
+          'applied.postingId': new ObjectId(postingId),
         },
-      }
-    );
+        {
+          $set: {
+            'applied.$.applicantStatus': newStatus,
+          },
+        }
+      );
 
-    const updatedApplicant = await applicantsCollection.findOne({
-      _id: new ObjectId(applicantId),
-    });
+      const updatedApplicant = await applicantsCollection.findOne({
+        _id: new ObjectId(applicantId),
+      });
 
-    return updatedApplicant;
+      return updatedApplicant;
+    } catch (e) {
+      throw {code: 500, err: e}
+    }
   },
 };
 

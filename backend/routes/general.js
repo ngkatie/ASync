@@ -2,7 +2,13 @@ import { Router } from 'express';
 import postingFunctions from '../data/postings.js';
 import applicantFunctions from '../data/applicants.js';
 import employerFunctions from '../data/employers.js';
-import * as validation from './routeValidation.js';
+import {
+  validObjectId,
+  validStr,
+  validFloat,
+  validInt,
+  validAlphabetical
+} from "./routeValidation.js";
 
 const router = Router();
 
@@ -28,7 +34,8 @@ router.route('/register').post(async (req, res) => {
         industry
       );
       res.status(201).json(applicant);
-    } else if (userRole === 'employer') {
+    } 
+    else if (userRole === 'employer') {
       const { companyName } = req.body;
       const employer = await employerFunctions.addEmployer(
         displayName,
@@ -63,9 +70,9 @@ router.route('/postings/:id').get(async (req, res) => {
   //code here for posting GET request
   let postingId = null;
   try {
-    postingId = validation.validStr(req.params.id);
-  } catch (err) {
-    res.status(400).send(err);
+    postingId = validStr(req.params.id);
+  } catch (e) {
+    res.status(400).json({ message: e });
   }
   
   try {
@@ -73,7 +80,6 @@ router.route('/postings/:id').get(async (req, res) => {
     let posting = await client.hGet('postings', postingId);
     if (posting) {
       postingInfo = JSON.parse(posting);
-      console.log(`Posting ${postingId} from cache`);
     } else {
       postingInfo = await postingFunctions.getPosting(postingId);
       await client.hSet('postings', postingId, JSON.stringify(postingInfo));
@@ -88,9 +94,9 @@ router.route('/postings/:id').get(async (req, res) => {
 router.route('/postings/page/:pagenum').get(async (req, res) => {
   let page = req.params.pagenum;
   try {
-    page = validation.validInt(page);
+    page = validInt(page);
   } catch (e) {
-    throw {code: 400, err: e};
+    res.status(400).json({ message: e })
   }
 
   try {
@@ -143,7 +149,7 @@ router.route('/postings').post(async (req, res) => {
 router.route('/postings/apply/:id').post(async (req, res) => {
   const { applicantId, applicantStatus } = req.body;
   try {
-    const postingId = validation.validStr(req.params.id);
+    const postingId = validStr(req.params.id);
     const applicantWithAppliedPosting = await applicantFunctions.applyToPosting(
       applicantId,
       postingId,
@@ -157,14 +163,21 @@ router.route('/postings/apply/:id').post(async (req, res) => {
     await client.hSet('postings', postingId, JSON.stringify(postingInfo));
     res.status(200).json(applicantWithAppliedPosting);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
 router
   .route('/postings/:id')
   .delete(async (req, res) => {
-    const postingId = req.params.id.trim();
+    let postingId = req.params.id;
+    try {
+      postingId = validStr(postingId);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+
     try {
       const deletedPosting = await postingFunctions.deletePosting(postingId);
       const employerWithDeletedPosting =
@@ -174,12 +187,18 @@ router
         );
       res.status(200).json(deletedPosting);
     } catch (e) {
-      res.status(400).send(e);
+      const { code, err } = e;
+      res.status(code).send(err);
     }
   })
   .patch(async (req, res) => {
-    const postingId = req.params.id.trim();
+    let postingId = req.params.id;
     const updatedFields = req.body;
+    try {
+      postingId = validStr(postingId);
+    } catch (e) {
+      res.status(400).json({ message: e });
+    };
     try {
       const updatedPosting = await postingFunctions.updatePosting(
         postingId,
@@ -187,7 +206,8 @@ router
       );
       res.status(200).json(updatedPosting);
     } catch (e) {
-      res.status(400).send(e);
+      const { code, err } = e;
+      res.status(code).send(err);
     }
   });
 
@@ -196,7 +216,8 @@ router.route('/applicants').get(async (req, res) => {
     const applicantList = await applicantFunctions.getAll();
     res.status(200).json(applicantList);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
@@ -204,28 +225,23 @@ router.route('/applicants/:id').get(async (req, res) => {
   //code here for applicant GET request
   let applicant = null;
   try {
-    const applicantId = validation.validStr(req.params.id);
-    // const cachedApplicant = await client.hGet('applicants', applicantId);
-    // if (cachedApplicant) {
-    //   applicant = JSON.parse(cachedApplicant);
-    //   console.log(`Applicant ${applicantId} from cache`);
-    // }
-    // else {
-    //   console.log('Getting applicant from API');
+    const applicantId = validStr(req.params.id);
     applicant = await applicantFunctions.getApplicant(applicantId);
-    // await client.hSet('applicants', applicantId, JSON.stringify(applicant));
-    // }
     res.status(200).json(applicant);
   } catch (e) {
     res.status(400).send(e);
-    console.log(e);
   }
 });
 
 router
   .route('/applicants/:applicantId/applied-companies')
   .get(async (req, res) => {
-    const applicantId = req.params.applicantId.trim();
+    let applicantId = req.params.applicantId;
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      res.status(400).json({ message: e });
+    }
     try {
       let applicantAppliedCompanies =
         await applicantFunctions.getPostingsAppliedByApplicant(applicantId);
@@ -238,11 +254,17 @@ router
 router
   .route('/applicants/:applicantId/update-status')
   .patch(async (req, res) => {
-    const applicantId = req.params.applicantId.trim();
+    let applicantId = req.params.applicantId;
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      res.status(400).json({ message: e });
+    }
+
     const { postingId, applicantStatus } = req.body;
-    console.log(applicantId);
-    console.log(postingId);
-    console.log(applicantStatus);
+    // console.log(applicantId);
+    // console.log(postingId);
+    // console.log(applicantStatus);
     try {
       let applicantWithUpdatedStatus =
         await employerFunctions.updateApplicantStatus(
@@ -252,7 +274,8 @@ router
         );
       res.status(200).json(applicantWithUpdatedStatus);
     } catch (e) {
-      res.status(400).send(e);
+      const { code, err } = e;
+      res.status(code).send(err);
     }
   });
 
@@ -261,25 +284,39 @@ router.route('/employers').get(async (req, res) => {
     const employerList = await employerFunctions.getAll();
     res.status(200).json(employerList);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e
+    res.status(code).send(err);
   }
 });
 
 router.route('/employers/:employerId/postings').get(async (req, res) => {
-  const employerId = req.params.employerId.trim();
+  let employerId = req.params.employerId;
+
+  try {
+    employerId = validStr(employerId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
 
   try {
     let employerPostings = await employerFunctions.getEmployer(employerId);
     employerPostings = employerPostings.postings;
     res.status(200).json(employerPostings);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
 router.route('/update-profile/:userId').put(async (req, res) => {
   const updatedFields = req.body;
-  const userId = req.params.userId.trim();
+  let userId = req.params.userId;
+  try {
+    userId = validStr(userId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
+
   try {
     if (updatedFields.role === 'applicant') {
       const updatedApplicant = await applicantFunctions.updateApplicant(
@@ -287,7 +324,8 @@ router.route('/update-profile/:userId').put(async (req, res) => {
         updatedFields
       );
       res.status(200).json(updatedApplicant);
-    } else if (updatedFields.role === 'employer') {
+    } 
+    else if (updatedFields.role === 'employer') {
       const updatedEmployer = await employerFunctions.updateEmployer(
         userId,
         updatedFields
@@ -297,7 +335,8 @@ router.route('/update-profile/:userId').put(async (req, res) => {
       res.status(400).json({ message: 'Invalid user type' });
     }
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 

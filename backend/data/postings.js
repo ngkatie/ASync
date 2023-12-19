@@ -1,8 +1,15 @@
 import { postings, employers, applicants } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import employerFunctions from './employers.js';
-import * as validation from "../validation.js";
-import { validStr } from './validation.js';
+import { 
+  validObjectId,
+  validStr,
+  validFloat,
+  validInt,
+  validAlphabetical,
+  validEmail,
+  validState
+ } from './validation.js';
 
 let exportedMethods = {
   
@@ -22,17 +29,17 @@ let exportedMethods = {
   ) {
     
     try {
-      employerId = validation.validStr(employerId);
-      jobTitle = validation.validStr(jobTitle);
-      companyName = validation.validStr(companyName);
-      jobType = validation.validStr(jobType);
-      numOfEmployees = validation.validStr(numOfEmployees);
-      description = validation.validStr(description);
-      pay = validation.validStr(pay);
-      rate = validation.validStr(rate);
-      skills = validation.validStr(skills);
-      city = validation.validAlphabetical(city);
-      state = validation.validState(state);
+      employerId = validStr(employerId);
+      jobTitle = validStr(jobTitle);
+      companyName = validStr(companyName);
+      jobType = validStr(jobType);
+      numOfEmployees = validStr(numOfEmployees);
+      description = validStr(description);
+      pay = validFloat(pay);
+      rate = validStr(rate);
+      skills = validStr(skills);
+      city = validAlphabetical(city);
+      state = validState(state);
     } catch (e) {
       throw {code: 400, err: e}
     }
@@ -134,32 +141,29 @@ let exportedMethods = {
   },
   async deletePosting(postingId) {
     //validation
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID';
-    }
+    postingId = validStr(postingId);
     const postingsCollection = await postings();
     const posting = await postingsCollection.findOne({
       _id: new ObjectId(postingId),
     });
 
     if (!posting) {
-      throw 'No posting found with the supplied ID';
+      throw {
+        code: 404, 
+        err: 'No posting found with the supplied ID'
+      };
     }
 
     //delete
     const deleteResult = await postingsCollection.deleteOne({
       _id: new ObjectId(postingId),
     });
-    // console.log(deleteResult);
+    
     if (deleteResult.deletedCount !== 1) {
-      throw 'Deletion failed';
+      throw {
+        code: 500,
+        err: 'Deletion failed'
+      };
     }
 
     //remove postingId from applicant applied arrays
@@ -168,7 +172,7 @@ let exportedMethods = {
       { 'applied.postingId': new ObjectId(postingId) },
       { $pull: { applied: { postingId: new ObjectId(postingId) } } }
     );
-    console.log(updateResult);
+    // console.log(updateResult);
     posting._id = posting._id.toString();
     posting.employerId = posting.employerId.toString();
     return posting;
@@ -180,8 +184,6 @@ let exportedMethods = {
     const validFields = [
       'employerId',
       'jobTitle',
-      // 'companyName',
-      // 'companyLogo',
       'jobType',
       'numOfEmployees',
       'description',
@@ -191,25 +193,20 @@ let exportedMethods = {
       'city',
       'state',
     ];
-
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID';
+    
+    try {
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: e}
     }
     if (!updatedFields || typeof updatedFields !== 'object') {
-      throw 'You must provide an object of updated fields';
+      throw {code: 400, err: 'You must provide an object of updated fields'};
     }
     const invalidFields = Object.keys(updatedFields).filter(
       (field) => !validFields.includes(field)
     );
     if (invalidFields.length > 0) {
-      throw `Invalid fields: ${invalidFields.join(', ')}`;
+      throw {code: 400, err: `Invalid fields: ${invalidFields.join(', ')}`};
     }
 
     const postingsCollection = await postings();
@@ -218,7 +215,10 @@ let exportedMethods = {
     });
 
     if (!currentPosting) {
-      throw 'No posting found with the supplied ID';
+      throw {
+        code: 404,
+        err: 'No posting found with the supplied ID'
+      };
     }
 
     // update
@@ -226,9 +226,12 @@ let exportedMethods = {
       { _id: new ObjectId(postingId) },
       { $set: updatedFields }
     );
-    //console.log(updatedPosting);
+  
     if (updatedPosting.acknowledged === false) {
-      throw 'Failed to update posting';
+      throw {
+        code: 500,
+        err: 'Failed to update posting'
+      };
     }
 
     updatedPosting = await postingsCollection.findOne({
@@ -365,25 +368,11 @@ let exportedMethods = {
     return updatedEmployer;
   },
   async deletePostingFromEmployer(employerId, postingId) {
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Employer ID must be a non-empty string';
-    }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID for Employer';
-    }
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non-empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID for Posting';
+    try {
+      employerId = validStr(employerId);
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: e};
     }
 
     const employersCollection = await employers();
@@ -392,7 +381,10 @@ let exportedMethods = {
     });
 
     if (!employer) {
-      throw 'No employer found with the supplied ID';
+      throw {
+        code: 404,
+        err: 'No employer found with the supplied ID'
+      };
     }
 
     let updatedEmployer = await employersCollection.findOneAndUpdate(
@@ -402,7 +394,10 @@ let exportedMethods = {
     );
 
     if (!updatedEmployer) {
-      throw 'Failed to delete posting from employer';
+      throw {
+        code: 500,
+        err: 'Failed to delete posting from employer'
+      };
     }
 
     updatedEmployer._id = updatedEmployer._id.toString();

@@ -1,16 +1,24 @@
 import { applicants, postings, employers } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import postingFunctions from './postings.js';
-import * as validation from "./validation.js";
+import {
+  validObjectId,
+  validStr,
+  validFloat,
+  validInt,
+  validAlphabetical,
+  validEmail,
+  validState
+} from "./validation.js";
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
 
-    name = validation.validAlphabetical(name);
-    email = validation.validEmail(email);
-    city = validation.validAlphabetical(city);
-    state = validation.validState(state);
-    industry = validation.validStr(industry);
+    name = validAlphabetical(name);
+    email = validEmail(email);
+    city = validAlphabetical(city);
+    state = validState(state);
+    industry = validStr(industry);
 
     let newApplicant = {
       name: name,
@@ -40,16 +48,12 @@ let exportedMethods = {
     applicant._id = applicant._id.toString();
     return applicant;
   },
+
   async getApplicant(applicantId) {
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw {code: 400, err: e}
     }
 
     const applicantCollection = await applicants();
@@ -58,16 +62,23 @@ let exportedMethods = {
     });
 
     if (!applicant) {
-      throw 'no applicant with the given id exists';
+      throw {
+        code: 404,
+        err: 'No applicant with the given id exists'
+      };
     }
     applicant._id = applicant._id.toString();
     return applicant;
   },
+
   async getAll() {
     const applicantCollection = await applicants();
     let applicantList = await applicantCollection.find({}).toArray();
     if (!applicantList) {
-      throw 'failed to get all applicants';
+      throw {
+        code: 500,
+        err: 'Failed to get all applicants'
+      };
     }
     applicantList = applicantList.map((applicant) => {
       return {
@@ -78,26 +89,23 @@ let exportedMethods = {
 
     return applicantList;
   },
+
   async updateApplicant(applicantId, updatedFields) {
     const validFields = ['name', 'email', 'role', 'city', 'state', 'industry'];
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
-    }
-    if (!updatedFields || typeof updatedFields !== 'object') {
-      throw 'You must provide an object of updated fields';
-    }
-    const invalidFields = Object.keys(updatedFields).filter(
-      (field) => !validFields.includes(field)
-    );
-    if (invalidFields.length > 0) {
-      throw `Invalid fields: ${invalidFields.join(', ')}`;
+    try {
+      applicantId = validStr(applicantId);
+
+      if (!updatedFields || typeof updatedFields !== 'object') {
+        throw 'You must provide an object of updated fields';
+      }
+      const invalidFields = Object.keys(updatedFields).filter(
+        (field) => !validFields.includes(field)
+      );
+      if (invalidFields.length > 0) {
+        throw `Invalid fields: ${invalidFields.join(', ')}`;
+      }
+    } catch (e) {
+      throw { code: 400, err: e }
     }
 
     const applicantsCollection = await applicants();
@@ -105,7 +113,10 @@ let exportedMethods = {
       email: updatedFields.email,
     });
     if (existingApplicant) {
-      throw 'Email is already in use';
+      throw {
+        code: 400,
+        err: 'Email is already in use'
+      };
     }
 
     const currentApplicant = await applicantsCollection.findOne({
@@ -113,7 +124,10 @@ let exportedMethods = {
     });
 
     if (!currentApplicant) {
-      throw 'No applicant found with the supplied ID';
+      throw {
+        code: 404,
+        err: 'No applicant found with the supplied ID'
+      };
     }
 
     let updatedApplicant = await applicantsCollection.updateOne(
@@ -121,7 +135,10 @@ let exportedMethods = {
       { $set: updatedFields }
     );
     if (updatedApplicant.acknowledged === false) {
-      throw 'Failed to update applicant';
+      throw {
+        code: 500,
+        err: 'Failed to update applicant'
+      };
     }
 
     updatedApplicant = await applicantsCollection.findOne({
@@ -130,6 +147,7 @@ let exportedMethods = {
     updatedApplicant._id = updatedApplicant._id.toString();
     return updatedApplicant;
   },
+
   async deleteApplicant(applicantId) {
     if (
       !applicantId ||
@@ -160,17 +178,13 @@ let exportedMethods = {
     applicant._id = applicant._id.toString();
     return applicant;
   },
+
   async getPostingsAppliedByApplicant(applicantId) {
     // get all postings that an applicant has applied to
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw {code: 400, err: e};
     }
 
     const applicantsCollection = await applicants();
@@ -179,7 +193,10 @@ let exportedMethods = {
     });
 
     if (!applicant) {
-      throw 'No applicant found with the supplied ID';
+      throw {
+        code: 404,
+        err: 'No applicant found with the supplied ID'
+      };
     }
 
     const appliedPostings = await Promise.all(
@@ -190,26 +207,13 @@ let exportedMethods = {
     );
     return appliedPostings;
   },
+  
   async applyToPosting(applicantId, postingId, applicantStatus) {
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
-    }
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID';
+    try {
+      applicantId = validStr(applicantId);
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: e};
     }
 
     const applicantsCollection = await applicants();
@@ -217,10 +221,16 @@ let exportedMethods = {
       _id: new ObjectId(applicantId),
     });
     if (!applicant) {
-      throw 'No applicant found with the supplied ID';
+      throw {
+        code: 404,
+        err: 'No applicant found with the supplied ID'
+      };
     }
     if (applicant.applied.includes(postingId)) {
-      throw 'Applicant has already applied to this posting';
+      throw {
+        code: 400,
+        err: 'Applicant has already applied to this posting'
+      };
     }
 
     //add postingId to applied field of applicants
@@ -236,7 +246,10 @@ let exportedMethods = {
       }
     );
     if (updatedApplicant.acknowledged === false) {
-      throw `Failed to add postingId to applicant's applied list`;
+      throw {
+        code: 500,
+        err: `Failed to add postingId to applicant's applied list`
+      };
     }
 
     //add applicantId to applicants field of postings
@@ -247,7 +260,10 @@ let exportedMethods = {
     );
 
     if (updatedPosting.acknowledged === false) {
-      throw `Failed to add applicantId to posting's applicants list`;
+      throw {
+        code: 500,
+        err: `Failed to add applicantId to posting's applicants list`
+      };
     }
 
     //add applicantId to the specific employer's posting's applied
@@ -261,7 +277,10 @@ let exportedMethods = {
     });
 
     if (!employer) {
-      throw 'No employer found for the posting';
+      throw {
+        code: 404,
+        err: 'No employer found for the posting'
+      };
     }
 
     const updatedEmployer = await employersCollection.updateOne(
@@ -273,7 +292,10 @@ let exportedMethods = {
     );
 
     if (updatedEmployer.acknowledged === false) {
-      throw `Failed to add applicantId to employer's posting's applicants list`;
+      throw {
+        code: 500,
+        err: `Failed to add applicantId to employer's posting's applicants list`
+      };
     }
 
     const applicantWithAppliedPosting = await applicantsCollection.findOne({
