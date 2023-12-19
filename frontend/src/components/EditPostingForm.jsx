@@ -71,18 +71,6 @@ const EditPostingForm = ({ currentSelectedPosting, onSave, onCancel }) => {
         sx={{ mb: 4 }}
         name="jobTitle"
       />
-      <TextField
-        type="text"
-        label="Company Name"
-        color="secondary"
-        value={editedPosting.companyName}
-        onChange={handleInputChange}
-        // disabled
-        fullWidth
-        required
-        sx={{ mb: 4 }}
-        name="companyName"
-      />
       <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
         <FormControl sx={{ width: '50%' }}>
           <InputLabel id="job-type-label">Job Type *</InputLabel>
