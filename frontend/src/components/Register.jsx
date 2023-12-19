@@ -9,36 +9,36 @@ import {
   Select,
   MenuItem,
   FormControl,
-} from "@mui/material";
-import React, { useContext, useState } from "react";
-import { Navigate } from "react-router";
-import { Link } from "react-router-dom";
-import Navbar from "./Navbar";
-import { AuthContext } from "../context/AuthContext";
-import { doCreateUserWithEmailAndPassword } from "../firebase/FirebaseFunctions";
-import { useDispatch } from "react-redux";
-import { setUser } from "../actions";
-import axios from "axios";
-import dayjs from "dayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import stateAbbreviations from "../utils/stateAbbreviations";
+} from '@mui/material';
+import React, { useContext, useState } from 'react';
+import { Navigate } from 'react-router';
+import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
+import { AuthContext } from '../context/AuthContext';
+import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../actions';
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import stateAbbreviations from '../utils/stateAbbreviations';
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordMatch, setPasswordMatch] = useState("");
-  const [userType, setUserType] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMatch, setPasswordMatch] = useState('');
+  const [userType, setUserType] = useState('');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
   // const [birthDate, setBirthDate] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const [industry, setIndustry] = useState('');
+  const [companyName, setCompanyName] = useState('');
 
   const dispatch = useDispatch();
 
@@ -49,10 +49,10 @@ const Register = () => {
 
     // Check that passwords match
     if (password !== confirmPassword) {
-      setPasswordMatch("Passwords do not match");
+      setPasswordMatch('Passwords do not match');
       return false;
     } else {
-      setPasswordMatch("");
+      setPasswordMatch('');
     }
 
     try {
@@ -67,7 +67,7 @@ const Register = () => {
         industry: industry,
       };
       let user = await axios.post(
-        "http://localhost:3000/api/register",
+        'http://localhost:3000/api/register',
         requestBody
       );
       user = user.data;
@@ -98,7 +98,7 @@ const Register = () => {
   return (
     <div>
       <Navbar />
-      <Box sx={{ maxWidth: "500px", marginTop: 10, color: "black" }}>
+      <Box sx={{ maxWidth: '500px', marginTop: 10, color: 'black' }}>
         <Typography variant="h4" sx={{ marginBottom: 2 }}>
           Create an account
         </Typography>
@@ -132,13 +132,13 @@ const Register = () => {
               label="Role"
               required
               sx={{ mb: 4 }}
-              >
+            >
               <MenuItem value="applicant">Applicant</MenuItem>
               <MenuItem value="employer">Employer</MenuItem>
             </Select>
           </FormControl>
           <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
-            <FormControl sx={{ width: "50%" }} required>
+            <FormControl sx={{ width: '50%' }} required>
               <InputLabel id="user-state-label">State</InputLabel>
               <Select
                 labelId="user-state-label"
@@ -164,7 +164,7 @@ const Register = () => {
               required
             />
           </Stack>
-          {userType === "employer" ? (
+          {userType === 'employer' ? (
             <TextField
               type="text"
               label="Company Name"
@@ -220,7 +220,7 @@ const Register = () => {
           </Button>
         </form>
       </Box>
-      <Typography sx={{ fontSize: 14 }}>
+      <Typography sx={{ color: 'black', fontSize: 14 }}>
         Already have an account? <Link to="/login">Login</Link>
       </Typography>
     </div>
