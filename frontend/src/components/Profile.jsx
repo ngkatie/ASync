@@ -110,7 +110,7 @@ const Profile = () => {
     const appInfo = appliedStatuses.filter(
       (post) => post.postingId == postingId
     );
-    const status = appInfo[0].applicantStatus;
+    const status = appInfo[0]?.applicantStatus;
     // console.log(appInfo[0]);
     return status;
   };
@@ -217,7 +217,7 @@ const Profile = () => {
 
     return (
       <div
-        role="tabpanel"
+        role='tabpanel'
         hidden={value !== index}
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
@@ -250,20 +250,20 @@ const Profile = () => {
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={handleTabChange} centered>
-            <Tab label="About" />
+            <Tab label='About' />
             {userData && userData.role === 'employer' ? (
-              <Tab label="Postings" />
+              <Tab label='Postings' />
             ) : (
-              <Tab label="Applied Companies" />
+              <Tab label='Applied Companies' />
             )}
-            <Tab label="Settings" />
+            <Tab label='Settings' />
           </Tabs>
         </Box>
 
         <TabPanel value={tab} index={0}>
           <Box sx={{ textAlign: 'left' }}>
             {userData.photoURL ? (
-              <img src={userData.photoURL} width="200" />
+              <img src={userData.photoURL} width='200' />
             ) : (
               ''
             )}
@@ -382,16 +382,16 @@ const Profile = () => {
             {edit && (
               <>
                 <TextField
-                  label="Name"
-                  name="name"
+                  label='Name'
+                  name='name'
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 4 }}
                 />
                 <TextField
-                  label="Email"
-                  name="email"
+                  label='Email'
+                  name='email'
                   value={userData.email}
                   onChange={handleChange}
                   fullWidth
@@ -399,22 +399,22 @@ const Profile = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
-                  label="City"
-                  name="city"
+                  label='City'
+                  name='city'
                   value={userData.city}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
                 />
                 <FormControl fullWidth required sx={{ mb: 2 }}>
-                  <InputLabel id="user-state-label">State</InputLabel>
+                  <InputLabel id='user-state-label'>State</InputLabel>
                   <Select
-                    labelId="user-state-label"
-                    id="user-state"
-                    name="state"
+                    labelId='user-state-label'
+                    id='user-state'
+                    name='state'
                     value={userData.state}
                     onChange={handleChange}
-                    label="State"
+                    label='State'
                   >
                     {stateAbbreviations.map((abbreviation) => (
                       <MenuItem key={abbreviation} value={abbreviation}>
@@ -424,15 +424,15 @@ const Profile = () => {
                   </Select>
                 </FormControl>
                 <TextField
-                  label="Industry"
-                  name="industry"
+                  label='Industry'
+                  name='industry'
                   value={userData.industry}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
                 />
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={handleSaveClick}
                   sx={{ mb: 2 }}
                 >
@@ -442,7 +442,7 @@ const Profile = () => {
             )}
 
             <Button
-              variant="outlined"
+              variant='outlined'
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
@@ -450,7 +450,7 @@ const Profile = () => {
             </Button>
 
             <Button
-              variant="outlined"
+              variant='outlined'
               onClick={showUploadImageForm}
               sx={{ mb: 2 }}
             >
@@ -461,7 +461,7 @@ const Profile = () => {
             )}
 
             <Button
-              variant="outlined"
+              variant='outlined'
               onClick={showPasswordForm}
               sx={{ mb: 2 }}
             >
@@ -471,7 +471,7 @@ const Profile = () => {
               <ChangePassword hideForm={hidePasswordForm} />
             )}
 
-            <Link to="/" onClick={handleSignOut}>
+            <Link to='/' onClick={handleSignOut}>
               Log out
             </Link>
           </Box>
