@@ -83,49 +83,63 @@ const Login = () => {
   };
 
   if (currentUser) {
-    return <Navigate to='/' />;
+    return <Navigate to="/" />;
   }
+
+  const handleForgotPassword = async () => {
+    const email = prompt('Please enter your email address');
+    if (email) {
+      try {
+        await doPasswordReset(email);
+        alert(
+          `If an account exists for ${email}, an email will be sent with instructions to reset your password.`
+        );
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+  };
 
   return (
     <div>
       <Navbar />
       <Box>
-        <Typography variant='h4' sx={{ marginBottom: 2, color: "black" }}>
+        <Typography variant="h4" sx={{ marginBottom: 2, color: 'black' }}>
           Log In
         </Typography>
 
-        <form onSubmit={handleLogin} action={<Link to='/postings' />}>
+        <form onSubmit={handleLogin} action={<Link to="/postings" />}>
           <TextField
-            type='email'
-            label='Email'
-            color='secondary'
+            type="email"
+            label="Email"
+            color="secondary"
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           <TextField
-            type='password'
-            label='Password'
-            color='secondary'
+            type="password"
+            label="Password"
+            color="secondary"
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
 
-          <Button type='submit'>Log In</Button>
+          <Button type="submit">Log In</Button>
 
-          <br></br>
+          <br />
+
+          <Button onClick={handleForgotPassword}>Forgot Password</Button>
+
+          <br />
 
           <small>
             Don't have an account yet?{' '}
-            <Link to='/register'>Register here!</Link>
+            <Link to="/register">Register here!</Link>
           </small>
-
-          {/* <Button onClick={passwordReset}>
-            Forgot Password
-          </Button> */}
         </form>
       </Box>
     </div>
