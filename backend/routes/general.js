@@ -198,16 +198,16 @@ router.route('/applicants/:id').get(async (req, res) => {
   let applicant = null;
   try {
     const applicantId = validation.validStr(req.params.id);
-    const cachedApplicant = await client.hGet('applicants', applicantId);
-    if (cachedApplicant) {
-      applicant = JSON.parse(cachedApplicant);
-      console.log(`Applicant ${applicantId} from cache`);
-    }
-    else {
-      console.log('Getting applicant from API');
+    // const cachedApplicant = await client.hGet('applicants', applicantId);
+    // if (cachedApplicant) {
+    //   applicant = JSON.parse(cachedApplicant);
+    //   console.log(`Applicant ${applicantId} from cache`);
+    // }
+    // else {
+    //   console.log('Getting applicant from API');
       applicant = await applicantFunctions.getApplicant(applicantId);
-      await client.hSet('applicants', applicantId, JSON.stringify(applicant));
-    }
+      // await client.hSet('applicants', applicantId, JSON.stringify(applicant));
+    // }
     res.status(200).json(applicant);
   } catch (e) {
     res.status(400).send(e);

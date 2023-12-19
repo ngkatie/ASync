@@ -82,14 +82,21 @@ const Profile = () => {
     fetchData();
   }, [currentSelectedPostingId]);
 
-  const findStatus = async (postingId) => {
-    console.log('REACHED');
-    let applicant = await axios.get(
-      `http://localhost:3000/api/applicants/${currentUserState.userId}`
-    );
-    const { data } = applicant;
-    const appInfo = data.applied.filter((post) => post.postingId == postingId);
-    return appInfo[0].applicantStatus;
+  useEffect(() => {
+    async function getStatuses() {
+      let applicant = await axios.get(
+        `http://localhost:3000/api/applicants/${currentUserState.userId}`
+      );
+      const { data } = applicant;
+      setAppliedStatuses(data.applied);
+    };
+    getStatuses();
+  }, [])
+
+  const findStatus = (postingId) => {
+    const appInfo = appliedStatuses.filter((post) => post.postingId == postingId);
+    const status = appInfo[0].applicantStatus;
+    return status;
   }
 
   const handleSignOut = () => {
