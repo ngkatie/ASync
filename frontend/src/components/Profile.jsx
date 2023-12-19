@@ -114,11 +114,15 @@ const Profile = () => {
 
   useEffect(() => {
     async function getStatuses() {
-      let applicant = await axios.get(
-        `http://localhost:3000/api/applicants/${currentUserState.userId}`
-      );
-      const { data } = applicant;
-      setAppliedStatuses(data.applied);
+      console.log(currentUserState);
+      if (currentUserState && currentUserState.role === 'applicant') {
+        let applicant = await axios.get(
+          `http://localhost:3000/api/applicants/${currentUserState.userId}`
+        );
+        console.log(applicant);
+        const { data } = applicant;
+        setAppliedStatuses(data.applied);
+      }
     }
     getStatuses();
   }, []);
@@ -392,6 +396,7 @@ const Profile = () => {
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
+                  required
                 />
                 <TextField
                   label='Email'
@@ -401,6 +406,7 @@ const Profile = () => {
                   fullWidth
                   disabled
                   sx={{ mb: 2 }}
+                  required
                 />
                 <TextField
                   label='City'
@@ -409,6 +415,7 @@ const Profile = () => {
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
+                  required
                 />
                 <FormControl fullWidth required sx={{ mb: 2 }}>
                   <InputLabel id='user-state-label'>State</InputLabel>
@@ -419,6 +426,7 @@ const Profile = () => {
                     value={userData.state}
                     onChange={handleChange}
                     label='State'
+                    required
                   >
                     {stateAbbreviations.map((abbreviation) => (
                       <MenuItem key={abbreviation} value={abbreviation}>
@@ -434,6 +442,7 @@ const Profile = () => {
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
+                  required
                 />
                 <Button
                   variant='contained'

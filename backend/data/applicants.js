@@ -51,6 +51,7 @@ let exportedMethods = {
     const applicant = await applicantCollection.findOne({
       _id: new ObjectId(applicantId),
     });
+
     if (!applicant) {
       throw 'no applicant with the given id exists';
     }
