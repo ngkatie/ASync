@@ -2,8 +2,10 @@ import { postings, employers, applicants } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import employerFunctions from './employers.js';
 import * as validation from "../validation.js";
+import { validStr } from './validation.js';
 
 let exportedMethods = {
+  
   async addPosting(
     employerId,
     jobTitle,
@@ -18,7 +20,22 @@ let exportedMethods = {
     city,
     state
   ) {
-    //add validation
+    
+    try {
+      employerId = validation.validStr(employerId);
+      jobTitle = validation.validStr(jobTitle);
+      companyName = validation.validStr(companyName);
+      jobType = validation.validStr(jobType);
+      numOfEmployees = validation.validStr(numOfEmployees);
+      description = validation.validStr(description);
+      pay = validation.validStr(pay);
+      rate = validation.validStr(rate);
+      skills = validation.validStr(skills);
+      city = validation.validAlphabetical(city);
+      state = validation.validState(state);
+    } catch (e) {
+      throw {code: 400, err: e}
+    }
 
     // const employer = await employerData.getUserById(employerId);
     // if (!employer) {
@@ -47,7 +64,7 @@ let exportedMethods = {
     const postingCollection = await postings();
     const insertInfo = await postingCollection.insertOne(newPosting);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw 'could not add posting';
+      throw {code: 500, err: 'Could not add posting'};
     }
 
     const newId = insertInfo.insertedId.toString();
@@ -63,34 +80,35 @@ let exportedMethods = {
 
     return posting;
   },
+
   async getPosting(postingId) {
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Invalid posting ID';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID';
+    try {
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: e};
     }
 
-    const postingCollection = await postings();
-    const posting = await postingCollection.findOne({
-      _id: new ObjectId(postingId),
-    });
-    if (posting === null) {
-      throw 'no posting exists with the given id';
+    try {
+      const postingCollection = await postings();
+      const posting = await postingCollection.findOne({
+        _id: new ObjectId(postingId),
+      });
+      if (posting === null) {
+        throw 'No posting exists with the given postingId';
+      }
+      posting._id = posting._id.toString();
+      posting.employerId = posting.employerId.toString();
+      return posting;
+    } catch (e) {
+      throw {code: 500, err: e}
     }
-    posting._id = posting._id.toString();
-    posting.employerId = posting.employerId.toString();
-    return posting;
   },
+
   async getAll() {
     const postingCollection = await postings();
     let postingList = await postingCollection.find({}).toArray();
     if (!postingList) {
-      throw 'failed to get all postings';
+      throw {code: 500, err: 'Failed to get all postings'};
     }
     postingList = postingList.map((posting) => {
       posting._id = posting._id.toString();
@@ -99,16 +117,20 @@ let exportedMethods = {
     });
     return postingList;
   },
+
   async getPostingsByPageNumber(page) {
-    const postingCollection = await postings();
-    let skipAmount = (page - 1) * 10;
-    const postingList = await postingCollection
-      .find({})
-      .skip(skipAmount)
-      .limit(10)
-      .toArray();
-    // console.log(postingList);
-    return postingList;
+    try {
+      const postingCollection = await postings();
+      let skipAmount = (page - 1) * 10;
+      const postingList = await postingCollection
+        .find({})
+        .skip(skipAmount)
+        .limit(10)
+        .toArray();
+      return postingList;
+    } catch (e) {
+      throw {code: 500, err: e}
+    }
   },
   async deletePosting(postingId) {
     //validation

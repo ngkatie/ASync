@@ -1,19 +1,24 @@
 import { applicants, postings, employers } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import postingFunctions from './postings.js';
+import * as validation from "./validation.js";
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
-    //add validation
+
+    name = validation.validAlphabetical(name);
+    email = validation.validEmail(email);
+    city = validation.validAlphabetical(city);
+    state = validation.validState(state);
+    industry = validation.validStr(industry);
 
     let newApplicant = {
       name: name,
       email: email,
-      //password: password,
       city: city,
       state: state,
       industry: industry,
-      applied: [], //array of postingIds that the applicant has applied to
+      applied: [], // Array of postingIds that the applicant has applied to and respective statuses
     };
 
     const applicantsCollection = await applicants();
@@ -27,7 +32,7 @@ let exportedMethods = {
 
     const insertInfo = await applicantsCollection.insertOne(newApplicant);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw 'failed to add applicant';
+      throw 'Failed to add applicant';
     }
 
     const id = insertInfo.insertedId.toString();

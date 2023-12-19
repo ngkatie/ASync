@@ -12,8 +12,8 @@ let exportedMethods = {
       city = validation.validAlphabetical(city);
       state = validation.validState(state);
       industry = validation.validStr(industry);
-    } catch (error) {
-      throw [400, error];
+    } catch (e) {
+      throw {code: 400, err: e};
     }
 
     let newEmployer = {
@@ -28,17 +28,14 @@ let exportedMethods = {
 
     const employersCollection = await employers();
   
-    const existingEmployer = await employersCollection.findOne({
-      email: email,
-    });
-    console.log(existingEmployer);
+    const existingEmployer = await employersCollection.findOne({email: email});
     if (existingEmployer) {
-      throw [400, 'Email is already in use'];
+      throw {code: 400, err: 'Email is already in use'};
     }
 
     const insertInfo = await employersCollection.insertOne(newEmployer);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw [400, 'Failed to add employer'];
+      throw {code: 500, err: 'Failed to add employer'};
     }
 
     const id = insertInfo.insertedId.toString();

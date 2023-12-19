@@ -30,8 +30,6 @@ router.route('/register').post(async (req, res) => {
       res.status(201).json(applicant);
     } else if (userRole === 'employer') {
       const { companyName } = req.body;
-      // console.log(req.body);
-      // console.log(email);
       const employer = await employerFunctions.addEmployer(
         displayName,
         email,
@@ -45,8 +43,8 @@ router.route('/register').post(async (req, res) => {
       res.status(400).json({ message: 'Invalid user type' });
     }
   } catch (e) {
-    res.status(400).send(e);
-    console.log(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
@@ -56,20 +54,25 @@ router.route('/postings').get(async (req, res) => {
     const postingList = await postingFunctions.getAll();
     res.status(200).json(postingList);
   } catch (e) {
-    res.status(404).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
 router.route('/postings/:id').get(async (req, res) => {
   //code here for posting GET request
+  let postingId = null;
   try {
-    const postingId = validation.validStr(req.params.id);
+    postingId = validation.validStr(req.params.id);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+  
+  try {
     let postingInfo = null;
-
     let posting = await client.hGet('postings', postingId);
     if (posting) {
       postingInfo = JSON.parse(posting);
-      console.log(`Posting ${postingId} from cache`);
     }
     else {
       postingInfo = await postingFunctions.getPosting(postingId);
@@ -77,21 +80,26 @@ router.route('/postings/:id').get(async (req, res) => {
     }
     return res.status(200).json(postingInfo);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
 router.route('/postings/page/:pagenum').get(async (req, res) => {
+  let page = req.params.pagenum;
   try {
-    let page = validation.validInt(req.params.pagenum);
+    page = validation.validInt(page);
+  } catch (e) {
+    throw {code: 400, err: e};
+  }
+
+  try {
     let postingsByPageNumber = null;
-
     postingsByPageNumber = await postingFunctions.getPostingsByPageNumber(page);
-
     res.status(200).json(postingsByPageNumber);
   } catch (e) {
-    res.status(400).send(e);
-    console.log(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
@@ -127,7 +135,8 @@ router.route('/postings').post(async (req, res) => {
     );
     res.status(201).json(posting);
   } catch (e) {
-    res.status(400).send(e);
+    const { code, err } = e;
+    res.status(code).send(err);
   }
 });
 
