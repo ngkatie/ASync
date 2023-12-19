@@ -25,6 +25,23 @@ import PostingCard from './PostingCard';
 import PostingDetailsModal from './PostingDetailsModal';
 import stateAbbreviations from '../utils/stateAbbreviations';
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role='tabpanel'
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+      style={{ minHeight: '700px' }}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState({});
@@ -124,6 +141,10 @@ const Profile = () => {
     setEdit(() => !edit);
   };
 
+  const handleCancelEditClick = () => {
+    setEdit(() => !edit);
+  };
+
   const handleSaveClick = async () => {
     try {
       //update context api
@@ -211,23 +232,6 @@ const Profile = () => {
   const handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
-
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role='tabpanel'
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-        style={{ minHeight: '700px' }}
-      >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-      </div>
-    );
-  }
 
   return (
     <>
@@ -387,7 +391,7 @@ const Profile = () => {
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
-                  sx={{ mb: 4 }}
+                  sx={{ mb: 2 }}
                 />
                 <TextField
                   label='Email'
@@ -437,6 +441,9 @@ const Profile = () => {
                   sx={{ mb: 2 }}
                 >
                   Save
+                </Button>
+                <Button onClick={handleCancelEditClick} sx={{ mb: 2 }}>
+                  Cancel
                 </Button>
               </>
             )}

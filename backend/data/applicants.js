@@ -95,6 +95,13 @@ let exportedMethods = {
     }
 
     const applicantsCollection = await applicants();
+    const existingApplicant = await applicantsCollection.findOne({
+      email: updatedFields.email,
+    });
+    if (existingApplicant) {
+      throw 'Email is already in use';
+    }
+
     const currentApplicant = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
     });
