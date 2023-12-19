@@ -1,6 +1,6 @@
-import { employers, applicants } from "../config/mongoCollections.js";
-import { ObjectId } from "mongodb";
-import * as validation from "./validation.js"
+import { employers, applicants } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
+import * as validation from './validation.js';
 
 let exportedMethods = {
   async addEmployer(name, email, companyName, city, state, industry) {
@@ -23,12 +23,13 @@ let exportedMethods = {
       city: city,
       state: state,
       industry: industry,
-      postings: []
+      postings: [],
     };
 
     const employersCollection = await employers();
   
     const existingEmployer = await employersCollection.findOne({email: email});
+
     if (existingEmployer) {
       throw {code: 400, err: 'Email is already in use'};
     }
@@ -97,6 +98,14 @@ let exportedMethods = {
     }
 
     const employersCollection = await employers();
+
+    const existingEmployer = await employersCollection.findOne({
+      email: updatedFields.email,
+    });
+    if (existingEmployer) {
+      throw 'Email is already in use';
+    }
+
     const currentEmployer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
     });
@@ -142,31 +151,31 @@ let exportedMethods = {
     employer._id = employer._id.toString();
     return employer;
   },
-  
+
   async updateApplicantStatus(applicantId, postingId, newStatus) {
-    const validStatuses = ["In Progress", "Accepted", "Rejected"];
+    const validStatuses = ['In Progress', 'Accepted', 'Rejected'];
 
     try {
       applicantId = validation.validStr(applicantId);
       postingId = validation.validStr(postingId);
 
       if (!validStatuses.includes(newStatus)) {
-        throw "Invalid applicant status";
+        throw 'Invalid applicant status';
       }
     } catch (e) {
       console.log(e);
-      throw [400, 'Bad input']
+      throw [400, 'Bad input'];
     }
 
     const applicantsCollection = await applicants();
     const updateResult = await applicantsCollection.updateOne(
       {
         _id: new ObjectId(applicantId),
-        "applied.postingId": new ObjectId(postingId),
+        'applied.postingId': new ObjectId(postingId),
       },
       {
         $set: {
-          "applied.$.applicantStatus": newStatus,
+          'applied.$.applicantStatus': newStatus,
         },
       }
     );

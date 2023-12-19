@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Navbar from './Navbar';
 import { updateProfile } from 'firebase/auth';
 import ChangePassword from './ChangePassword';
@@ -8,16 +8,46 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { doSignOut } from '../firebase/FirebaseFunctions';
 import { setUser, unsetUser } from '../actions';
-import { Box, Button, Tab, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import axios from 'axios';
 import PostingCard from './PostingCard';
 import PostingDetailsModal from './PostingDetailsModal';
+import stateAbbreviations from '../utils/stateAbbreviations';
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role='tabpanel'
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+      style={{ minHeight: '700px' }}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState({});
   const [edit, setEdit] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showEditCredentials, setShowEditCredentials] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
   const [tab, setTab] = useState(0);
   const [postings, setPostings] = useState([]);
@@ -42,7 +72,7 @@ const Profile = () => {
           state: currentUserState.state,
           city: currentUserState.city,
           industry: currentUserState.industry,
-          photoURL: currentUser.photoURL
+          photoURL: currentUser.photoURL,
         });
         if (currentUserState.role === 'employer') {
           const postingList = await axios.get(
@@ -84,21 +114,27 @@ const Profile = () => {
 
   useEffect(() => {
     async function getStatuses() {
-      let applicant = await axios.get(
-        `http://localhost:3000/api/applicants/${currentUserState.userId}`
-      );
-      const { data } = applicant;
-      setAppliedStatuses(data.applied);
-    };
+      console.log(currentUserState);
+      if (currentUserState && currentUserState.role === 'applicant') {
+        let applicant = await axios.get(
+          `http://localhost:3000/api/applicants/${currentUserState.userId}`
+        );
+        console.log(applicant);
+        const { data } = applicant;
+        setAppliedStatuses(data.applied);
+      }
+    }
     getStatuses();
-  }, [])
+  }, []);
 
   const findStatus = (postingId) => {
-    const appInfo = appliedStatuses.filter((post) => post.postingId == postingId);
-    const status = appInfo[0].applicantStatus;
+    const appInfo = appliedStatuses.filter(
+      (post) => post.postingId == postingId
+    );
+    const status = appInfo[0]?.applicantStatus;
     // console.log(appInfo[0]);
     return status;
-  }
+  };
 
   const handleSignOut = () => {
     doSignOut();
@@ -106,7 +142,11 @@ const Profile = () => {
   };
 
   const handleEditClick = () => {
-    setEdit(true);
+    setEdit(() => !edit);
+  };
+
+  const handleCancelEditClick = () => {
+    setEdit(() => !edit);
   };
 
   const handleSaveClick = async () => {
@@ -117,14 +157,33 @@ const Profile = () => {
         email: userData.email,
       });
       //update mongodb
-      if (userData.companyName.length === 0) {
-        let { userId, companyName, ...userDataWithoutId } = userData;
+      let userDataWithoutId = {};
+      if (currentUserState.role === 'employer') {
+        const { userId, companyName, ...employerData } = userData;
+        userDataWithoutId = {
+          companyName,
+          role: employerData.role,
+          state: employerData.state,
+          city: employerData.city,
+          industry: employerData.industry,
+        };
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
         );
       } else {
-        let { userId, ...userDataWithoutId } = userData;
+        const { userId, ...applicantData } = userData;
+        userDataWithoutId = {
+          name: applicantData.name,
+          email: applicantData.email,
+          role: applicantData.role,
+          state: applicantData.state,
+          city: applicantData.city,
+          industry: applicantData.industry,
+        };
+
+        console.log(userDataWithoutId);
+        console.log(userData);
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
@@ -160,11 +219,11 @@ const Profile = () => {
 
   const showUploadImageForm = () => {
     setShowUploadImage(true);
-  }
+  };
 
   const hideUploadPhotoForm = () => {
     setShowUploadImage(false);
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,23 +236,6 @@ const Profile = () => {
   const handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
-
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role='tabpanel'
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-        style={{ minHeight: '700px' }}
-      >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-      </div>
-    );
-  }
 
   return (
     <>
@@ -228,10 +270,11 @@ const Profile = () => {
 
         <TabPanel value={tab} index={0}>
           <Box sx={{ textAlign: 'left' }}>
-            {userData.photoURL 
-              ? <img src={userData.photoURL} width="200"/>
-              : ""
-            }
+            {userData.photoURL ? (
+              <img src={userData.photoURL} width='200' />
+            ) : (
+              ''
+            )}
             <Typography sx={{ fontSize: 30 }}>{userData.name}</Typography>
             <Typography>{userData.email}</Typography>
             {userData && userData.role === 'employer' && (
@@ -352,7 +395,8 @@ const Profile = () => {
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
-                  sx={{ mb: 4 }}
+                  sx={{ mb: 2 }}
+                  required
                 />
                 <TextField
                   label='Email'
@@ -362,6 +406,43 @@ const Profile = () => {
                   fullWidth
                   disabled
                   sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  label='City'
+                  name='city'
+                  value={userData.city}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <FormControl fullWidth required sx={{ mb: 2 }}>
+                  <InputLabel id='user-state-label'>State</InputLabel>
+                  <Select
+                    labelId='user-state-label'
+                    id='user-state'
+                    name='state'
+                    value={userData.state}
+                    onChange={handleChange}
+                    label='State'
+                    required
+                  >
+                    {stateAbbreviations.map((abbreviation) => (
+                      <MenuItem key={abbreviation} value={abbreviation}>
+                        {abbreviation}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  label='Industry'
+                  name='industry'
+                  value={userData.industry}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  required
                 />
                 <Button
                   variant='contained'
@@ -369,6 +450,9 @@ const Profile = () => {
                   sx={{ mb: 2 }}
                 >
                   Save
+                </Button>
+                <Button onClick={handleCancelEditClick} sx={{ mb: 2 }}>
+                  Cancel
                 </Button>
               </>
             )}
@@ -378,7 +462,7 @@ const Profile = () => {
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
-              Edit credentials
+              Edit profile details
             </Button>
 
             <Button
@@ -389,7 +473,7 @@ const Profile = () => {
               Upload profile photo
             </Button>
             {showUploadImage && (
-              <UploadImageModal hideForm={hideUploadPhotoForm}/>
+              <UploadImageModal hideForm={hideUploadPhotoForm} />
             )}
 
             <Button
@@ -402,7 +486,7 @@ const Profile = () => {
             {showChangePassword && (
               <ChangePassword hideForm={hidePasswordForm} />
             )}
-            
+
             <Link to='/' onClick={handleSignOut}>
               Log out
             </Link>

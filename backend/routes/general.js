@@ -2,7 +2,7 @@ import { Router } from 'express';
 import postingFunctions from '../data/postings.js';
 import applicantFunctions from '../data/applicants.js';
 import employerFunctions from '../data/employers.js';
-import * as validation from "./routeValidation.js"
+import * as validation from './routeValidation.js';
 
 const router = Router();
 
@@ -73,8 +73,8 @@ router.route('/postings/:id').get(async (req, res) => {
     let posting = await client.hGet('postings', postingId);
     if (posting) {
       postingInfo = JSON.parse(posting);
-    }
-    else {
+      console.log(`Posting ${postingId} from cache`);
+    } else {
       postingInfo = await postingFunctions.getPosting(postingId);
       await client.hSet('postings', postingId, JSON.stringify(postingInfo));
     }
@@ -149,7 +149,7 @@ router.route('/postings/apply/:id').post(async (req, res) => {
       postingId,
       applicantStatus
     );
-    
+
     // Update cache
     const applicantInfo = await applicantFunctions.getApplicant(applicantId);
     await client.hSet('applicants', applicantId, JSON.stringify(applicantInfo));
@@ -212,8 +212,8 @@ router.route('/applicants/:id').get(async (req, res) => {
     // }
     // else {
     //   console.log('Getting applicant from API');
-      applicant = await applicantFunctions.getApplicant(applicantId);
-      // await client.hSet('applicants', applicantId, JSON.stringify(applicant));
+    applicant = await applicantFunctions.getApplicant(applicantId);
+    // await client.hSet('applicants', applicantId, JSON.stringify(applicant));
     // }
     res.status(200).json(applicant);
   } catch (e) {

@@ -117,10 +117,12 @@ const PostingDetailsModal = (props) => {
   };
 
   const findStatus = (applicant) => {
-    const appInfo = applicant.applied.filter((post) => post.postingId == currentSelectedPosting._id);
-    console.log(appInfo[0].applicantStatus);
+    const appInfo = applicant.applied.filter(
+      (post) => post.postingId == currentSelectedPosting._id
+    );
+    console.log(appInfo[0]?.applicantStatus);
     return appInfo[0].applicantStatus;
-  }
+  };
 
   const handleChangeApplicantStatus = async (newStatus, currentApplicant) => {
     try {
@@ -173,7 +175,7 @@ const PostingDetailsModal = (props) => {
             justifyContent: 'space-between',
             border: '1px solid rgba(0, 0, 0, 0.2)',
             borderRadius: 5,
-            backgroundColor: "white",
+            backgroundColor: 'white',
             minHeight: 600,
             maxHeight: 650,
             minWidth: 500,
@@ -209,7 +211,7 @@ const PostingDetailsModal = (props) => {
               </Typography>
               {currentUserState && currentUserState.role === 'applicant' && (
                 <Button
-                  variant="contained"
+                  variant='contained'
                   disabled={isApplied}
                   onClick={handleApply}
                 >
@@ -237,8 +239,8 @@ const PostingDetailsModal = (props) => {
                         Edit
                       </Button>
                       <Button
-                        variant="contained"
-                        color="error"
+                        variant='contained'
+                        color='error'
                         onClick={handleDeletePosting}
                       >
                         Delete
@@ -247,11 +249,11 @@ const PostingDetailsModal = (props) => {
                     <Dialog
                       open={isEditing}
                       onClose={handleCancelEditing}
-                      maxWidth="sm"
+                      maxWidth='sm'
                       fullWidth
                     >
                       <DialogContent>
-                        <Typography variant="h6">Edit Posting</Typography>
+                        <Typography variant='h6'>Edit Posting</Typography>
                         <EditPostingForm
                           currentSelectedPosting={currentSelectedPosting}
                           onSave={handleSaveEditing}
@@ -287,7 +289,7 @@ const PostingDetailsModal = (props) => {
                 {currentSelectedPosting.numOfEmployees} employees
               </Typography>
               <Typography>Skills: {currentSelectedPosting.skills}</Typography>
-              <Typography color="textSecondary" gutterBottom>
+              <Typography color='textSecondary' gutterBottom>
                 Pay Rate: ${currentSelectedPosting.pay}/
                 {currentSelectedPosting.rate}
               </Typography>
@@ -340,7 +342,7 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                <Avatar src="/async.png" />
+                                <Avatar src='/async.png' />
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
@@ -356,9 +358,7 @@ const PostingDetailsModal = (props) => {
                                 <Select
                                   labelId={`applicant-status-label-${index}`}
                                   id={`applicant-status-${index}`}
-                                  value={
-                                    findStatus(applicant)
-                                  }
+                                  value={findStatus(applicant)}
                                   onChange={(e) => {
                                     setApplicantStatuses((prevStatuses) => ({
                                       ...prevStatuses,
@@ -369,11 +369,17 @@ const PostingDetailsModal = (props) => {
                                       applicant
                                     );
                                   }}
-                                  label="Status"
+                                  label='Status'
                                 >
-                                  <MenuItem value={`In Progress`}>In Progress</MenuItem>
-                                  <MenuItem value={`Accepted`}>Accepted</MenuItem>
-                                  <MenuItem value={`Rejected`}>Rejected</MenuItem>
+                                  <MenuItem value={`In Progress`}>
+                                    In Progress
+                                  </MenuItem>
+                                  <MenuItem value={`Accepted`}>
+                                    Accepted
+                                  </MenuItem>
+                                  <MenuItem value={`Rejected`}>
+                                    Rejected
+                                  </MenuItem>
                                 </Select>
                               </FormControl>
                             </ListItemButton>
