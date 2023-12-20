@@ -10,6 +10,8 @@ import {
   validEmail,
   validState
 } from "./validation.js";
+import fs from 'fs';
+import axios from 'axios';
 
 import gm from "gm";
 var im = gm.subClass({ imageMagick: true });
@@ -206,12 +208,28 @@ let exportedMethods = {
     }
 
     try {
-      gm(photoUrl).resize(200, 200).write(photoUrl, function (err) {
+      console.log("MAGICCCCCCC");
+  
+      // Ensure the /temp/ directory exists
+      fs.mkdirSync('/temp/', { recursive: true });
+  
+      // Download the image locally
+      const response = await axios.get(photoUrl, { responseType: 'arraybuffer' });
+      const localFilePath = `/temp/${applicantId}.jpg`;
+  
+      // Write the downloaded image to a local file
+      fs.writeFileSync(localFilePath, Buffer.from(response.data));
+      console.log(localFilePath);
+      // Resize and write to the new file
+      gm(localFilePath).resize(200, 200).write(`${applicantId}_revised.jpg`, function (err) {
         if (!err) console.log('Success');
+        else console.log(err);
       });
-    } catch (e) {
-      throw {code: 500, err: e}
-    }
+  
+  } catch (e) {
+      console.error("Error:", e);
+      throw { code: 500, err: e };
+  }
 
     let updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },

@@ -16,36 +16,39 @@ const UploadImageModal = ({ hideForm }) => {
     const dispatch = useDispatch();
     const currentUserState = useSelector((state) => state.user);
 
-   async function uploadImage() {
-        if (image == null) {
-            return;
-        }
-        const imageRef = ref(storage, `images/${currentUser.uid}`);
-        uploadBytes(imageRef, image).then((snapshot) => {
-            getDownloadURL(imageRef)
-                .then((url)=> {
-                    setImageUrl(url);
-                    const auth = getAuth();
-                    updateProfile(auth.currentUser, {
-                        photoURL: url
-                    })
-                })
-        })
-        try {
-            const requestBody = {
-                userType: currentUserState.role,
-                photoUrl: imageUrl
-            };
-        
-            await axios.put(
-                `http://localhost:3000/api/update-photo/${currentUserState.userId}`,
-                requestBody
-            );
-        } catch (e) {
-            console.log(e);
-        }
-        alert("Image uploaded");
+    async function uploadImage() {
+    if (image == null) {
+        return;
     }
+
+    const imageRef = ref(storage, `images/${currentUser.uid}`);
+    try {
+        const snapshot = await uploadBytes(imageRef, image);
+        const url = await getDownloadURL(imageRef);
+
+        // Update user profile
+        const auth = getAuth();
+        await updateProfile(auth.currentUser, {
+            photoURL: url,
+        });
+
+        // Send request to update photo URL on the server
+        const requestBody = {
+            userType: currentUserState.role,
+            photoUrl: url,
+        };
+
+        const updated = await axios.put(
+            `http://localhost:3000/api/update-photo/${currentUserState.userId}`,
+            requestBody
+        );
+
+        console.log(updated);
+        alert("Image uploaded");
+    } catch (e) {
+        console.error(e);
+    }
+}
 
     return (
         <Box sx={{mb: 2}}>

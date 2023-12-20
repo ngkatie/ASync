@@ -381,7 +381,6 @@ router.route('/update-photo/:userId').put(async (req, res) => {
   }
 
   try {
-    console.log(userType);
     if (userType === "employer") {
       const updatedEmployer = await employerFunctions.updateCompanyLogo(
         userId,
