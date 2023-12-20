@@ -27,6 +27,7 @@ let exportedMethods = {
       state: state,
       industry: industry,
       applied: [], // Array of postingIds that the applicant has applied to and respective statuses
+      resume: null
     };
 
     const applicantsCollection = await applicants();
@@ -138,6 +139,42 @@ let exportedMethods = {
       throw {
         code: 500,
         err: 'Failed to update applicant'
+      };
+    }
+
+    updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+    updatedApplicant._id = updatedApplicant._id.toString();
+    return updatedApplicant;
+  },
+
+  async updateApplicantResume(applicantId, resumeUrl) {
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const applicantsCollection = await applicants();
+
+    const currentApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId)
+    });
+    if (!currentApplicant) {
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
+    }
+
+    let updatedApplicant = await applicantsCollection.updateOne(
+      { _id: new ObjectId(applicantId) },
+      { $set: {
+        resume: resumeUrl
+      }}
+    );
+    if (updatedApplicant.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update applicant resume'
       };
     }
 

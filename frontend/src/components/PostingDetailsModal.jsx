@@ -4,6 +4,7 @@ import {
   Button,
   FormControl,
   InputLabel,
+  Link,
   List,
   ListItem,
   ListItemAvatar,
@@ -13,7 +14,7 @@ import {
   Select,
   Typography,
   Dialog,
-  DialogContent,
+  DialogContent
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -342,13 +343,15 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                <Avatar src='/async.png' />
+                                <Avatar src={'/async.png'} />
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
-                              <Typography>Resume somewhere here</Typography>
+                              <Link href={applicant.resume}>
+                                View Resume
+                              </Link>
                               <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}

@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import { updateProfile } from 'firebase/auth';
 import ChangePassword from './ChangePassword';
 import UploadImageModal from './UploadImageModal';
+import UploadResumeModal from './UploadResumeModal';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -49,6 +50,7 @@ const Profile = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
+  const [showUploadResume, setShowUploadResume] = useState(false);
   const [tab, setTab] = useState(0);
   const [postings, setPostings] = useState([]);
   const [currentSelectedPostingId, setCurrentSelectedPostingId] = useState('');
@@ -182,8 +184,8 @@ const Profile = () => {
           industry: applicantData.industry,
         };
 
-        console.log(userDataWithoutId);
-        console.log(userData);
+        // console.log(userDataWithoutId);
+        // console.log(userData);
         await axios.put(
           `http://localhost:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
@@ -223,6 +225,14 @@ const Profile = () => {
 
   const hideUploadPhotoForm = () => {
     setShowUploadImage(false);
+  };
+
+  const showUploadResumeForm = () => {
+    setShowUploadResume(true);
+  };
+
+  const hideUploadResumeForm = () => {
+    setShowUploadResume(false);
   };
 
   const handleChange = (e) => {
@@ -474,6 +484,17 @@ const Profile = () => {
             </Button>
             {showUploadImage && (
               <UploadImageModal hideForm={hideUploadPhotoForm} />
+            )}
+
+            <Button
+              variant='outlined'
+              onClick={showUploadResumeForm}
+              sx={{ mb: 2 }}
+            >
+              Update resume
+            </Button>
+            {showUploadResume && (
+              <UploadResumeModal hideForm={hideUploadResumeForm} />
             )}
 
             <Button
