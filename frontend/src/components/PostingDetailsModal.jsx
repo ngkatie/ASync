@@ -41,6 +41,7 @@ const PostingDetailsModal = (props) => {
 
   useEffect(() => {
     async function fetchData() {
+      console.log(currentSelectedPosting);
       if (
         currentUserState.role === 'applicant' &&
         currentSelectedPosting &&
@@ -119,10 +120,11 @@ const PostingDetailsModal = (props) => {
   };
 
   const findStatus = (applicant) => {
+    console.log(applicant);
     const appInfo = applicant.applied.filter(
       (post) => post.postingId == currentSelectedPosting._id
     );
-    console.log(appInfo[0]?.applicantStatus);
+    // console.log(appInfo[0]);
     return appInfo[0].applicantStatus;
   };
 
@@ -208,6 +210,10 @@ const PostingDetailsModal = (props) => {
                 color: 'black',
               }}
             >
+              {currentSelectedPosting.companyLogo ? 
+                <Avatar src={currentSelectedPosting.companyLogo} alt="Company Logo" sx={{width: 56, height: 56}} />
+                : null
+              }
               <Typography sx={{ fontSize: 30 }}>
                 {currentSelectedPosting && currentSelectedPosting.jobTitle}
               </Typography>
@@ -341,6 +347,7 @@ const PostingDetailsModal = (props) => {
                             key={applicant._id}
                             disablePadding
                             sx={{ width: '100%' }}
+                            alignItems='center'
                           >
                             <ListItemButton>
                               <ListItemAvatar>
@@ -351,9 +358,6 @@ const PostingDetailsModal = (props) => {
                                 primary={applicant.name}
                               />
                               {applicant.resumeUrl ? <Link href={applicant.resumeUrl}>View Resume</Link> : "No resume available"}
-                              {/* <Link href={applicant.resumeUrl}>
-                                View Resume
-                              </Link> */}
                               <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}
