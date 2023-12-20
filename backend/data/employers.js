@@ -21,7 +21,7 @@ let exportedMethods = {
       state = validState(state);
       industry = validStr(industry);
     } catch (e) {
-      throw {code: 400, err: e};
+      throw {code: 500, err: e};
     }
 
     let newEmployer = {
