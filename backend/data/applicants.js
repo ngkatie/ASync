@@ -11,6 +11,9 @@ import {
   validState
 } from "./validation.js";
 
+import gm from "gm";
+var im = gm.subClass({ imageMagick: true });
+
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
 
@@ -202,6 +205,15 @@ let exportedMethods = {
       throw {code: 404, err: 'No applicant found with the supplied ID'};
     }
 
+    try {
+      gm(photoUrl).resize(200, 200).write(photoUrl, function (err) {
+        if (!err) console.log('Success');
+      });
+    } catch (e) {
+      console.log(e);
+      throw {code: 500, err: e}
+    }
+
     let updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
       { $set: {
@@ -223,16 +235,12 @@ let exportedMethods = {
   },
 
   async deleteApplicant(applicantId) {
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
     }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
-    }
+
     const applicantsCollection = await applicants();
     const applicant = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
@@ -245,7 +253,7 @@ let exportedMethods = {
     const deleteResult = await applicantsCollection.deleteOne({
       _id: new ObjectId(applicantId),
     });
-    // console.log(deleteResult);
+
     if (deleteResult.deletedCount !== 1) {
       throw 'Deletion failed';
     }

@@ -26,6 +26,7 @@ const UploadImageModal = ({ hideForm }) => {
             getDownloadURL(imageRef)
                 .then((url)=> {
                     setImageUrl(url);
+                    console.log(url);
                     const auth = getAuth();
                     updateProfile(auth.currentUser, {
                         photoURL: url
