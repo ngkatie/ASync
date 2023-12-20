@@ -14,6 +14,7 @@ import React, { useContext, useState } from 'react';
 import { Navigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
+import UploadImageModal from './UploadImageModal';
 import { AuthContext } from '../context/AuthContext';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
 import { useDispatch } from 'react-redux';

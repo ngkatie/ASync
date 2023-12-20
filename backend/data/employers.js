@@ -32,6 +32,7 @@ let exportedMethods = {
       state: state,
       industry: industry,
       postings: [],
+      companyLogo: null
     };
 
     const employersCollection = await employers();
@@ -173,6 +174,50 @@ let exportedMethods = {
     }
     employer._id = employer._id.toString();
     return employer;
+  },
+
+  async updateCompanyLogo(employerId, photoUrl) {
+    try {
+      employerId = validStr(employerId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const employersCollection = await employers();
+    const employer = await employersCollection.findOne({
+      _id: new ObjectId(employerId),
+    });
+    if (!employer) {
+      throw {code: 404, err: 'No employer found with the supplied ID'};
+    }
+
+    // try {
+    //   gm(photoUrl).resize(200, 200).write(photoUrl, function (err) {
+    //     if (!err) console.log('Success');
+    //   });
+    // } catch (e) {
+    //   console.log(e);
+    //   throw {code: 500, err: e}
+    // }
+
+    let updatedEmployer = await employersCollection.updateOne(
+      { _id: new ObjectId(employerId) },
+      { $set: {
+        companyLogo: photoUrl
+      }}
+    );
+    if (updatedEmployer.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update company logo'
+      };
+    }
+
+    updatedEmployer = await employersCollection.findOne({
+      _id: new ObjectId(employerId),
+    });
+    updatedEmployer._id = updatedEmployer._id.toString();
+    return updatedEmployer;
   },
 
   async updateApplicantStatus(applicantId, postingId, newStatus) {

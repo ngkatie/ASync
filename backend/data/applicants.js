@@ -210,7 +210,6 @@ let exportedMethods = {
         if (!err) console.log('Success');
       });
     } catch (e) {
-      console.log(e);
       throw {code: 500, err: e}
     }
 

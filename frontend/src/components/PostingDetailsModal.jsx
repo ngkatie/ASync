@@ -19,6 +19,7 @@ import {
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import EditPostingForm from './EditPostingForm';
+import ExamplePhoto from "../assets/examplePhoto.jpeg";
 
 const PostingDetailsModal = (props) => {
   const {
@@ -343,15 +344,16 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                {applicant.photoUrl ? <Avatar src={applicant.photoUrl} /> :<Avatar src={'/async.png'} />}
+                                {applicant.photoUrl ? <Avatar src={applicant.photoUrl} /> :<Avatar src={ExamplePhoto} />}
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
-                              <Link href={applicant.resumeUrl}>
+                              {applicant.resumeUrl ? <Link href={applicant.resumeUrl}>View Resume</Link> : "No resume available"}
+                              {/* <Link href={applicant.resumeUrl}>
                                 View Resume
-                              </Link>
+                              </Link> */}
                               <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}

@@ -372,7 +372,7 @@ router.route('/update-profile/:userId').put(async (req, res) => {
 });
 
 router.route('/update-photo/:userId').put(async (req, res) => {
-  const { photoUrl } = req.body;
+  const { userType, photoUrl } = req.body;
   let userId = req.params.userId;
   try {
     userId = validStr(userId);
@@ -381,11 +381,21 @@ router.route('/update-photo/:userId').put(async (req, res) => {
   }
 
   try {
-    const updatedApplicant = await applicantFunctions.updateApplicantPhoto(
-      userId,
-      photoUrl
-    );
-    res.status(200).json(updatedApplicant);
+    console.log(userType);
+    if (userType === "employer") {
+      const updatedEmployer = await employerFunctions.updateCompanyLogo(
+        userId,
+        photoUrl
+      );
+      res.status(200).json(updatedEmployer);
+    } 
+    else {
+      const updatedApplicant = await applicantFunctions.updateApplicantPhoto(
+        userId,
+        photoUrl
+      );
+      res.status(200).json(updatedApplicant);
+    }
   } catch (e) {
     const { code, err } = e;
     res.status(code).send(err);

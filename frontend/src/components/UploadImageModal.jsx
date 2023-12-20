@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import { getAuth, updateProfile } from "firebase/auth";
 import axios from 'axios';
 import { Box, Stack, Button, TextField } from '@mui/material';
+import { current } from '@reduxjs/toolkit';
 
 const UploadImageModal = ({ hideForm }) => {
     const { currentUser } = useContext(AuthContext);
@@ -19,26 +20,23 @@ const UploadImageModal = ({ hideForm }) => {
         if (image == null) {
             return;
         }
-        console.log(currentUser);
         const imageRef = ref(storage, `images/${currentUser.uid}`);
-        console.log(imageRef);
         uploadBytes(imageRef, image).then((snapshot) => {
             getDownloadURL(imageRef)
                 .then((url)=> {
                     setImageUrl(url);
-                    console.log(url);
                     const auth = getAuth();
                     updateProfile(auth.currentUser, {
                         photoURL: url
                     })
                 })
-            // console.log(currentUser);
         })
         try {
             const requestBody = {
+                userType: currentUserState.role,
                 photoUrl: imageUrl
             };
-            console.log(requestBody);
+        
             await axios.put(
                 `http://localhost:3000/api/update-photo/${currentUserState.userId}`,
                 requestBody

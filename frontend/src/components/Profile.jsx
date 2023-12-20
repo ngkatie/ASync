@@ -480,19 +480,24 @@ const Profile = () => {
               onClick={showUploadImageForm}
               sx={{ mb: 2 }}
             >
-              Upload profile photo
+              {currentUserState.role === 'employer' 
+                ? "Update company logo" 
+                : "Update profile photo"
+              }
             </Button>
             {showUploadImage && (
               <UploadImageModal hideForm={hideUploadPhotoForm} />
             )}
-
-            <Button
-              variant='outlined'
-              onClick={showUploadResumeForm}
-              sx={{ mb: 2 }}
-            >
-              Update resume
-            </Button>
+            {currentUserState.role === 'applicant' 
+                ? <Button
+                    variant='outlined'
+                    onClick={showUploadResumeForm}
+                    sx={{ mb: 2 }}
+                  >
+                    Update resume
+                  </Button>
+                : null
+              }
             {showUploadResume && (
               <UploadResumeModal hideForm={hideUploadResumeForm} />
             )}
