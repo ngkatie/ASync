@@ -407,11 +407,9 @@ let exportedMethods = {
 
   
   async getPostingsBySearch(searchQuery) {
-    console.log("CALLED")
     try {
       searchQuery = validStr(searchQuery);
     } catch (e) {
-    console.log("40000000000000")
 
       throw { code: 400, err: e };
     }
@@ -436,7 +434,6 @@ let exportedMethods = {
       .toArray();
   
     if (!postingList) {
-    console.log("50000000000000")
 
       throw {
         code: 500,
@@ -453,6 +450,94 @@ let exportedMethods = {
   
     return formattedList;
   },
+
+  async filterPostings(filter) {
+    try {
+      if (!filter || typeof filter !== 'string' || filter.trim() === '') {
+        throw 'Filter value must be a non-empty string';
+      }
+  
+      const postingsCollection = await postings();
+  
+      // Create a regular expression for case-insensitive search
+      const regex = new RegExp(filter, 'i');
+  
+      const filteredPostings = await postingsCollection
+        .find({ companyName: { $regex: regex } })
+        .toArray();
+  
+      if (!filteredPostings) {
+        throw {
+          code: 500,
+          err: 'Failed to filter postings',
+        };
+      }
+  
+      const formattedList = filteredPostings.map((posting) => ({
+        ...posting,
+        _id: posting._id.toString(),
+      }));
+  
+      return formattedList;
+    } catch (error) {
+      throw { code: 400, err: error };
+    }
+  },
+
+  async searchAndFilterPostings(searchQuery, filter) {
+    try {
+      if (!filter || typeof filter !== 'string' || filter.trim() === '') {
+        throw 'Filter value must be a non-empty string';
+      }
+      if (!searchQuery || typeof searchQuery !== 'string' || searchQuery.trim() === '') {
+        throw 'searchQuery value must be a non-empty string';
+      }
+      searchQuery = validStr(searchQuery);
+      filter = validStr(filter);
+  
+      const postingsCollection = await postings();
+  
+      // Create a regular expression for case-insensitive search
+      const regex = new RegExp(searchQuery, 'i');
+  
+      const query = {
+        $or: [
+          { jobTitle: { $regex: regex } },
+          { description: { $regex: regex } },
+          { companyName: { $regex: regex } },
+          { state: { $regex: regex } },
+          { city: { $regex: regex } },
+          { skills: { $regex: regex } },
+          { jobType: { $regex: regex } },
+        ],
+      };
+  
+      if (filter) {
+        // Add filter condition if filter is provided
+        query.companyName = { $regex: new RegExp(filter, 'i') };
+      }
+  
+      const postingList = await postingsCollection.find(query).toArray();
+  
+      if (!postingList) {
+        throw {
+          code: 500,
+          err: 'Failed to get postings by search and filter',
+        };
+      }
+  
+      const formattedList = postingList.map((posting) => ({
+        ...posting,
+        _id: posting._id.toString(),
+      }));
+  
+      return formattedList;
+    } catch (error) {
+      throw { code: 400, err: error };
+    }
+  },
+
+
 };
 
 export default exportedMethods;
