@@ -31,7 +31,7 @@ function TabPanel(props) {
 
   return (
     <div
-      role='tabpanel'
+      role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -177,7 +177,6 @@ const Profile = () => {
         const { userId, ...applicantData } = userData;
         userDataWithoutId = {
           name: applicantData.name,
-          email: applicantData.email,
           role: applicantData.role,
           state: applicantData.state,
           city: applicantData.city,
@@ -268,20 +267,20 @@ const Profile = () => {
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={handleTabChange} centered>
-            <Tab label='About' />
+            <Tab label="About" />
             {userData && userData.role === 'employer' ? (
-              <Tab label='Postings' />
+              <Tab label="Postings" />
             ) : (
-              <Tab label='Applied Companies' />
+              <Tab label="Applied Companies" />
             )}
-            <Tab label='Settings' />
+            <Tab label="Settings" />
           </Tabs>
         </Box>
 
         <TabPanel value={tab} index={0}>
           <Box sx={{ textAlign: 'left' }}>
             {userData.photoURL ? (
-              <img src={userData.photoURL} width='200' />
+              <img src={userData.photoURL} width="200" />
             ) : (
               ''
             )}
@@ -400,8 +399,8 @@ const Profile = () => {
             {edit && (
               <>
                 <TextField
-                  label='Name'
-                  name='name'
+                  label="Name"
+                  name="name"
                   value={userData.name}
                   onChange={handleChange}
                   fullWidth
@@ -409,18 +408,8 @@ const Profile = () => {
                   required
                 />
                 <TextField
-                  label='Email'
-                  name='email'
-                  value={userData.email}
-                  onChange={handleChange}
-                  fullWidth
-                  disabled
-                  sx={{ mb: 2 }}
-                  required
-                />
-                <TextField
-                  label='City'
-                  name='city'
+                  label="City"
+                  name="city"
                   value={userData.city}
                   onChange={handleChange}
                   fullWidth
@@ -428,14 +417,14 @@ const Profile = () => {
                   required
                 />
                 <FormControl fullWidth required sx={{ mb: 2 }}>
-                  <InputLabel id='user-state-label'>State</InputLabel>
+                  <InputLabel id="user-state-label">State</InputLabel>
                   <Select
-                    labelId='user-state-label'
-                    id='user-state'
-                    name='state'
+                    labelId="user-state-label"
+                    id="user-state"
+                    name="state"
                     value={userData.state}
                     onChange={handleChange}
-                    label='State'
+                    label="State"
                     required
                   >
                     {stateAbbreviations.map((abbreviation) => (
@@ -446,8 +435,8 @@ const Profile = () => {
                   </Select>
                 </FormControl>
                 <TextField
-                  label='Industry'
-                  name='industry'
+                  label="Industry"
+                  name="industry"
                   value={userData.industry}
                   onChange={handleChange}
                   fullWidth
@@ -455,7 +444,7 @@ const Profile = () => {
                   required
                 />
                 <Button
-                  variant='contained'
+                  variant="contained"
                   onClick={handleSaveClick}
                   sx={{ mb: 2 }}
                 >
@@ -468,7 +457,7 @@ const Profile = () => {
             )}
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={handleEditClick}
               sx={{ mt: 2, mb: 2 }}
             >
@@ -476,34 +465,32 @@ const Profile = () => {
             </Button>
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={showUploadImageForm}
               sx={{ mb: 2 }}
             >
-              {currentUserState.role === 'employer' 
-                ? "Update company logo" 
-                : "Update profile photo"
-              }
+              {currentUserState.role === 'employer'
+                ? 'Update company logo'
+                : 'Update profile photo'}
             </Button>
             {showUploadImage && (
               <UploadImageModal hideForm={hideUploadPhotoForm} />
             )}
-            {currentUserState.role === 'applicant' 
-                ? <Button
-                    variant='outlined'
-                    onClick={showUploadResumeForm}
-                    sx={{ mb: 2 }}
-                  >
-                    Update resume
-                  </Button>
-                : null
-              }
+            {currentUserState.role === 'applicant' ? (
+              <Button
+                variant="outlined"
+                onClick={showUploadResumeForm}
+                sx={{ mb: 2 }}
+              >
+                Update resume
+              </Button>
+            ) : null}
             {showUploadResume && (
               <UploadResumeModal hideForm={hideUploadResumeForm} />
             )}
 
             <Button
-              variant='outlined'
+              variant="outlined"
               onClick={showPasswordForm}
               sx={{ mb: 2 }}
             >
@@ -513,7 +500,7 @@ const Profile = () => {
               <ChangePassword hideForm={hidePasswordForm} />
             )}
 
-            <Link to='/' onClick={handleSignOut}>
+            <Link to="/" onClick={handleSignOut}>
               Log out
             </Link>
           </Box>
