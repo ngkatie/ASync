@@ -18,7 +18,6 @@ import stateAbbreviations from '../utils/stateAbbreviations';
 const EditPostingForm = ({ currentSelectedPosting, onSave, onCancel }) => {
   const [editedPosting, setEditedPosting] = useState({
     jobTitle: currentSelectedPosting.jobTitle,
-    companyName: currentSelectedPosting.companyName,
     jobType: currentSelectedPosting.jobType,
     numOfEmployees: currentSelectedPosting.numOfEmployees,
     description: currentSelectedPosting.description,
@@ -32,7 +31,6 @@ const EditPostingForm = ({ currentSelectedPosting, onSave, onCancel }) => {
   useEffect(() => {
     setEditedPosting({
       jobTitle: currentSelectedPosting.jobTitle,
-      companyName: currentSelectedPosting.companyName,
       jobType: currentSelectedPosting.jobType,
       numOfEmployees: currentSelectedPosting.numOfEmployees,
       description: currentSelectedPosting.description,
