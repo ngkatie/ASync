@@ -45,11 +45,11 @@ const PostingCard = ({
           {city}, {state}
         </Typography>
         
-        {userRole ? 
+        {userRole === "applicant" ? 
           <Typography color="textSecondary" gutterBottom>
             Status: {status}
           </Typography>
-        : ""}
+        : null}
         {/* <Typography color="textSecondary" gutterBottom>
           {numOfEmployees} employees
         </Typography>

@@ -10,6 +10,11 @@ import {
   validEmail,
   validState
 } from "./validation.js";
+import fs from 'fs';
+import axios from 'axios';
+
+import gm from "gm";
+var im = gm.subClass({ imageMagick: true });
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
@@ -27,6 +32,8 @@ let exportedMethods = {
       state: state,
       industry: industry,
       applied: [], // Array of postingIds that the applicant has applied to and respective statuses
+      photoUrl: null,
+      resumeUrl: null
     };
 
     const applicantsCollection = await applicants();
@@ -148,17 +155,109 @@ let exportedMethods = {
     return updatedApplicant;
   },
 
+  async updateApplicantResume(applicantId, resumeUrl) {
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const applicantsCollection = await applicants();
+
+    const currentApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId)
+    });
+    if (!currentApplicant) {
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
+    }
+
+    let updatedApplicant = await applicantsCollection.updateOne(
+      { _id: new ObjectId(applicantId) },
+      { $set: {
+        resumeUrl: resumeUrl
+      }}
+    );
+    if (updatedApplicant.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update applicant resume'
+      };
+    }
+
+    updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+    updatedApplicant._id = updatedApplicant._id.toString();
+    return updatedApplicant;
+  },
+
+  async updateApplicantPhoto(applicantId, photoUrl) {
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const applicantsCollection = await applicants();
+
+    const currentApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId)
+    });
+    if (!currentApplicant) {
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
+    }
+
+    try {
+      console.log("MAGICCCCCCC");
+  
+      // Ensure the /temp/ directory exists
+      fs.mkdirSync('/temp/', { recursive: true });
+  
+      // Download the image locally
+      const response = await axios.get(photoUrl, { responseType: 'arraybuffer' });
+      const localFilePath = `/temp/${applicantId}.jpg`;
+  
+      // Write the downloaded image to a local file
+      fs.writeFileSync(localFilePath, Buffer.from(response.data));
+      console.log(localFilePath);
+      // Resize and write to the new file
+      gm(localFilePath).resize(200, 200).write(`${applicantId}_revised.jpg`, function (err) {
+        if (!err) console.log('Success');
+        else console.log(err);
+      });
+  
+  } catch (e) {
+      console.error("Error:", e);
+      throw { code: 500, err: e };
+  }
+
+    let updatedApplicant = await applicantsCollection.updateOne(
+      { _id: new ObjectId(applicantId) },
+      { $set: {
+        photoUrl: photoUrl
+      }}
+    );
+    if (updatedApplicant.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update applicant photo'
+      };
+    }
+
+    updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+    updatedApplicant._id = updatedApplicant._id.toString();
+    return updatedApplicant;
+  },
+
   async deleteApplicant(applicantId) {
-    if (
-      !applicantId ||
-      typeof applicantId !== 'string' ||
-      applicantId.trim() === ''
-    ) {
-      throw 'Applicant ID must be a non empty string';
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
     }
-    if (!ObjectId.isValid(applicantId)) {
-      throw 'Invalid ObjectID';
-    }
+
     const applicantsCollection = await applicants();
     const applicant = await applicantsCollection.findOne({
       _id: new ObjectId(applicantId),
@@ -171,7 +270,7 @@ let exportedMethods = {
     const deleteResult = await applicantsCollection.deleteOne({
       _id: new ObjectId(applicantId),
     });
-    // console.log(deleteResult);
+
     if (deleteResult.deletedCount !== 1) {
       throw 'Deletion failed';
     }
