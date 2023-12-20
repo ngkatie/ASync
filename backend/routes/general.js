@@ -56,10 +56,41 @@ router.route('/register').post(async (req, res) => {
 });
 
 router.route('/postings').get(async (req, res) => {
-  //code here for postings GET request
   try {
-    const postingList = await postingFunctions.getAll();
-    res.status(200).json(postingList);
+    const searchQuery = req.query.search;
+    const filter = req.query.filter;
+
+    if (searchQuery) {
+      try {
+        validStr(searchQuery);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid searchQuery parameter' });
+      }
+    }
+
+    if (filter) {
+      try {
+        validStr(filter);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid filter parameter' });
+      }
+    }
+
+    if (!searchQuery && !filter) {
+      const postingList = await postingFunctions.getAll();
+      res.status(200).json(postingList);
+    } else if (searchQuery && filter) {
+      const postingList = await postingFunctions.searchAndFilterPostings(searchQuery, filter);
+      res.status(200).json(postingList);
+    } else if (searchQuery) {
+      const postingList = await postingFunctions.getPostingsBySearch(searchQuery);
+      res.status(200).json(postingList);
+    } else if (filter) {
+      const postingList = await postingFunctions.filterPostings(filter);
+      res.status(200).json(postingList);
+    } else {
+      res.status(400).json({ error: 'Invalid request parameters' });
+    }
   } catch (e) {
     const { code, err } = e;
     res.status(code).send(err);

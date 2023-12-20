@@ -309,6 +309,7 @@ let exportedMethods = {
     }
     return applicantWithAppliedPosting;
   },
+
 };
 
 export default exportedMethods;
