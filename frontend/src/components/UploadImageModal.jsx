@@ -1,15 +1,21 @@
 import React, { useState, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { storage } from "../main"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { AuthContext } from '../context/AuthContext';
 import { getAuth, updateProfile } from "firebase/auth";
+import axios from 'axios';
 import { Box, Stack, Button, TextField } from '@mui/material';
 
 const UploadImageModal = ({ hideForm }) => {
     const { currentUser } = useContext(AuthContext);
     const [image, setImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState('');
 
-    function uploadImage() {
+    const dispatch = useDispatch();
+    const currentUserState = useSelector((state) => state.user);
+
+   async function uploadImage() {
         if (image == null) {
             return;
         }
@@ -19,14 +25,27 @@ const UploadImageModal = ({ hideForm }) => {
         uploadBytes(imageRef, image).then((snapshot) => {
             getDownloadURL(imageRef)
                 .then((url)=> {
+                    setImageUrl(url);
                     const auth = getAuth();
                     updateProfile(auth.currentUser, {
                         photoURL: url
                     })
                 })
-            console.log(currentUser);
-            alert("Image uploaded");
+            // console.log(currentUser);
         })
+        try {
+            const requestBody = {
+                photoUrl: imageUrl
+            };
+            console.log(requestBody);
+            await axios.put(
+                `http://localhost:3000/api/update-photo/${currentUserState.userId}`,
+                requestBody
+            );
+        } catch (e) {
+            console.log(e);
+        }
+        alert("Image uploaded");
     }
 
     return (

@@ -19,8 +19,7 @@ const UploadResumeModal = ({ hideForm }) => {
         if (resume == null) {
             return;
         }
-        console.log('START HERE');
-        console.log(currentUserState);
+        
         const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
         uploadBytes(resumeRef, resume).then((snapshot) => {
             getDownloadURL(resumeRef)

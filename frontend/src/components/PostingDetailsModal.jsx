@@ -343,13 +343,13 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                <Avatar src={'/async.png'} />
+                                {applicant.photoUrl ? <Avatar src={applicant.photoUrl} /> :<Avatar src={'/async.png'} />}
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
-                              <Link href={applicant.resume}>
+                              <Link href={applicant.resumeUrl}>
                                 View Resume
                               </Link>
                               <FormControl sx={{ width: '30%' }}>

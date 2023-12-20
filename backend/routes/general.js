@@ -371,6 +371,27 @@ router.route('/update-profile/:userId').put(async (req, res) => {
   }
 });
 
+router.route('/update-photo/:userId').put(async (req, res) => {
+  const { photoUrl } = req.body;
+  let userId = req.params.userId;
+  try {
+    userId = validStr(userId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
+
+  try {
+    const updatedApplicant = await applicantFunctions.updateApplicantPhoto(
+      userId,
+      photoUrl
+    );
+    res.status(200).json(updatedApplicant);
+  } catch (e) {
+    const { code, err } = e;
+    res.status(code).send(err);
+  }
+});
+
 router.route('/update-resume/:userId').put(async (req, res) => {
   const { resumeUrl } = req.body;
   let userId = req.params.userId;
@@ -387,6 +408,7 @@ router.route('/update-resume/:userId').put(async (req, res) => {
     );
     res.status(200).json(updatedApplicant);
   } catch (e) {
+    console.log(e);
     const { code, err } = e;
     res.status(code).send(err);
   }
