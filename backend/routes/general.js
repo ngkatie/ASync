@@ -371,4 +371,25 @@ router.route('/update-profile/:userId').put(async (req, res) => {
   }
 });
 
+router.route('/update-resume/:userId').put(async (req, res) => {
+  const { resumeUrl } = req.body;
+  let userId = req.params.userId;
+  try {
+    userId = validStr(userId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
+
+  try {
+    const updatedApplicant = await applicantFunctions.updateApplicantResume(
+      userId,
+      resumeUrl
+    );
+    res.status(200).json(updatedApplicant);
+  } catch (e) {
+    const { code, err } = e;
+    res.status(code).send(err);
+  }
+});
+
 export default router;
