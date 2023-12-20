@@ -57,12 +57,23 @@ router.route('/register').post(async (req, res) => {
 
 router.route('/postings').get(async (req, res) => {
   //code here for postings GET request
-  try {
-    const postingList = await postingFunctions.getAll();
-    res.status(200).json(postingList);
-  } catch (e) {
-    const { code, err } = e;
-    res.status(code).send(err);
+  let searchQuery = req.query.search
+  if (!searchQuery) {
+    try {
+      const postingList = await postingFunctions.getAll();
+      res.status(200).json(postingList);
+    } catch (e) {
+      const { code, err } = e;
+      res.status(code).send(err);
+    }
+  } else {
+    try {
+      const postingList = await postingFunctions.getPostingsBySearch(searchQuery);
+      res.status(200).json(postingList);
+    } catch (e) {
+      const { code, err } = e;
+      res.status(code).send(err);
+    }
   }
 });
 

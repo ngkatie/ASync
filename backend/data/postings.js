@@ -404,6 +404,55 @@ let exportedMethods = {
 
     return updatedEmployer;
   },
+
+  
+  async getPostingsBySearch(searchQuery) {
+    console.log("CALLED")
+    try {
+      searchQuery = validStr(searchQuery);
+    } catch (e) {
+    console.log("40000000000000")
+
+      throw { code: 400, err: e };
+    }
+  
+    const postingsCollection = await postings();
+  
+    // Create a regular expression for case-insensitive search
+    const regex = new RegExp(searchQuery, 'i');
+  
+    const postingList = await postingsCollection
+      .find({
+        $or: [
+          { jobTitle: { $regex: regex } },
+          { description: { $regex: regex } },
+          { companyName: { $regex: regex } },
+          { state: { $regex: regex } },
+          { city: { $regex: regex } },
+          { skills: { $regex: regex } },
+          { jobType: {$regex: regex} },
+        ],
+      })
+      .toArray();
+  
+    if (!postingList) {
+    console.log("50000000000000")
+
+      throw {
+        code: 500,
+        err: 'Failed to get postings by search',
+      };
+    }
+  
+    const formattedList = postingList.map((posting) => {
+      return {
+        ...posting,
+        _id: posting._id.toString(),
+      };
+    });
+  
+    return formattedList;
+  },
 };
 
 export default exportedMethods;
