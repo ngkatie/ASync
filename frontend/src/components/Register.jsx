@@ -26,6 +26,13 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import stateAbbreviations from '../utils/stateAbbreviations';
+import {
+  validateDisplayName,
+  validateEmail,
+  validateCompanyName,
+  validateCity,
+  validateIndustry,
+} from '../validation';
 
 const Register = () => {
   const { currentUser } = useContext(AuthContext);
@@ -57,6 +64,15 @@ const Register = () => {
     }
 
     try {
+      if (
+        !validateDisplayName(displayName) ||
+        !validateEmail(email) ||
+        !validateCompanyName(companyName) ||
+        !validateCity(city) ||
+        !validateIndustry(industry)
+      ) {
+        throw 'inputs are not strings or are too long';
+      }
       const requestBody = {
         displayName: displayName,
         email: email,
@@ -91,60 +107,60 @@ const Register = () => {
 
   // Logged-in user cannot register
   if (currentUser) {
-    return <Navigate to="/" replace={true} />;
+    return <Navigate to='/' replace={true} />;
   }
 
   return (
     <div>
       <Navbar />
       <Box sx={{ maxWidth: '500px', marginTop: 10, color: 'black' }}>
-        <Typography variant="h4" sx={{ marginBottom: 2 }}>
+        <Typography variant='h4' sx={{ marginBottom: 2 }}>
           Create an account
         </Typography>
 
-        <form onSubmit={handleRegistration} action={<Link to="/login" />}>
+        <form onSubmit={handleRegistration} action={<Link to='/login' />}>
           <TextField
-            type="text"
-            label="Name"
-            color="secondary"
+            type='text'
+            label='Name'
+            color='secondary'
             onChange={(e) => setDisplayName(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           <TextField
-            type="email"
-            label="Email"
-            color="secondary"
+            type='email'
+            label='Email'
+            color='secondary'
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           <FormControl fullWidth required>
-            <InputLabel id="user-role-label">Role</InputLabel>
+            <InputLabel id='user-role-label'>Role</InputLabel>
             <Select
-              labelId="user-role-label"
-              id="user-role"
+              labelId='user-role-label'
+              id='user-role'
               value={userType}
               onChange={(e) => setUserType(e.target.value)}
-              label="Role"
+              label='Role'
               required
               sx={{ mb: 4 }}
             >
-              <MenuItem value="applicant">Applicant</MenuItem>
-              <MenuItem value="employer">Employer</MenuItem>
+              <MenuItem value='applicant'>Applicant</MenuItem>
+              <MenuItem value='employer'>Employer</MenuItem>
             </Select>
           </FormControl>
-          <Stack spacing={3} direction="row" sx={{ marginBottom: 4 }}>
+          <Stack spacing={3} direction='row' sx={{ marginBottom: 4 }}>
             <FormControl sx={{ width: '50%' }} required>
-              <InputLabel id="user-state-label">State</InputLabel>
+              <InputLabel id='user-state-label'>State</InputLabel>
               <Select
-                labelId="user-state-label"
-                id="user-state"
+                labelId='user-state-label'
+                id='user-state'
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                label="State"
+                label='State'
                 required
               >
                 {stateAbbreviations.map((abbreviation) => (
@@ -155,9 +171,9 @@ const Register = () => {
               </Select>
             </FormControl>
             <TextField
-              type="text"
-              label="City"
-              color="secondary"
+              type='text'
+              label='City'
+              color='secondary'
               onChange={(e) => setCity(e.target.value)}
               fullWidth
               required
@@ -165,9 +181,9 @@ const Register = () => {
           </Stack>
           {userType === 'employer' ? (
             <TextField
-              type="text"
-              label="Company Name"
-              color="secondary"
+              type='text'
+              label='Company Name'
+              color='secondary'
               onChange={(e) => setCompanyName(e.target.value)}
               fullWidth
               required
@@ -188,39 +204,39 @@ const Register = () => {
             </DemoContainer>
           </LocalizationProvider> */}
           <TextField
-            type="text"
-            label="Industry"
-            color="secondary"
+            type='text'
+            label='Industry'
+            color='secondary'
             onChange={(e) => setIndustry(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
-          <Stack spacing={2} direction="row" sx={{ marginBottom: 2 }}>
+          <Stack spacing={2} direction='row' sx={{ marginBottom: 2 }}>
             <TextField
-              type="password"
-              label="Password"
-              color="secondary"
+              type='password'
+              label='Password'
+              color='secondary'
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               required
             />
             <TextField
-              type="password"
-              label="Confirm Password"
-              color="secondary"
+              type='password'
+              label='Confirm Password'
+              color='secondary'
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               required
             />
           </Stack>
-          <Button type="submit" sx={{ fontSize: 24 }}>
+          <Button type='submit' sx={{ fontSize: 24 }}>
             Register
           </Button>
         </form>
       </Box>
       <Typography sx={{ color: 'black', fontSize: 14 }}>
-        Already have an account? <Link to="/login">Login</Link>
+        Already have an account? <Link to='/login'>Login</Link>
       </Typography>
     </div>
   );

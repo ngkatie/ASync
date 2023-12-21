@@ -14,12 +14,12 @@ import {
   Select,
   Typography,
   Dialog,
-  DialogContent
+  DialogContent,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import EditPostingForm from './EditPostingForm';
-import ExamplePhoto from "../assets/examplePhoto.jpeg";
+import ExamplePhoto from '../assets/examplePhoto.jpeg';
 
 const PostingDetailsModal = (props) => {
   const {
@@ -210,10 +210,13 @@ const PostingDetailsModal = (props) => {
                 color: 'black',
               }}
             >
-              {currentSelectedPosting.companyLogo ? 
-                <Avatar src={currentSelectedPosting.companyLogo} alt="Company Logo" sx={{width: 56, height: 56}} />
-                : null
-              }
+              {currentSelectedPosting.companyLogo ? (
+                <Avatar
+                  src={currentSelectedPosting.companyLogo}
+                  alt='Company Logo'
+                  sx={{ width: 56, height: 56 }}
+                />
+              ) : null}
               <Typography sx={{ fontSize: 30 }}>
                 {currentSelectedPosting && currentSelectedPosting.jobTitle}
               </Typography>
@@ -351,13 +354,26 @@ const PostingDetailsModal = (props) => {
                           >
                             <ListItemButton>
                               <ListItemAvatar>
-                                {applicant.photoUrl ? <Avatar src={applicant.photoUrl} /> :<Avatar src={ExamplePhoto} />}
+                                {applicant.photoUrl ? (
+                                  <Avatar src={applicant.photoUrl} />
+                                ) : (
+                                  <Avatar src={ExamplePhoto} />
+                                )}
                               </ListItemAvatar>
                               <ListItemText
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
-                              {applicant.resumeUrl ? <Link target="_blank" href={applicant.resumeUrl}>View Resume</Link> : "No resume available"}
+                              {applicant.resumeUrl ? (
+                                <Link
+                                  target='_blank'
+                                  href={applicant.resumeUrl}
+                                >
+                                  View Resume
+                                </Link>
+                              ) : (
+                                'No resume available'
+                              )}
                               <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}
