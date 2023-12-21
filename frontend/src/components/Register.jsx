@@ -68,7 +68,7 @@ const Register = () => {
         industry: industry,
       };
       let user = await axios.post(
-        'http://localhost:3000/api/register',
+        'http://3.23.52.34:3000/api/register',
         requestBody
       );
       user = user.data;
