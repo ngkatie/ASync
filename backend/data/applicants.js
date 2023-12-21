@@ -8,17 +8,16 @@ import {
   validInt,
   validAlphabetical,
   validEmail,
-  validState
-} from "./validation.js";
+  validState,
+} from './validation.js';
 import fs from 'fs';
 import axios from 'axios';
 
-import gm from "gm";
+import gm from 'gm';
 var im = gm.subClass({ imageMagick: true });
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
-
     name = validAlphabetical(name);
     email = validEmail(email);
     city = validAlphabetical(city);
@@ -33,7 +32,7 @@ let exportedMethods = {
       industry: industry,
       applied: [], // Array of postingIds that the applicant has applied to and respective statuses
       photoUrl: null,
-      resumeUrl: null
+      resumeUrl: null,
     };
 
     const applicantsCollection = await applicants();
@@ -60,7 +59,7 @@ let exportedMethods = {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw {code: 400, err: e}
+      throw { code: 400, err: e };
     }
 
     const applicantCollection = await applicants();
@@ -71,7 +70,7 @@ let exportedMethods = {
     if (!applicant) {
       throw {
         code: 404,
-        err: 'No applicant with the given id exists'
+        err: 'No applicant with the given id exists',
       };
     }
     applicant._id = applicant._id.toString();
@@ -84,7 +83,7 @@ let exportedMethods = {
     if (!applicantList) {
       throw {
         code: 500,
-        err: 'Failed to get all applicants'
+        err: 'Failed to get all applicants',
       };
     }
     applicantList = applicantList.map((applicant) => {
@@ -112,7 +111,7 @@ let exportedMethods = {
         throw `Invalid fields: ${invalidFields.join(', ')}`;
       }
     } catch (e) {
-      throw { code: 400, err: e }
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
@@ -122,7 +121,7 @@ let exportedMethods = {
     if (existingApplicant) {
       throw {
         code: 400,
-        err: 'Email is already in use'
+        err: 'Email is already in use',
       };
     }
 
@@ -133,7 +132,7 @@ let exportedMethods = {
     if (!currentApplicant) {
       throw {
         code: 404,
-        err: 'No applicant found with the supplied ID'
+        err: 'No applicant found with the supplied ID',
       };
     }
 
@@ -144,7 +143,7 @@ let exportedMethods = {
     if (updatedApplicant.acknowledged === false) {
       throw {
         code: 500,
-        err: 'Failed to update applicant'
+        err: 'Failed to update applicant',
       };
     }
 
@@ -159,28 +158,30 @@ let exportedMethods = {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw { code: 400, err: e }
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
 
     const currentApplicant = await applicantsCollection.findOne({
-      _id: new ObjectId(applicantId)
+      _id: new ObjectId(applicantId),
     });
     if (!currentApplicant) {
-      throw {code: 404, err: 'No applicant found with the supplied ID'};
+      throw { code: 404, err: 'No applicant found with the supplied ID' };
     }
 
     let updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
-      { $set: {
-        resumeUrl: resumeUrl
-      }}
+      {
+        $set: {
+          resumeUrl: resumeUrl,
+        },
+      }
     );
     if (updatedApplicant.acknowledged === false) {
       throw {
         code: 500,
-        err: 'Failed to update applicant resume'
+        err: 'Failed to update applicant resume',
       };
     }
 
@@ -195,52 +196,64 @@ let exportedMethods = {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw { code: 400, err: e }
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
 
     const currentApplicant = await applicantsCollection.findOne({
-      _id: new ObjectId(applicantId)
+      _id: new ObjectId(applicantId),
     });
     if (!currentApplicant) {
-      throw {code: 404, err: 'No applicant found with the supplied ID'};
+      throw { code: 404, err: 'No applicant found with the supplied ID' };
     }
 
     try {
-      console.log("MAGICCCCCCC");
-  
+      console.log('MAGICCCCCCC');
+
       // Ensure the /temp/ directory exists
-      fs.mkdirSync('/temp/', { recursive: true });
-  
+      fs.mkdirSync('./temp/', { recursive: true });
+
       // Download the image locally
-      const response = await axios.get(photoUrl, { responseType: 'arraybuffer' });
-      const localFilePath = `/temp/${applicantId}.jpg`;
-  
+      const response = await axios.get(photoUrl, {
+        responseType: 'arraybuffer',
+      });
+      const localFilePath = `./temp/${applicantId}.jpg`;
+
       // Write the downloaded image to a local file
       fs.writeFileSync(localFilePath, Buffer.from(response.data));
       console.log(localFilePath);
       // Resize and write to the new file
-      gm(localFilePath).resize(200, 200).write(`${applicantId}_revised.jpg`, function (err) {
-        if (!err) console.log('Success');
-        else console.log(err);
-      });
-  
-  } catch (e) {
-      console.error("Error:", e);
+      await new Promise((resolve, reject) => {
+        gm(localFilePath)
+          .resize(200, 200)
+          .write(`${applicantId}_revised.jpg`, function (err) {
+            if (!err) {
+              console.log('Success');
+              resolve(); // Resolve the promise to indicate completion
+            } else {
+              console.log(err);
+              reject(err); // Reject the promise with the error
+            }
+        });
+      })
+    } catch (e) {
+      console.error('Error:', e);
       throw { code: 500, err: e };
-  }
+    }
 
     let updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
-      { $set: {
-        photoUrl: photoUrl
-      }}
+      {
+        $set: {
+          photoUrl: photoUrl,
+        },
+      }
     );
     if (updatedApplicant.acknowledged === false) {
       throw {
         code: 500,
-        err: 'Failed to update applicant photo'
+        err: 'Failed to update applicant photo',
       };
     }
 
@@ -255,7 +268,7 @@ let exportedMethods = {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw { code: 400, err: e }
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
@@ -283,7 +296,7 @@ let exportedMethods = {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw {code: 400, err: e};
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
@@ -294,7 +307,7 @@ let exportedMethods = {
     if (!applicant) {
       throw {
         code: 404,
-        err: 'No applicant found with the supplied ID'
+        err: 'No applicant found with the supplied ID',
       };
     }
 
@@ -306,13 +319,13 @@ let exportedMethods = {
     );
     return appliedPostings;
   },
-  
+
   async applyToPosting(applicantId, postingId, applicantStatus) {
     try {
       applicantId = validStr(applicantId);
       postingId = validStr(postingId);
     } catch (e) {
-      throw {code: 400, err: e};
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
@@ -322,13 +335,13 @@ let exportedMethods = {
     if (!applicant) {
       throw {
         code: 404,
-        err: 'No applicant found with the supplied ID'
+        err: 'No applicant found with the supplied ID',
       };
     }
     if (applicant.applied.includes(postingId)) {
       throw {
         code: 400,
-        err: 'Applicant has already applied to this posting'
+        err: 'Applicant has already applied to this posting',
       };
     }
 
@@ -347,7 +360,7 @@ let exportedMethods = {
     if (updatedApplicant.acknowledged === false) {
       throw {
         code: 500,
-        err: `Failed to add postingId to applicant's applied list`
+        err: `Failed to add postingId to applicant's applied list`,
       };
     }
 
@@ -361,7 +374,7 @@ let exportedMethods = {
     if (updatedPosting.acknowledged === false) {
       throw {
         code: 500,
-        err: `Failed to add applicantId to posting's applicants list`
+        err: `Failed to add applicantId to posting's applicants list`,
       };
     }
 
@@ -378,7 +391,7 @@ let exportedMethods = {
     if (!employer) {
       throw {
         code: 404,
-        err: 'No employer found for the posting'
+        err: 'No employer found for the posting',
       };
     }
 
@@ -393,7 +406,7 @@ let exportedMethods = {
     if (updatedEmployer.acknowledged === false) {
       throw {
         code: 500,
-        err: `Failed to add applicantId to employer's posting's applicants list`
+        err: `Failed to add applicantId to employer's posting's applicants list`,
       };
     }
 
@@ -407,6 +420,43 @@ let exportedMethods = {
       application.postingId = application.postingId.toString();
     }
     return applicantWithAppliedPosting;
+  },
+
+  
+  async updateMongoPhoto(applicantId, photoUrl) {
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const applicantsCollection = await applicants();
+
+    const currentApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId)
+    });
+    if (!currentApplicant) {
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
+    }
+
+    let updatedApplicant = await applicantsCollection.updateOne(
+      { _id: new ObjectId(applicantId) },
+      { $set: {
+        photoUrl: photoUrl
+      }}
+    );
+    if (updatedApplicant.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update applicant photo'
+      };
+    }
+
+    updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+    updatedApplicant._id = updatedApplicant._id.toString();
+    return updatedApplicant;
   },
 
 };

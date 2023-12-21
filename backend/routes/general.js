@@ -9,8 +9,16 @@ import {
   validInt,
   validAlphabetical
 } from "./routeValidation.js";
+import fs from 'fs';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import express from 'express';
 
 const router = Router();
+
+let __dirname = dirname(fileURLToPath(import.meta.url));
+__dirname = path.resolve(__dirname, '..');
+router.use(express.static(__dirname));
 
 // **** REDIS ****
 import redis from 'redis';
@@ -374,7 +382,6 @@ router.route('/update-profile/:userId').put(async (req, res) => {
 router.route('/update-photo/:userId').put(async (req, res) => {
   const { userType, photoUrl } = req.body;
   let userId = req.params.userId;
-  console.log('DEBUGGING HERE');
   try {
     userId = validStr(userId);
   } catch (e) {
@@ -395,7 +402,6 @@ router.route('/update-photo/:userId').put(async (req, res) => {
         userId,
         photoUrl
       );
-      console.log(updatedApplicant);
       res.status(200).json(updatedApplicant);
     }
   } catch (e) {
@@ -417,6 +423,74 @@ router.route('/update-resume/:userId').put(async (req, res) => {
     const updatedApplicant = await applicantFunctions.updateApplicantResume(
       userId,
       resumeUrl
+    );
+    res.status(200).json(updatedApplicant);
+  } catch (e) {
+    console.log(e);
+    const { code, err } = e;
+    res.status(code).send(err);
+  }
+});
+
+
+
+
+//gets photo from backend folder
+router.route('/photo/:userId').get(async (req, res) => {
+  console.log("called get image")
+  try {
+    const userId = req.params.userId;
+    const fileName = `${userId}_revised.jpg`;
+    const filePath = path.join(__dirname, fileName);
+
+    // Check if the file exists
+    console.log(filePath);
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);
+    } else {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: e });
+  }
+  console.log("WE OUT DIS ROUTE")
+});
+
+//deletes photo from backend folder
+router.route('/photo/:userId').delete(async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const fileName = `${userId}_revised.jpg`;
+    const filePath = path.join(__dirname, fileName);
+
+    // Check if the file exists
+    if (fs.existsSync(filePath)) {
+      // Delete the file
+      fs.unlinkSync(filePath);
+      res.status(200).json({ message: 'Image deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'Image not found' });
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+//updates the user's picture url to the new one
+router.route('/mongo-update/:userId').put(async (req, res) => {
+  const { userType, photoUrl } = req.body;
+  let userId = req.params.userId;
+  try {
+    userId = validStr(userId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
+  try {
+    const updatedApplicant = await applicantFunctions.updateMongoPhoto(
+      userId,
+      photoUrl
     );
     res.status(200).json(updatedApplicant);
   } catch (e) {
