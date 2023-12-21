@@ -432,25 +432,29 @@ router.route('/update-resume/:userId').put(async (req, res) => {
   }
 });
 
+
+
+
 //gets photo from backend folder
 router.route('/photo/:userId').get(async (req, res) => {
-  console.log("WE IN DIS ROUTE")
+  console.log("called get image")
   try {
     const userId = req.params.userId;
     const fileName = `${userId}_revised.jpg`;
     const filePath = path.join(__dirname, fileName);
 
-    console.log("WOWOWOWOWOW", filePath);
     // Check if the file exists
+    console.log(filePath);
     if (fs.existsSync(filePath)) {
       res.sendFile(filePath);
     } else {
-      res.status(404).json({ message: 'Image not found' });
+      return res.status(404).json({ message: 'Image not found' });
     }
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: e });
+    return res.status(500).json({ message: e });
   }
+  console.log("WE OUT DIS ROUTE")
 });
 
 //deletes photo from backend folder

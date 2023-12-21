@@ -224,12 +224,19 @@ let exportedMethods = {
       fs.writeFileSync(localFilePath, Buffer.from(response.data));
       console.log(localFilePath);
       // Resize and write to the new file
-      gm(localFilePath)
-        .resize(200, 200)
-        .write(`${applicantId}_revised.jpg`, function (err) {
-          if (!err) console.log('Success');
-          else console.log(err);
+      await new Promise((resolve, reject) => {
+        gm(localFilePath)
+          .resize(200, 200)
+          .write(`${applicantId}_revised.jpg`, function (err) {
+            if (!err) {
+              console.log('Success');
+              resolve(); // Resolve the promise to indicate completion
+            } else {
+              console.log(err);
+              reject(err); // Reject the promise with the error
+            }
         });
+      })
     } catch (e) {
       console.error('Error:', e);
       throw { code: 500, err: e };

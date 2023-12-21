@@ -357,7 +357,7 @@ const PostingDetailsModal = (props) => {
                                 id={applicant._id}
                                 primary={applicant.name}
                               />
-                              {applicant.resumeUrl ? <Link href={applicant.resumeUrl}>View Resume</Link> : "No resume available"}
+                              {applicant.resumeUrl ? <Link target="_blank" href={applicant.resumeUrl}>View Resume</Link> : "No resume available"}
                               <FormControl sx={{ width: '30%' }}>
                                 <InputLabel
                                   id={`applicant-status-label-${index}`}

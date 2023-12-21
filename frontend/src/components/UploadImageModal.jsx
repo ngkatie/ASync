@@ -49,7 +49,6 @@ const UploadImageModal = ({ hideForm }) => {
             console.log(updated);
 
 
-            // NEEDS FIXING =========================================
             //get editted photo from backend
             console.log("WE GET FILE !!!")
             const edittedImage = await axios.get(
@@ -66,7 +65,8 @@ const UploadImageModal = ({ hideForm }) => {
             await updateProfile(auth.currentUser, {
                 photoURL: url2,
             });
-            console.log("URL2: ", url2)
+            console.log("URL2: ")
+            console.log(url2);
 
             //update Mongo
             requestBody = {
@@ -78,10 +78,10 @@ const UploadImageModal = ({ hideForm }) => {
                 requestBody
             )
 
-            //delete photo from backend
-            // const deleted = await axios.delete(
-            //     `http://localhost:3000/api/photo/${currentUserState.userId}`
-            // );
+            // delete photo from backend
+            const deleted = await axios.delete(
+                `http://localhost:3000/api/photo/${currentUserState.userId}`
+            );
 
             alert("Image uploaded");
         } catch (e) {
