@@ -414,6 +414,44 @@ let exportedMethods = {
     }
     return applicantWithAppliedPosting;
   },
+
+  
+  async updateMongoPhoto(applicantId, photoUrl) {
+    try {
+      applicantId = validStr(applicantId);
+    } catch (e) {
+      throw { code: 400, err: e }
+    }
+
+    const applicantsCollection = await applicants();
+
+    const currentApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId)
+    });
+    if (!currentApplicant) {
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
+    }
+
+    let updatedApplicant = await applicantsCollection.updateOne(
+      { _id: new ObjectId(applicantId) },
+      { $set: {
+        photoUrl: photoUrl
+      }}
+    );
+    if (updatedApplicant.acknowledged === false) {
+      throw {
+        code: 500,
+        err: 'Failed to update applicant photo'
+      };
+    }
+
+    updatedApplicant = await applicantsCollection.findOne({
+      _id: new ObjectId(applicantId),
+    });
+    updatedApplicant._id = updatedApplicant._id.toString();
+    return updatedApplicant;
+  },
+
 };
 
 export default exportedMethods;
