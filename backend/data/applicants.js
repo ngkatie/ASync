@@ -227,7 +227,7 @@ let exportedMethods = {
       await new Promise((resolve, reject) => {
         gm(localFilePath)
           .resize(200, 200)
-          .write(`${applicantId}_revised.jpg`, function (err) {
+          .write(`./temp/${applicantId}_revised.jpg`, function (err) {
             if (!err) {
               console.log('Success');
               resolve(); // Resolve the promise to indicate completion
@@ -235,8 +235,8 @@ let exportedMethods = {
               console.log(err);
               reject(err); // Reject the promise with the error
             }
-        });
-      })
+          });
+      });
     } catch (e) {
       console.error('Error:', e);
       throw { code: 500, err: e };
@@ -422,33 +422,34 @@ let exportedMethods = {
     return applicantWithAppliedPosting;
   },
 
-  
   async updateMongoPhoto(applicantId, photoUrl) {
     try {
       applicantId = validStr(applicantId);
     } catch (e) {
-      throw { code: 400, err: e }
+      throw { code: 400, err: e };
     }
 
     const applicantsCollection = await applicants();
 
     const currentApplicant = await applicantsCollection.findOne({
-      _id: new ObjectId(applicantId)
+      _id: new ObjectId(applicantId),
     });
     if (!currentApplicant) {
-      throw {code: 404, err: 'No applicant found with the supplied ID'};
+      throw { code: 404, err: 'No applicant found with the supplied ID' };
     }
 
     let updatedApplicant = await applicantsCollection.updateOne(
       { _id: new ObjectId(applicantId) },
-      { $set: {
-        photoUrl: photoUrl
-      }}
+      {
+        $set: {
+          photoUrl: photoUrl,
+        },
+      }
     );
     if (updatedApplicant.acknowledged === false) {
       throw {
         code: 500,
-        err: 'Failed to update applicant photo'
+        err: 'Failed to update applicant photo',
       };
     }
 
@@ -458,7 +459,6 @@ let exportedMethods = {
     updatedApplicant._id = updatedApplicant._id.toString();
     return updatedApplicant;
   },
-
 };
 
 export default exportedMethods;
