@@ -18,11 +18,15 @@ var im = gm.subClass({ imageMagick: true });
 
 let exportedMethods = {
   async addApplicant(name, email, city, state, industry) {
-    name = validAlphabetical(name);
-    email = validEmail(email);
-    city = validAlphabetical(city);
-    state = validState(state);
-    industry = validStr(industry);
+    try {
+      name = validAlphabetical(name);
+      email = validEmail(email);
+      city = validAlphabetical(city);
+      state = validState(state);
+      industry = validStr(industry);
+    } catch (e) {
+      throw {code: 400, err: e}
+    }
 
     let newApplicant = {
       name: name,
@@ -41,12 +45,12 @@ let exportedMethods = {
       email: email,
     });
     if (existingApplicant) {
-      throw 'Email is already in use';
+      throw {code: 400, err: 'Email is already in use'};
     }
 
     const insertInfo = await applicantsCollection.insertOne(newApplicant);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw 'Failed to add applicant';
+      throw {code: 500, err: 'Failed to add applicant'};
     }
 
     const id = insertInfo.insertedId.toString();
@@ -69,9 +73,7 @@ let exportedMethods = {
 
     if (!applicant) {
       throw {
-        code: 404,
-        err: 'No applicant with the given id exists',
-      };
+        code: 404, err: 'No applicant with the given id exists'};
     }
     applicant._id = applicant._id.toString();
     return applicant;
@@ -277,7 +279,7 @@ let exportedMethods = {
     });
 
     if (!applicant) {
-      throw 'No applicant found with the supplied ID';
+      throw {code: 404, err: 'No applicant found with the supplied ID'};
     }
 
     const deleteResult = await applicantsCollection.deleteOne({
@@ -285,7 +287,7 @@ let exportedMethods = {
     });
 
     if (deleteResult.deletedCount !== 1) {
-      throw 'Deletion failed';
+      throw {code: 500, err: 'Deletion failed'};
     }
     applicant._id = applicant._id.toString();
     return applicant;

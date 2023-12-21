@@ -57,7 +57,6 @@ const Register = () => {
     }
 
     try {
-      await doCreateUserWithEmailAndPassword(email, password, displayName);
       const requestBody = {
         displayName: displayName,
         email: email,
@@ -71,6 +70,7 @@ const Register = () => {
         'http://localhost:3000/api/register',
         requestBody
       );
+      await doCreateUserWithEmailAndPassword(email, password, displayName);
       user = user.data;
       dispatch(
         setUser(
@@ -91,8 +91,6 @@ const Register = () => {
 
   // Logged-in user cannot register
   if (currentUser) {
-    // console.log(currentUser);
-    // console.log("User logged in");
     return <Navigate to="/" replace={true} />;
   }
 

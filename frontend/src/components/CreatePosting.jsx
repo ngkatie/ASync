@@ -50,7 +50,7 @@ const CreatePosting = () => {
         employerId: currentUserState.userId,
         jobTitle: jobTitle,
         companyName: currentUserState.companyName,
-        companyLogo: companyLogo,
+        companyLogo: currentUserState.companyLogo,
         jobType: jobType,
         numOfEmployees: numOfEmployees,
         description: description,

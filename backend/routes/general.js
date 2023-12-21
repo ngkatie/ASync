@@ -59,7 +59,11 @@ router.route('/register').post(async (req, res) => {
     }
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -101,7 +105,11 @@ router.route('/postings').get(async (req, res) => {
     }
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -126,7 +134,11 @@ router.route('/postings/:id').get(async (req, res) => {
     return res.status(200).json(postingInfo);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -144,7 +156,11 @@ router.route('/postings/page/:pagenum').get(async (req, res) => {
     res.status(200).json(postingsByPageNumber);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -181,7 +197,11 @@ router.route('/postings').post(async (req, res) => {
     res.status(201).json(posting);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -203,7 +223,11 @@ router.route('/postings/apply/:id').post(async (req, res) => {
     res.status(200).json(applicantWithAppliedPosting);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -227,7 +251,11 @@ router
       res.status(200).json(deletedPosting);
     } catch (e) {
       const { code, err } = e;
-      res.status(code).send(err);
+      if (code) {
+        res.status(code).send(err);
+      } else {
+        res.status(500).send(e);
+      }
     }
   })
   .patch(async (req, res) => {
@@ -246,7 +274,11 @@ router
       res.status(200).json(updatedPosting);
     } catch (e) {
       const { code, err } = e;
-      res.status(code).send(err);
+      if (code) {
+        res.status(code).send(err);
+      } else {
+        res.status(500).send(e);
+      }
     }
   });
 
@@ -256,7 +288,11 @@ router.route('/applicants').get(async (req, res) => {
     res.status(200).json(applicantList);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -301,9 +337,6 @@ router
     }
 
     const { postingId, applicantStatus } = req.body;
-    // console.log(applicantId);
-    // console.log(postingId);
-    // console.log(applicantStatus);
     try {
       let applicantWithUpdatedStatus =
         await employerFunctions.updateApplicantStatus(
@@ -314,7 +347,11 @@ router
       res.status(200).json(applicantWithUpdatedStatus);
     } catch (e) {
       const { code, err } = e;
-      res.status(code).send(err);
+      if (code) {
+        res.status(code).send(err);
+      } else {
+        res.status(500).send(e);
+      }
     }
   });
 
@@ -324,7 +361,11 @@ router.route('/employers').get(async (req, res) => {
     res.status(200).json(employerList);
   } catch (e) {
     const { code, err } = e
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -343,7 +384,11 @@ router.route('/employers/:employerId/postings').get(async (req, res) => {
     res.status(200).json(employerPostings);
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -375,7 +420,11 @@ router.route('/update-profile/:userId').put(async (req, res) => {
     }
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -406,7 +455,11 @@ router.route('/update-photo/:userId').put(async (req, res) => {
     }
   } catch (e) {
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 
@@ -428,12 +481,13 @@ router.route('/update-resume/:userId').put(async (req, res) => {
   } catch (e) {
     console.log(e);
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
-
-
-
 
 //gets photo from backend folder
 router.route('/photo/:userId').get(async (req, res) => {
@@ -494,9 +548,13 @@ router.route('/mongo-update/:userId').put(async (req, res) => {
     );
     res.status(200).json(updatedApplicant);
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     const { code, err } = e;
-    res.status(code).send(err);
+    if (code) {
+      res.status(code).send(err);
+    } else {
+      res.status(500).send(e);
+    }
   }
 });
 

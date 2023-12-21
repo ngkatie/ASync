@@ -1,6 +1,5 @@
 import { postings, employers, applicants } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-import employerFunctions from './employers.js';
 import { 
   validObjectId,
   validStr,
@@ -243,24 +242,18 @@ let exportedMethods = {
   },
   async getPostingsByEmployer(employerId) {
     // validate
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Employer ID must be a non empty string';
+    try {
+      employerId = validStr(employerId);
+    } catch (e) {
+      throw {code: 400, err: 'Invalid employerId'}
     }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID';
-    }
-
     const employersCollection = await employers();
     const employer = await employersCollection.findOne({
       _id: new ObjectId(employerId),
     });
 
     if (!employer) {
-      throw new Error('No employer with the supplied ID');
+      throw {code: 404, err: 'No employer found with the supplied ID'};
     }
 
     // query postings
@@ -283,15 +276,10 @@ let exportedMethods = {
   async getApplicantsForPosting(postingId) {
     //gets a list of applicants for given posting
     // validation
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID';
+    try {
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: 'Invalid postingId'}
     }
 
     const postingsCollection = await postings();
@@ -300,7 +288,7 @@ let exportedMethods = {
     });
 
     if (!currentPosting) {
-      throw 'No posting found with the supplied ID';
+      throw {code: 404, err: 'No posting found with the supplied ID'};
     }
 
     // query applicants
@@ -318,25 +306,11 @@ let exportedMethods = {
     return applicantsArray;
   },
   async addPostingToEmployer(employerId, postingId) {
-    if (
-      !employerId ||
-      typeof employerId !== 'string' ||
-      employerId.trim() === ''
-    ) {
-      throw 'Employer ID must be a non-empty string';
-    }
-    if (!ObjectId.isValid(employerId)) {
-      throw 'Invalid ObjectID for Employer';
-    }
-    if (
-      !postingId ||
-      typeof postingId !== 'string' ||
-      postingId.trim() === ''
-    ) {
-      throw 'Posting ID must be a non-empty string';
-    }
-    if (!ObjectId.isValid(postingId)) {
-      throw 'Invalid ObjectID for Posting';
+    try {
+      employerId = validStr(employerId);
+      postingId = validStr(postingId);
+    } catch (e) {
+      throw {code: 400, err: e}
     }
 
     const employersCollection = await employers();
@@ -345,7 +319,7 @@ let exportedMethods = {
     });
 
     if (!employer) {
-      throw 'No employer found with the supplied ID';
+      throw {code: 404, err: 'No employer found with the supplied ID'};
     }
 
     const postingCollection = await postings();
@@ -360,7 +334,7 @@ let exportedMethods = {
     );
 
     if (!updatedEmployer) {
-      throw 'Failed to add posting to employer';
+      throw {code: 500, err: 'Failed to add posting to employer'};
     }
 
     updatedEmployer._id = updatedEmployer._id.toString();
@@ -453,9 +427,7 @@ let exportedMethods = {
 
   async filterPostings(filter) {
     try {
-      if (!filter || typeof filter !== 'string' || filter.trim() === '') {
-        throw 'Filter value must be a non-empty string';
-      }
+      filter = validStr(filter);
   
       const postingsCollection = await postings();
   
@@ -520,10 +492,7 @@ let exportedMethods = {
       const postingList = await postingsCollection.find(query).toArray();
   
       if (!postingList) {
-        throw {
-          code: 500,
-          err: 'Failed to get postings by search and filter',
-        };
+        throw 'Failed to get postings by search and filter';
       }
   
       const formattedList = postingList.map((posting) => ({
