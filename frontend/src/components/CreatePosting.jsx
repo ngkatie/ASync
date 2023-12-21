@@ -61,7 +61,7 @@ const CreatePosting = () => {
         state: state,
       };
       let posting = await axios.post(
-        "http://localhost:3000/api/postings",
+        "http://3.23.52.34:3000/api/postings",
         requestBody
       );
       posting = posting.data;

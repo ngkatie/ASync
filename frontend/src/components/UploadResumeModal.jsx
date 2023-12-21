@@ -33,7 +33,7 @@ const UploadResumeModal = ({ hideForm }) => {
 
         try {
             await axios.put(
-                `http://localhost:3000/api/update-resume/${currentUserState.userId}`,
+                `http://3.23.52.34:3000/api/update-resume/${currentUserState.userId}`,
                 requestBody
             );
         } catch (e) {

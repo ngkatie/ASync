@@ -42,7 +42,7 @@ const UploadImageModal = ({ hideForm }) => {
             };
 
             const updated = await axios.put(
-                `http://localhost:3000/api/update-photo/${currentUserState.userId}`,
+                `http://3.23.52.34:3000/api/update-photo/${currentUserState.userId}`,
                 requestBody
             );
 
@@ -52,7 +52,7 @@ const UploadImageModal = ({ hideForm }) => {
             //get editted photo from backend
             console.log("WE GET FILE !!!")
             const edittedImage = await axios.get(
-                `http://localhost:3000/api/photo/${currentUserState.userId}`, { responseType: 'arraybuffer' }
+                `http://3.23.52.34:3000/api/photo/${currentUserState.userId}`, { responseType: 'arraybuffer' }
             );
             const imageData = edittedImage.data;
 
@@ -74,13 +74,13 @@ const UploadImageModal = ({ hideForm }) => {
                 photoUrl: url2,
             };
             const mongoUpdate = await axios.put(
-                `http://localhost:3000/api/mongo-update/${currentUserState.userId}`,
+                `http://3.23.52.34:3000/api/mongo-update/${currentUserState.userId}`,
                 requestBody
             )
 
             // delete photo from backend
             const deleted = await axios.delete(
-                `http://localhost:3000/api/photo/${currentUserState.userId}`
+                `http://3.23.52.34:3000/api/photo/${currentUserState.userId}`
             );
 
             alert("Image uploaded");
