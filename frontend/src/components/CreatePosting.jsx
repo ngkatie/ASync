@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Navbar from "./Navbar";
+import React, { useState } from 'react';
+import Navbar from './Navbar';
 import {
   Box,
   FormControl,
@@ -14,31 +14,38 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-} from "@mui/material";
-import stateAbbreviations from "../utils/stateAbbreviations";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import axios from "axios";
+} from '@mui/material';
+import stateAbbreviations from '../utils/stateAbbreviations';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import {
+  validateDescription,
+  validateJobTitle,
+  validateJobType,
+  validatePay,
+  validateSkills,
+} from '../validation';
 
 const CreatePosting = () => {
-  const [jobTitle, setJobTitle] = useState("");
-  const [companyLogo, setCompanyLogo] = useState("");
-  const [jobType, setJobType] = useState("");
-  const [numOfEmployees, setNumOfEmployees] = useState("");
-  const [description, setDescription] = useState("");
-  const [pay, setPay] = useState("");
-  const [rate, setRate] = useState("");
-  const [skills, setSkills] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [postingId, setPostingId] = useState("");
+  const [jobTitle, setJobTitle] = useState('');
+  const [companyLogo, setCompanyLogo] = useState('');
+  const [jobType, setJobType] = useState('');
+  const [numOfEmployees, setNumOfEmployees] = useState('');
+  const [description, setDescription] = useState('');
+  const [pay, setPay] = useState('');
+  const [rate, setRate] = useState('');
+  const [skills, setSkills] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [postingId, setPostingId] = useState('');
 
   const currentUserState = useSelector((state) => state.user);
 
   const navigate = useNavigate();
 
-  if (currentUserState && currentUserState.role !== "employer") {
-    navigate("/");
+  if (currentUserState && currentUserState.role !== 'employer') {
+    navigate('/');
     return;
   }
 
@@ -46,6 +53,15 @@ const CreatePosting = () => {
     e.preventDefault();
 
     try {
+      if (
+        !validateJobTitle(jobTitle) ||
+        !validateJobType(jobType) ||
+        !validateDescription(description) ||
+        !validatePay(pay) ||
+        !validateSkills(skills)
+      ) {
+        throw 'inputs are too long';
+      }
       const requestBody = {
         employerId: currentUserState.userId,
         jobTitle: jobTitle,
@@ -61,7 +77,7 @@ const CreatePosting = () => {
         state: state,
       };
       let posting = await axios.post(
-        "http://3.23.52.34:3000/api/postings",
+        'http://3.23.52.34:3000/api/postings',
         requestBody
       );
       posting = posting.data;
@@ -75,8 +91,8 @@ const CreatePosting = () => {
   return (
     <>
       <Navbar />
-      <Box sx={{ maxWidth: "500px", marginTop: 20, color: "black" }}>
-        <Typography variant="h4" sx={{ marginBottom: 2 }}>
+      <Box sx={{ maxWidth: '500px', marginTop: 20, color: 'black' }}>
+        <Typography variant='h4' sx={{ marginBottom: 2 }}>
           Create a posting
         </Typography>
         <form
@@ -84,56 +100,56 @@ const CreatePosting = () => {
           action={<Link to={`/postings${postingId}`} />}
         >
           <TextField
-            type="text"
-            label="Job Title"
-            color="secondary"
+            type='text'
+            label='Job Title'
+            color='secondary'
             onChange={(e) => setJobTitle(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           {/* company logo image input */}
-          <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
-            <FormControl sx={{ width: "50%" }}>
-              <InputLabel id="job-type-label">Job Type *</InputLabel>
+          <Stack spacing={2} direction='row' sx={{ marginBottom: 4 }}>
+            <FormControl sx={{ width: '50%' }}>
+              <InputLabel id='job-type-label'>Job Type *</InputLabel>
               <Select
-                labelId="job-type-label"
-                id="job-type"
+                labelId='job-type-label'
+                id='job-type'
                 value={jobType}
                 onChange={(e) => setJobType(e.target.value)}
-                label="job-type"
+                label='job-type'
                 required
               >
-                <MenuItem value="full-time">Full-Time</MenuItem>
-                <MenuItem value="part-time">Part-Time</MenuItem>
-                <MenuItem value="internship">Internship</MenuItem>
+                <MenuItem value='full-time'>Full-Time</MenuItem>
+                <MenuItem value='part-time'>Part-Time</MenuItem>
+                <MenuItem value='internship'>Internship</MenuItem>
               </Select>
             </FormControl>
-            <FormControl sx={{ width: "50%" }}>
-              <InputLabel id="num-employees-label">Num. Employees *</InputLabel>
+            <FormControl sx={{ width: '50%' }}>
+              <InputLabel id='num-employees-label'>Num. Employees *</InputLabel>
               <Select
-                labelId="num-employees-label"
-                id="num-employees"
+                labelId='num-employees-label'
+                id='num-employees'
                 value={numOfEmployees}
                 onChange={(e) => setNumOfEmployees(e.target.value)}
-                label="num-employees"
+                label='num-employees'
                 required
               >
-                <MenuItem value="1-10">1-10</MenuItem>
-                <MenuItem value="11-50">11-50</MenuItem>
-                <MenuItem value="51-100">51-100</MenuItem>
-                <MenuItem value="101-500">101-500</MenuItem>
-                <MenuItem value="501-1,000">501-1,000</MenuItem>
-                <MenuItem value="1,001-5,000">1,001-5,000</MenuItem>
-                <MenuItem value="5,001-10,000">5,001-10,000</MenuItem>
-                <MenuItem value="10,001+">10,001+</MenuItem>
+                <MenuItem value='1-10'>1-10</MenuItem>
+                <MenuItem value='11-50'>11-50</MenuItem>
+                <MenuItem value='51-100'>51-100</MenuItem>
+                <MenuItem value='101-500'>101-500</MenuItem>
+                <MenuItem value='501-1,000'>501-1,000</MenuItem>
+                <MenuItem value='1,001-5,000'>1,001-5,000</MenuItem>
+                <MenuItem value='5,001-10,000'>5,001-10,000</MenuItem>
+                <MenuItem value='10,001+'>10,001+</MenuItem>
               </Select>
             </FormControl>
           </Stack>
           <TextField
-            type="text"
-            label="Description"
-            color="secondary"
+            type='text'
+            label='Description'
+            color='secondary'
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
             required
@@ -142,59 +158,59 @@ const CreatePosting = () => {
             sx={{ mb: 4 }}
           />
           <TextField
-            type="text"
-            label="Skills"
-            color="secondary"
+            type='text'
+            label='Skills'
+            color='secondary'
             onChange={(e) => setSkills(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
-          <Stack spacing={4} direction="row" sx={{ marginBottom: 4 }}>
+          <Stack spacing={4} direction='row' sx={{ marginBottom: 4 }}>
             <TextField
-              type="text"
-              label="Pay"
-              color="secondary"
+              type='text'
+              label='Pay'
+              color='secondary'
               onChange={(e) => setPay(e.target.value)}
-              sx={{ width: "30%" }}
+              sx={{ width: '30%' }}
               required
             />
             <FormControl>
-              <FormLabel id="rate">Rate *</FormLabel>
+              <FormLabel id='rate'>Rate *</FormLabel>
               <RadioGroup
                 row
-                aria-labelledby="rate"
-                name="Rate"
+                aria-labelledby='rate'
+                name='Rate'
                 value={rate}
                 onChange={(e) => setRate(e.target.value)}
               >
                 <FormControlLabel
-                  value="hr"
+                  value='hr'
                   control={<Radio />}
-                  label="Hourly"
+                  label='Hourly'
                 />
                 <FormControlLabel
-                  value="mo"
+                  value='mo'
                   control={<Radio />}
-                  label="Monthly"
+                  label='Monthly'
                 />
                 <FormControlLabel
-                  value="yr"
+                  value='yr'
                   control={<Radio />}
-                  label="Yearly"
+                  label='Yearly'
                 />
               </RadioGroup>
             </FormControl>
           </Stack>
-          <Stack spacing={4} direction="row" sx={{ marginBottom: 4 }}>
-            <FormControl sx={{ width: "50%" }}>
-              <InputLabel id="user-state-label">State *</InputLabel>
+          <Stack spacing={4} direction='row' sx={{ marginBottom: 4 }}>
+            <FormControl sx={{ width: '50%' }}>
+              <InputLabel id='user-state-label'>State *</InputLabel>
               <Select
-                labelId="user-state-label"
-                id="user-state"
+                labelId='user-state-label'
+                id='user-state'
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                label="State"
+                label='State'
                 required
               >
                 {stateAbbreviations.map((abbreviation) => (
@@ -205,15 +221,15 @@ const CreatePosting = () => {
               </Select>
             </FormControl>
             <TextField
-              type="text"
-              label="City"
-              color="secondary"
+              type='text'
+              label='City'
+              color='secondary'
               onChange={(e) => setCity(e.target.value)}
               fullWidth
               required
             />
           </Stack>
-          <Button type="submit" variant="contained" sx={{ fontSize: 18 }}>
+          <Button type='submit' variant='contained' sx={{ fontSize: 18 }}>
             Create
           </Button>
         </form>

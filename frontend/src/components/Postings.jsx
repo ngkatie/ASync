@@ -2,11 +2,20 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import EmployerCard from './EmployerCard';
 import Navbar from './Navbar';
-import { Box, Button, Pagination, Stack, Typography, TextField, MenuItem } from '@mui/material';
+import {
+  Box,
+  Button,
+  Pagination,
+  Stack,
+  Typography,
+  TextField,
+  MenuItem,
+} from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PostingCard from './PostingCard';
 import PostingDetailsModal from './PostingDetailsModal';
+import { validateSearchInput, validStr } from '../validation';
 
 function Postings() {
   let { page } = useParams();
@@ -30,7 +39,9 @@ function Postings() {
     // Fetch the list of employers
     async function fetchEmployers() {
       try {
-        const response = await axios.get('http://3.23.52.34:3000/api/employers');
+        const response = await axios.get(
+          'http://3.23.52.34:3000/api/employers'
+        );
         setEmployers(response.data);
       } catch (error) {
         console.error('Error fetching employers:', error);
@@ -62,13 +73,13 @@ function Postings() {
         }
         let postingList = await axios.get(url);
         setAllPostings(postingList.data);
-  
+
         if (postingList.data.length !== 0) {
           setCurrentSelectedPostingId(postingList.data[0]._id);
         } else {
-          setCurrentSelectedPostingId("")
+          setCurrentSelectedPostingId('');
         }
-  
+
         setNumberOfTotalPostings(postingList.data.length);
         let index = (page - 1) * 10;
         setStartingIndex(index);
@@ -79,10 +90,10 @@ function Postings() {
         navigate('/404');
       }
     }
-  
+
     fetchData();
   }, [page, finalSearch, selectedFilter]);
-  
+
   useEffect(() => {
     // Page change logic
     let index = (currentPage - 1) * 10;
@@ -118,6 +129,16 @@ function Postings() {
     navigate(`/postings/page/${newPage}`);
   };
 
+  const handleSearch = (searchInput) => {
+    if (validStr(searchInput) && searchInput.length <= 0) {
+      alert('must input a valid search');
+    } else if (!validateSearchInput(searchInput)) {
+      alert('search input must be under 100 characters');
+    } else {
+      setFinalSearch(searchInput);
+    }
+  };
+
   const hidePrevButton = page === 1;
   const hideNextButton = numberOfTotalPostings - startingIndex <= 10;
 
@@ -125,37 +146,58 @@ function Postings() {
     <>
       <Navbar />
       <Box sx={{ mt: 11 }}>
-        <Typography sx={{color: "black"}}>Search based on Title, Description, Company, State, City, Skills, or Job Type!</Typography>
-        <TextField
-          type="text"
-          placeholder="Search..."
-          value={searchInput}
-          required
-          onChange={(e) => setSearchInput(e.target.value)}
-          sx={{width: "400px"}}
-        />
-        <Button
-          variant="contained"
-          onClick={() => setFinalSearch(searchInput)}
-          sx={{height: "55px", ml: 1, width: "200px"}}
+        <Typography sx={{ color: 'black', mb: 3 }}>
+          Search based on Title, Description, Company, State, City, Skills, or
+          Job Type!
+        </Typography>
+        <Box
+          sx={{
+            mb: 5,
+
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          Search
-        </Button>
-        <Typography sx={{ color: 'black', display: 'inline', ml: 6 }}>Filter:</Typography>
-        <TextField
-          select
-          value={selectedFilter}
-          onChange={(e) => setSelectedFilter(e.target.value)}
-          sx={{ width: '200px', ml: 3 }}
-          placeholder={'Choose'}
-        >
-          <MenuItem key={"None"} value={""}>None</MenuItem>
-          {employers.map((employer) => (
+          <TextField
+            type='text'
+            placeholder='Search...'
+            value={searchInput}
+            required
+            onChange={(e) => setSearchInput(e.target.value)}
+            sx={{ width: '400px' }}
+          />
+          <Button
+            variant='contained'
+            onClick={() => handleSearch(searchInput)}
+            sx={{ ml: 3, width: '100px' }}
+          >
+            Search
+          </Button>
+          <Typography sx={{ color: 'black', display: 'inline', ml: 6 }}>
+            Filter:
+          </Typography>
+          <TextField
+            select
+            value={selectedFilter}
+            onChange={(e) => setSelectedFilter(e.target.value)}
+            sx={{ width: '200px', ml: 2 }}
+            placeholder={'Choose'}
+          >
+            <MenuItem key={'None'} value={''}>
+              None
+            </MenuItem>
+            {[
+              ...new Map(
+                employers.map((employer) => [employer.companyName, employer])
+              ).values(),
+            ].map((employer) => (
               <MenuItem key={employer._id} value={employer.companyName}>
                 {employer.companyName}
               </MenuItem>
             ))}
-        </TextField>
+          </TextField>
+        </Box>
       </Box>
       <Box
         sx={{

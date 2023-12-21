@@ -18,6 +18,7 @@ import Navbar from './Navbar';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../actions';
+import { validateEmail, validatePassword } from '../validation';
 
 const Login = () => {
   const { currentUser } = useContext(AuthContext);
@@ -36,6 +37,9 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      if (!validateEmail(email) || !validatePassword(password)) {
+        throw 'email or password must be strings or are too long';
+      }
       await doSignInWithEmailAndPassword(email, password);
       let applicants = await axios.get('http://3.23.52.34:3000/api/applicants');
       console.log(applicants);
@@ -83,7 +87,7 @@ const Login = () => {
   };
 
   if (currentUser) {
-    return <Navigate to="/" />;
+    return <Navigate to='/' />;
   }
 
   const handleForgotPassword = async () => {
@@ -104,31 +108,31 @@ const Login = () => {
     <div>
       <Navbar />
       <Box>
-        <Typography variant="h4" sx={{ marginBottom: 2, color: 'black' }}>
+        <Typography variant='h4' sx={{ marginBottom: 2, color: 'black' }}>
           Log In
         </Typography>
 
-        <form onSubmit={handleLogin} action={<Link to="/postings" />}>
+        <form onSubmit={handleLogin} action={<Link to='/postings' />}>
           <TextField
-            type="email"
-            label="Email"
-            color="secondary"
+            type='email'
+            label='Email'
+            color='secondary'
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
           <TextField
-            type="password"
-            label="Password"
-            color="secondary"
+            type='password'
+            label='Password'
+            color='secondary'
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             required
             sx={{ mb: 4 }}
           />
 
-          <Button type="submit">Log In</Button>
+          <Button type='submit'>Log In</Button>
 
           <br />
 
@@ -138,7 +142,7 @@ const Login = () => {
 
           <Typography sx={{ color: 'black', fontSize: 14 }}>
             Don't have an account yet?{' '}
-            <Link to="/register">Register here!</Link>
+            <Link to='/register'>Register here!</Link>
           </Typography>
         </form>
       </Box>
