@@ -78,7 +78,7 @@ const Profile = () => {
         });
         if (currentUserState.role === 'employer') {
           const postingList = await axios.get(
-            `http://localhost:3000/api/employers/${currentUserState.userId}/postings`
+            `http://3.23.52.34:3000/api/employers/${currentUserState.userId}/postings`
           );
           console.log(postingList.data);
           setPostings(postingList.data);
@@ -87,7 +87,7 @@ const Profile = () => {
           }
         } else if (currentUserState.role === 'applicant') {
           const appliedCompaniesList = await axios.get(
-            `http://localhost:3000/api/applicants/${currentUserState.userId}/applied-companies`
+            `http://3.23.52.34:3000/api/applicants/${currentUserState.userId}/applied-companies`
           );
           setAppliedCompanies(appliedCompaniesList.data);
         }
@@ -102,7 +102,7 @@ const Profile = () => {
       try {
         if (postings && postings.length !== 0) {
           let posting = await axios.get(
-            `http://localhost:3000/api/postings/${currentSelectedPostingId}`
+            `http://3.23.52.34:3000/api/postings/${currentSelectedPostingId}`
           );
           setCurrentSelectedPosting(posting.data);
           console.log(posting.data);
@@ -119,7 +119,7 @@ const Profile = () => {
       console.log(currentUserState);
       if (currentUserState && currentUserState.role === 'applicant') {
         let applicant = await axios.get(
-          `http://localhost:3000/api/applicants/${currentUserState.userId}`
+          `http://3.23.52.34:3000/api/applicants/${currentUserState.userId}`
         );
         console.log(applicant);
         const { data } = applicant;
@@ -170,7 +170,7 @@ const Profile = () => {
           industry: employerData.industry,
         };
         await axios.put(
-          `http://localhost:3000/api/update-profile/${userData.userId}`,
+          `http://3.23.52.34:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
         );
       } else {
@@ -186,7 +186,7 @@ const Profile = () => {
         // console.log(userDataWithoutId);
         // console.log(userData);
         await axios.put(
-          `http://localhost:3000/api/update-profile/${userData.userId}`,
+          `http://3.23.52.34:3000/api/update-profile/${userData.userId}`,
           userDataWithoutId
         );
       }

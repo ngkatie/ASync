@@ -30,7 +30,7 @@ function Postings() {
     // Fetch the list of employers
     async function fetchEmployers() {
       try {
-        const response = await axios.get('http://localhost:3000/api/employers');
+        const response = await axios.get('http://3.23.52.34:3000/api/employers');
         setEmployers(response.data);
       } catch (error) {
         console.error('Error fetching employers:', error);
@@ -49,7 +49,7 @@ function Postings() {
       }
 
       try {
-        let url = 'http://localhost:3000/api/postings';
+        let url = 'http://3.23.52.34:3000/api/postings';
         const queryParams = [];
         if (searchInput) {
           queryParams.push(`search=${searchInput}`);
@@ -101,7 +101,7 @@ function Postings() {
       try {
         if (postings.length !== 0) {
           let posting = await axios.get(
-            `http://localhost:3000/api/postings/${currentSelectedPostingId}`
+            `http://3.23.52.34:3000/api/postings/${currentSelectedPostingId}`
           );
           setCurrentSelectedPosting(posting.data);
           console.log(posting.data);

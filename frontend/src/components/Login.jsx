@@ -37,7 +37,7 @@ const Login = () => {
 
     try {
       await doSignInWithEmailAndPassword(email, password);
-      let applicants = await axios.get('http://localhost:3000/api/applicants');
+      let applicants = await axios.get('http://3.23.52.34:3000/api/applicants');
       console.log(applicants);
       applicants = applicants.data;
       for (const applicant of applicants) {
@@ -58,7 +58,7 @@ const Login = () => {
         }
       }
 
-      let employers = await axios.get('http://localhost:3000/api/employers');
+      let employers = await axios.get('http://3.23.52.34:3000/api/employers');
       employers = employers.data;
       for (const employer of employers) {
         if (employer.email === email) {

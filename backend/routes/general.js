@@ -7,8 +7,8 @@ import {
   validStr,
   validFloat,
   validInt,
-  validAlphabetical
-} from "./routeValidation.js";
+  validAlphabetical,
+} from './routeValidation.js';
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -42,8 +42,7 @@ router.route('/register').post(async (req, res) => {
         industry
       );
       res.status(201).json(applicant);
-    } 
-    else if (userRole === 'employer') {
+    } else if (userRole === 'employer') {
       const { companyName } = req.body;
       const employer = await employerFunctions.addEmployer(
         displayName,
@@ -92,10 +91,15 @@ router.route('/postings').get(async (req, res) => {
       const postingList = await postingFunctions.getAll();
       res.status(200).json(postingList);
     } else if (searchQuery && filter) {
-      const postingList = await postingFunctions.searchAndFilterPostings(searchQuery, filter);
+      const postingList = await postingFunctions.searchAndFilterPostings(
+        searchQuery,
+        filter
+      );
       res.status(200).json(postingList);
     } else if (searchQuery) {
-      const postingList = await postingFunctions.getPostingsBySearch(searchQuery);
+      const postingList = await postingFunctions.getPostingsBySearch(
+        searchQuery
+      );
       res.status(200).json(postingList);
     } else if (filter) {
       const postingList = await postingFunctions.filterPostings(filter);
@@ -121,7 +125,7 @@ router.route('/postings/:id').get(async (req, res) => {
   } catch (e) {
     res.status(400).json({ message: e });
   }
-  
+
   try {
     let postingInfo = null;
     let posting = await client.hGet('postings', postingId);
@@ -147,7 +151,7 @@ router.route('/postings/page/:pagenum').get(async (req, res) => {
   try {
     page = validInt(page);
   } catch (e) {
-    res.status(400).json({ message: e })
+    res.status(400).json({ message: e });
   }
 
   try {
@@ -265,7 +269,7 @@ router
       postingId = validStr(postingId);
     } catch (e) {
       res.status(400).json({ message: e });
-    };
+    }
     try {
       const updatedPosting = await postingFunctions.updatePosting(
         postingId,
@@ -408,8 +412,7 @@ router.route('/update-profile/:userId').put(async (req, res) => {
         updatedFields
       );
       res.status(200).json(updatedApplicant);
-    } 
-    else if (updatedFields.role === 'employer') {
+    } else if (updatedFields.role === 'employer') {
       const updatedEmployer = await employerFunctions.updateEmployer(
         userId,
         updatedFields
@@ -438,15 +441,14 @@ router.route('/update-photo/:userId').put(async (req, res) => {
   }
 
   try {
-    if (userType === "employer") {
+    if (userType === 'employer') {
       const updatedEmployer = await employerFunctions.updateCompanyLogo(
         userId,
         photoUrl
       );
       console.log(updatedEmployer);
       res.status(200).json(updatedEmployer);
-    } 
-    else {
+    } else {
       const updatedApplicant = await applicantFunctions.updateApplicantPhoto(
         userId,
         photoUrl
@@ -491,11 +493,11 @@ router.route('/update-resume/:userId').put(async (req, res) => {
 
 //gets photo from backend folder
 router.route('/photo/:userId').get(async (req, res) => {
-  console.log("called get image")
+  console.log('called get image');
   try {
     const userId = req.params.userId;
     const fileName = `${userId}_revised.jpg`;
-    const filePath = path.join(__dirname, fileName);
+    const filePath = path.join(__dirname, `/temp/${fileName}`);
 
     // Check if the file exists
     console.log(filePath);
@@ -508,24 +510,31 @@ router.route('/photo/:userId').get(async (req, res) => {
     console.log(e);
     return res.status(500).json({ message: e });
   }
-  console.log("WE OUT DIS ROUTE")
+  console.log('WE OUT DIS ROUTE');
 });
 
 //deletes photo from backend folder
 router.route('/photo/:userId').delete(async (req, res) => {
   try {
     const userId = req.params.userId;
-    const fileName = `${userId}_revised.jpg`;
-    const filePath = path.join(__dirname, fileName);
+    const originalFileName = `${userId}.jpg`;
+    const revisedFileName = `${userId}_revised.jpg`;
+    const originalFilePath = path.join(__dirname, `/temp/${originalFileName}`);
+    const revisedFilePath = path.join(__dirname, `/temp/${revisedFileName}`);
 
     // Check if the file exists
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(originalFilePath)) {
       // Delete the file
-      fs.unlinkSync(filePath);
-      res.status(200).json({ message: 'Image deleted successfully' });
+      fs.unlinkSync(originalFilePath);
     } else {
       res.status(404).json({ message: 'Image not found' });
     }
+    if (fs.existsSync(revisedFilePath)) {
+      fs.unlinkSync(revisedFilePath);
+    } else {
+      res.status(404).json({ message: 'Image not found' });
+    }
+    res.status(200).json({ message: 'Images deleted successfully' });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: 'Internal Server Error' });

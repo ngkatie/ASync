@@ -55,7 +55,7 @@ const PostingDetailsModal = (props) => {
           }
         }
         const currentApplicant = await axios.get(
-          `http://localhost:3000/api/applicants/${currentUserState.userId}`
+          `http://3.23.52.34:3000/api/applicants/${currentUserState.userId}`
         );
         for (const application of currentApplicant.data.applied) {
           if (
@@ -76,7 +76,7 @@ const PostingDetailsModal = (props) => {
         const applicantList = [];
         for (const applicantId of currentSelectedPosting.applicants) {
           const applicant = await axios.get(
-            `http://localhost:3000/api/applicants/${applicantId}`
+            `http://3.23.52.34:3000/api/applicants/${applicantId}`
           );
           applicantList.push(applicant.data);
         }
@@ -90,7 +90,7 @@ const PostingDetailsModal = (props) => {
   const handleDeletePosting = async () => {
     try {
       let deletedPosting = await axios.delete(
-        `http://localhost:3000/api/postings/${currentSelectedPosting._id}`
+        `http://3.23.52.34:3000/api/postings/${currentSelectedPosting._id}`
       );
       setPostings((prevPostings) =>
         prevPostings.filter(
@@ -110,7 +110,7 @@ const PostingDetailsModal = (props) => {
         applicantStatus: 'In Progress',
       };
       const applicantWithAppliedPosting = await axios.post(
-        `http://localhost:3000/api/postings/apply/${currentSelectedPosting._id}`,
+        `http://3.23.52.34:3000/api/postings/apply/${currentSelectedPosting._id}`,
         requestBody
       );
       setIsApplied(true);
@@ -136,7 +136,7 @@ const PostingDetailsModal = (props) => {
       };
       console.log(currentApplicant);
       const applicantWithUpdatedStatus = await axios.patch(
-        `http://localhost:3000/api/applicants/${currentApplicant._id}/update-status`,
+        `http://3.23.52.34:3000/api/applicants/${currentApplicant._id}/update-status`,
         requestBody
       );
       console.log(applicantWithUpdatedStatus.data);
@@ -154,7 +154,7 @@ const PostingDetailsModal = (props) => {
     // console.log(editedPosting);
     try {
       const updatedPosting = await axios.patch(
-        `http://localhost:3000/api/postings/${currentSelectedPosting._id}`,
+        `http://3.23.52.34:3000/api/postings/${currentSelectedPosting._id}`,
         editedPosting
       );
       setCurrentSelectedPosting(updatedPosting.data);
